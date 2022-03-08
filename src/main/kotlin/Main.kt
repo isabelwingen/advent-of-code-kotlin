@@ -5,5 +5,8 @@ fun main(args: Array<String>) {
     // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
     println("Program arguments: ${args.joinToString()}")
 
-    println(Day12Part2().execute())
+    val a = 186430471117411L
+    val b = 670237748696851L
+    println(extented_euclid(a, b))
+    println(executeDay13Part2())
 }
