@@ -73,16 +73,11 @@ fun executeDay16Part2(): Long {
         .map { input.myTicket[it] }
         .map { it.toLong() }
         .reduce {a, b -> a * b}
-
-
-
-
 }
 
 fun valueIsValidForField(field: Field, values: List<Int>): Boolean {
     return values.all { v ->  field.ranges.any { it.contains(v) }}
 }
-
 
 private fun cleanInput(input: Input): Input {
     val ranges = input.fields.flatMap { it.ranges }
