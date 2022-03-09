@@ -5,5 +5,5 @@ fun main(args: Array<String>) {
     // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
     println("Program arguments: ${args.joinToString()}")
 
-    println(executeDay15Part1(listOf(1,0,16,5,17,4)))
+    println(executeDay16Part2())
 }
