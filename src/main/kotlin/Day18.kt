@@ -1,113 +1,53 @@
-private fun parseInput(): List<List<Pair<Int, Any>>> {
+private fun parseInput(): List<String> {
     return getResourceAsList("day18.txt")
         .filter { it.isNotBlank() }
-        .map { expressionToColl(it) }
-        .map { parse(it) }
+        .map { it.replace(" ", "")}
 }
 
-private fun expressionToColl(expression: String): List<String> {
-    return expression
-        .replace("(", " ( ")
-        .replace(")", " ) ")
-        .split(" ")
-        .filter { it.isNotBlank() }
-}
-
-enum class Op {
-    ADD, MUL
-}
-
-private fun parse(expression: List<String>): List<Pair<Int, Any>> {
-    val iter = expression.iterator()
-    val res = mutableListOf<Pair<Int, Any>>()
-    var depth = 0
-    while (iter.hasNext()) {
-        when (val x = iter.next()) {
-            "(" -> depth++
-            ")" -> depth--
-            "+" -> res.add(depth to Op.ADD)
-            "*" -> res.add(depth to Op.MUL)
-            else -> res.add(depth to x.toLong())
+private fun solvePart1(equation: CharIterator): Long {
+    val numbers = mutableListOf<Long>()
+    var op = '+'
+    while (equation.hasNext()) {
+        when (val next = equation.nextChar()) {
+            '(' -> numbers += solvePart1(equation)
+            ')' -> break
+            in setOf('+', '*') -> op = next
+            else -> numbers += next.asLong()
+        }
+        if (numbers.size == 2) {
+            val a = numbers.removeLast()
+            val b = numbers.removeLast()
+            numbers += if (op == '+') a + b else a * b
         }
     }
-    return res.toList()
+    return numbers.first()
 }
 
-private fun solve(expression: List<Pair<Int, Any>>): Long {
-    if (expression.map { it.first }.distinct().size == 1) {
-        var res = 0L
-        val iter = expression.map { it.second }.iterator()
-        if (iter.hasNext()) {
-            res += iter.next().toString().toLong()
-        }
-        while (iter.hasNext()) {
-            val x = iter.next();
-            if (x is Op) {
-                if (x == Op.ADD) {
-                    res += iter.next().toString().toLong()
-                } else {
-                    res *= iter.next().toString().toLong()
-                }
+private fun solvePart2(equation: CharIterator): Long {
+    val multiplyThese = mutableListOf<Long>()
+    var added = 0L
+    while (equation.hasNext()) {
+        when (val next = equation.nextChar()) {
+            '(' -> added += solvePart2(equation)
+            ')' -> break
+            '*' -> {
+                multiplyThese += added
+                added = 0L
             }
+            in setOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9') -> added += next.asLong()
         }
-        return res
-    } else {
-        val highestDepth = expression.maxOfOrNull { it.first }
-        val x = splitAt(expression) { it.first }
-        return solve(x.map { if(it.first().first == highestDepth) listOf((highestDepth - 1) to solve(it)) else it }.flatten())
     }
+    return (multiplyThese + added).reduceRight { a, b -> a * b }
 }
 
 fun executeDay18Part1(): Long {
-    return parseInput().sumOf { solve(it) }
+    return parseInput()
+        .map { it.toCharArray().iterator() }
+        .sumOf { solvePart1(it) }
 }
 
-private fun solve2(expression: List<Pair<Int, Any>>): Long {
-    if (expression.map { it.first }.distinct().size == 1) {
-        var res = 0L
-        val iter = expression.map { it.second }.iterator()
-        if (iter.hasNext()) {
-            res += iter.next().toString().toLong()
-        }
-        while (iter.hasNext()) {
-            val x = iter.next();
-            if (x is Op) {
-                if (x == Op.ADD) {
-                    res += iter.next().toString().toLong()
-                } else {
-                    res *= iter.next().toString().toLong()
-                }
-            }
-        }
-        return res
-    } else {
-        val highestDepth = expression.maxOfOrNull { it.first }
-        val x = splitAt(expression) { it.first }
-        return solve(x.map { if(it.first().first == highestDepth) listOf((highestDepth - 1) to solve(it)) else it }.flatten())
-    }
-}
-
-private fun prepareExpression(expression: List<Pair<Int, Any>>) {
-    if (expression.map { it.first }.distinct().size == 1) {
-        var res = 0L
-        var store = 0L
-        var iter = expression.map { it.second }.iterator()
-        if (iter.hasNext()) {
-            var x = iter.next().toString().toLong()
-            res = x
-            store = x
-        }
-        while (iter.hasNext()) {
-
-        }
-    } else {
-
-    }
-}
-
-fun executeDay18Part2(): List<Pair<Int, Any>> {
-    return listOf("(1 + 2) * (3 + 4) * 5 + 6")
-        .map { expressionToColl(it) }
-        .map { parse(it) }
-        .first()
+fun executeDay18Part2(): Long {
+    return parseInput()
+        .map { it.toCharArray().iterator() }
+        .sumOf { solvePart2(it) }
 }
