@@ -1,5 +1,5 @@
 fun main(args: Array<String>) {
     println("Hello World!")
 
-    println(executeDay18Part2())
+    println(executeDay19Part2())
 }

@@ -7,7 +7,7 @@ fun Char.isDigit(): Boolean =
 fun Iterable<Long>.product(): Long =
     this.reduce { a, b -> a * b }
 
-fun <T,S> Collection<T>.splitAt(splitFun: (x: T) -> S): List<List<T>> {
+fun <T,S> Collection<T>.splitBy(splitFun: (x: T) -> S): List<List<T>> {
     val res = mutableListOf<MutableList<T>>()
     val list = this.toList()
 
