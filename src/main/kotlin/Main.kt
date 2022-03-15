@@ -1,7 +1,7 @@
 fun main(args: Array<String>) {
     println("Hello World!")
 
-    println(executeDay21Part2())
+    println(executeDay22Part2("day22.txt"))
 
 }
 
