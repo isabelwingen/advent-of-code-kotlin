@@ -1,5 +1,6 @@
 package aoc2020
 
+import algorithm.GameOfLife
 import getResourceAsList
 import java.util.Comparator
 import java.util.SortedMap
@@ -119,7 +120,7 @@ fun executeDay24Part1(input: Collection<String> = getResourceAsList("day24.txt")
         .count()
 }
 
-fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")) {
+fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")): Int {
     val initialState =  input
         .asSequence()
         .filter { it.isNotBlank() }
@@ -133,6 +134,19 @@ fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")
         .filter { it.value % 2 == 1 }
         .map { it.key }
         .toSet()
+    val gameOfLife = GameOfLife(
+        initialState,
+        { getNeighbours(it) },
+        { neighbours: Set<HexTile>, alive: Set<HexTile> ->
+            val aliveNeighbours = neighbours.count { alive.contains(it) }
+            aliveNeighbours == 2
+        },
+        { neighbours: Set<HexTile>, alive: Set<HexTile> ->
+            val aliveNeighbours = neighbours.count { alive.contains(it) }
+            aliveNeighbours == 0 || aliveNeighbours > 2
+        })
+    repeat(100) { gameOfLife.step() }
+    return gameOfLife.getLivingCells().count()
 }
 
 
@@ -142,7 +156,6 @@ fun getNeighbours(tile: HexTile): Set<HexTile> {
     return listOf("w", "nw", "ne", "e", "se", "sw")
         .map { direction -> tile.path.toMutableMap().increase(direction).toSortedMap(Comparator.comparing {it}) }
         .map { HexTile(it) }
-        .map { it.transformPath() }
         .map { it.transformPath() }
         .toSet()
 }
