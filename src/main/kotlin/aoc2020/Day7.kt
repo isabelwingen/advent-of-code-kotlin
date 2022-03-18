@@ -1,3 +1,7 @@
+package aoc2020
+
+import getResourceAsList
+
 class Edge(val from: String, val to: String, val value: Int) {
     @Override
     override fun toString(): String {
@@ -5,7 +9,7 @@ class Edge(val from: String, val to: String, val value: Int) {
     }
 }
 
-fun parseLine(line: String): List<Edge> {
+private fun parseLine(line: String): List<Edge> {
     val x = line.split("bags contain")
     val source = x[0].trim()
     if (line.contains("no other bags")) {

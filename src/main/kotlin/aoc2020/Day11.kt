@@ -1,3 +1,6 @@
+package aoc2020
+
+import getResourceAsList
 
 enum class Seat(val seat: String) {
     EMPTY("L"),

@@ -1,3 +1,7 @@
+package aoc2020
+
+import getResourceAsList
+
 private fun parseInput(): List<List<Char>> {
     return getResourceAsList("day17.txt")
         .filter { it.isNotBlank() }

@@ -1,3 +1,7 @@
+package aoc2020
+
+import getResourceAsList
+
 class Policy (val range: IntRange, val char: Char, val password: String) {
 
 }

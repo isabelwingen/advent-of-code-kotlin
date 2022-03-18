@@ -1,3 +1,7 @@
+package aoc2020
+
+import getResourceAsList
+import splitBy
 import java.util.LinkedList
 import java.util.Queue
 
