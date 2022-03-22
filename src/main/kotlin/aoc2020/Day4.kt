@@ -2,21 +2,21 @@ package aoc2020
 
 import getResourceAsList
 
-fun validPassportPart1(passport: String): Int {
+private fun validPassportPart1(passport: String): Int {
     val x = passport
         .split(" ")
         .filter {it.isNotBlank()}
         .map { it.split(":")[0] }
-    if (x.count() == 8) {
-        return 1
+    return if (x.count() == 8) {
+        1
     } else if (x.count() == 7 && !x.contains("cid")) {
-        return 1
+        1
     } else {
-        return 0
+        0
     }
 }
 
-fun validPassportPart2(passport: String): Int {
+private fun validPassportPart2(passport: String): Int {
     if (validPassportPart1(passport) == 0) {
         return 0
     }
@@ -85,7 +85,7 @@ fun validPassportPart2(passport: String): Int {
     return 1
 }
 
-fun readBatchFile(path: String, validFun: (String) -> Int): Int {
+private fun readBatchFile(path: String, validFun: (String) -> Int): Int {
     val lines = getResourceAsList(path)
     var currentData = ""
     var validPassports = 0
@@ -101,10 +101,10 @@ fun readBatchFile(path: String, validFun: (String) -> Int): Int {
     return validPassports
 }
 
-fun executeDay4Part1(): Int {
-    return readBatchFile("day4.txt") { a -> validPassportPart1(a) }
+fun executeDay4Part1(name: String = "day4.txt"): Int {
+    return readBatchFile(name) { validPassportPart1(it) }
 }
 
-fun executeDay4Part2(): Int {
-    return readBatchFile("day4.txt") { a -> validPassportPart2(a) }
+fun executeDay4Part2(name: String = "day4.txt"): Int {
+    return readBatchFile(name) { validPassportPart2(it) }
 }
