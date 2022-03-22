@@ -1,3 +1,5 @@
+package aoc2020
+
 fun executeDay15Part1(input: List<Int>): Int {
     val index = mutableMapOf<Int, Int>()
     for (i in 0 until input.size - 1) {

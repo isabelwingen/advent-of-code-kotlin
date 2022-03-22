@@ -4,3 +4,4 @@ fun getResourceAsText(path: String): String? =
 fun getResourceAsList(path: String): Collection<String> =
     getResourceAsText(path)!!
         .split("\n")
+

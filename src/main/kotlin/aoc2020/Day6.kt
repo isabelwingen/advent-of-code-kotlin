@@ -1,3 +1,7 @@
+package aoc2020
+
+import getResourceAsList
+
 private fun parseInput(path: String): List<List<String>> {
     val coll = mutableListOf<List<String>>()
     var currentList = mutableListOf<String>()

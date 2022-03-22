@@ -1,3 +1,6 @@
+package aoc2020
+
+import getResourceAsList
 import kotlin.math.pow
 
 private fun <T> parseInput(path: String, transform: (Pair<String, String>) -> T): List<T> {

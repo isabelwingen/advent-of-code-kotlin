@@ -1,3 +1,7 @@
+package aoc2020
+
+import getResourceAsList
+
 fun parseSeat(seat: String): Int {
     val row = seat
         .substring(0, 7)

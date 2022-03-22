@@ -1,5 +1,9 @@
-private fun parseInput(path: String): List<Long> {
-    return getResourceAsList(path)
+package aoc2020
+
+import getResourceAsList
+
+private fun parseInput(name: String = "day9.txt"): List<Long> {
+    return getResourceAsList(name)
         .filter { it.isNotBlank() }
         .map { it.toLong() }
 }
@@ -16,8 +20,8 @@ fun isSumOfPair(list: List<Long>, index: Int): Boolean {
     return false
 }
 
-fun executeDay9Part1(): Long {
-    val numbers = parseInput("day9.txt")
+fun executeDay9Part1(name: String = "day9.txt"): Long {
+    val numbers = parseInput(name)
     for (i in 25 until numbers.size) {
         if (!isSumOfPair(numbers, i)) {
             return numbers[i]
@@ -35,8 +39,8 @@ private fun findWeaknessIndex(numbers: List<Long>): Long {
     return -1
 }
 
-fun executeDay9Part2(): Long {
-    val numbers = parseInput("day9.txt")
+fun executeDay9Part2(name: String = "day9.txt"): Long {
+    val numbers = parseInput(name)
     val goal = findWeaknessIndex(numbers)
     for (i in numbers.indices) {
         var currentSum = numbers[i]

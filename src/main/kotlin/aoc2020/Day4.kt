@@ -1,3 +1,7 @@
+package aoc2020
+
+import getResourceAsList
+
 fun validPassportPart1(passport: String): Int {
     val x = passport
         .split(" ")

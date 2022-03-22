@@ -1,3 +1,7 @@
+package aoc2020
+
+import getResourceAsList
+import splitBy
 import java.util.ArrayDeque
 
 data class Tile(val id: Int, val lines: List<CharSequence>) {

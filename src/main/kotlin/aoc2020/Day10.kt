@@ -1,15 +1,17 @@
-import java.lang.Integer.min
-import kotlin.math.pow
+package aoc2020
 
-private fun parseInput(path: String): List<Int> {
+import kotlin.math.pow
+import getResourceAsList
+
+private fun parseInput(path: String = "day10.txt"): List<Int> {
     return getResourceAsList(path)
         .filter { it.isNotBlank() }
         .map { it.toInt() }
         .sorted()
 }
 
-fun executeDay10Part1(): Int {
-    val list = parseInput("day10.txt")
+fun executeDay10Part1(name: String = "day10.txt"): Int {
+    val list = parseInput(name)
     var ones = 1
     var threes = 1
     for (i in 0 until list.size -1) {
@@ -38,8 +40,8 @@ private fun addMinAndMax(l: List<Int>): List<Int> {
     return coll.sorted()
 }
 
-fun executeDay10Part2(): Long {
-    val list = addMinAndMax(parseInput("day10.txt"))
+fun executeDay10Part2(name: String = "day10.txt"): Long {
+    val list = addMinAndMax(parseInput(name))
     val pairs = list.windowed(size = 2)
         .map { it[0] to it[1] }
 

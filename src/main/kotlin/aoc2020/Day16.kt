@@ -1,10 +1,14 @@
-class Field(val title: String, val ranges: List<IntRange>) {
+package aoc2020
+
+import getResourceAsList
+
+private class Field(val title: String, val ranges: List<IntRange>) {
     override fun toString(): String {
         return "$title: $ranges"
     }
 }
 
-class Input(var fields: List<Field>, var myTicket: List<Int>, var nearbyTickets: List<List<Int>>) {
+private class Input(var fields: List<Field>, var myTicket: List<Int>, var nearbyTickets: List<List<Int>>) {
     override fun toString(): String {
         return "fields: $fields, myTicket: $myTicket, nearbyTickets: $nearbyTickets"
     }
@@ -75,7 +79,7 @@ fun executeDay16Part2(): Long {
         .reduce {a, b -> a * b}
 }
 
-fun valueIsValidForField(field: Field, values: List<Int>): Boolean {
+private fun valueIsValidForField(field: Field, values: List<Int>): Boolean {
     return values.all { v ->  field.ranges.any { it.contains(v) }}
 }
 

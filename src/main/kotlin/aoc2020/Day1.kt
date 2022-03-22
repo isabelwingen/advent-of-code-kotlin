@@ -1,8 +1,16 @@
-fun executeDay1Part1(): Int {
-    val coll = getResourceAsList("day1.txt")
+package aoc2020
+
+import getResourceAsList
+
+private fun parseInput(name: String = "day1.txt"): List<Int> {
+    return getResourceAsList(name)
         .filter { x -> x.isNotBlank() }
         .map { x -> Integer.parseInt(x) }
         .sortedWith(compareBy {it})
+}
+
+fun executeDay1Part1(name: String = "day1.txt"): Int {
+    val coll = parseInput(name)
 
     for (i in coll.indices) {
         for (j in coll.size-1 downTo i+1) {
@@ -18,11 +26,8 @@ fun executeDay1Part1(): Int {
     return -1
 }
 
-fun executeDay1Part2(): Int {
-    val coll = getResourceAsList("day1.txt")
-        .filter { x -> x.isNotBlank() }
-        .map { x -> Integer.parseInt(x) }
-        .sortedWith(compareBy {it})
+fun executeDay1Part2(name: String = "day1.txt"): Int {
+    val coll = parseInput(name)
 
     for (i in coll.indices) {
         for (j in coll.size-1 downTo i+1) {

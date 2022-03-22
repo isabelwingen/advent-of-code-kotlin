@@ -1,3 +1,8 @@
+package aoc2020
+
+import getResourceAsList
+import splitBy
+
 private fun parseInput(): Data {
     val coll = getResourceAsList("day19.txt")
         .splitBy { it.isBlank() }

@@ -1,4 +1,6 @@
-const val INPUT: String = "394618527"
+package aoc2020
+
+private const val INPUT: String = "394618527"
 
 private fun parseInput(): List<Int> {
     return INPUT

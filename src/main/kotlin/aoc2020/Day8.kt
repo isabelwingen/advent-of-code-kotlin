@@ -1,3 +1,7 @@
+package aoc2020
+
+import getResourceAsList
+
 enum class Operation {
     NOP,
     ACC,
