@@ -1,55 +1,35 @@
 package aoc2020
 
 import getResourceAsList
+import splitBy
 
-private fun parseInput(path: String): List<List<String>> {
-    val coll = mutableListOf<List<String>>()
-    var currentList = mutableListOf<String>()
-    for (line in getResourceAsList(path)) {
-        if (line.isBlank()) {
-            coll.add(currentList.toList())
-            currentList = mutableListOf()
-        } else {
-            currentList.add(line)
-        }
-    }
-    return coll.toList()
+private fun parseInput(path: String, connect: (a: List<String>) -> Set<Char>): List<Set<Char>> {
+   return getResourceAsList(path)
+       .splitBy { it.isBlank() }
+       .filter { line -> line.all { it.isNotBlank() } }
+       .map { group -> connect(group) }
 }
 
-fun executeDay6Part1(): Int {
-    val coll = mutableListOf<Set<Char>>()
-    var currentList = mutableSetOf<Char>()
-    for (line in getResourceAsList("day6.txt")) {
-        if (line.isBlank()) {
-            coll.add(currentList.toSet())
-            currentList = mutableSetOf()
-        } else {
-            line.forEach { currentList.add(it) }
-        }
-    }
-    return coll
-        .map { it.count() }
-        .reduceRight { a, b -> a + b }
-}
-
-fun intersectGroup(lines: List<String>): Set<Char> {
+private fun intersectGroup(lines: List<String>): Set<Char> {
     return lines
         .map { it.toSet() }
         .reduceRight { a, b -> a.intersect(b)}
 }
 
+private  fun joinGroup(lines: List<String>): Set<Char> {
+    return lines
+        .map { it.toSet() }
+        .reduceRight { a, b -> a.union(b)}
+}
+
+fun executeDay6Part1(name: String = "day6.txt"): Int {
+    return parseInput(name) { joinGroup(it) }
+        .map { it.count() }
+        .reduceRight { a, b -> a + b }
+}
+
 fun executeDay6Part2(): Int {
-    val coll = mutableListOf<Set<Char>>()
-    var currentList = mutableListOf<String>()
-    for (line in getResourceAsList("day6.txt")) {
-        if (line.isBlank()) {
-            coll.add(intersectGroup(currentList.toList()))
-            currentList = mutableListOf()
-        } else {
-            currentList.add(line)
-        }
-    }
-    return coll
+    return parseInput("day6.txt") { intersectGroup(it) }
         .map { it.count() }
         .reduceRight { a, b -> a + b }
 }
