@@ -2,13 +2,13 @@ package aoc2020
 
 import getResourceAsList
 
-enum class Operation {
+private enum class Operation {
     NOP,
     ACC,
     JMP
 }
 
-fun toOperation(string: String): Operation {
+private fun toOperation(string: String): Operation {
     when (string) {
         "nop" -> return Operation.NOP
         "acc" -> return Operation.ACC
@@ -17,7 +17,7 @@ fun toOperation(string: String): Operation {
     return Operation.NOP
 }
 
-class Instruction(val operator: Operation, val argument: Int) {
+private class Instruction(val operator: Operation, val argument: Int) {
     override fun toString(): String {
         return "$operator $argument"
     }
@@ -30,7 +30,7 @@ private fun parseInput(path: String): List<Instruction> {
         .map { Instruction(toOperation(it[0]), Integer.parseInt(it[1])) }
 }
 
-private fun executeProgramm(program: List<Instruction>): Pair<Int, Boolean> {
+private fun executeProgram(program: List<Instruction>): Pair<Int, Boolean> {
     var acc = 0
     val visited = mutableSetOf<Int>()
     var currentInstruction = 0
@@ -54,7 +54,7 @@ private fun executeProgramm(program: List<Instruction>): Pair<Int, Boolean> {
 
 fun executeDay8Part1(): Int {
     val instructions = parseInput("example/day8_2.txt")
-    return executeProgramm(instructions).first
+    return executeProgram(instructions).first
 }
 
 fun executeDay8Part2(): Int {
@@ -79,7 +79,7 @@ fun executeDay8Part2(): Int {
     }
     return listOfPrograms
         .toList()
-        .map { executeProgramm(it) }
+        .map { executeProgram(it) }
         .first { it.second }
         .first
 }

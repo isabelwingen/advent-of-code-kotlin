@@ -2,7 +2,7 @@ package aoc2020
 
 import getResourceAsList
 
-enum class Seat(val seat: String) {
+private enum class Seat(val seat: String) {
     EMPTY("L"),
     FLOOR("."),
     OCCUPIED("#");
@@ -70,7 +70,7 @@ private fun directionVector(row: Int, col: Int, vector: Pair<Int, Int>): List<Pa
     return IntRange(1, MAX_STEPS).map { row + it * vector.first to col + it * vector.second }
 }
 
-fun viewNeighbours(row: Int, col: Int, seats: List<List<Seat>>): List<Seat> {
+private fun viewNeighbours(row: Int, col: Int, seats: List<List<Seat>>): List<Seat> {
     val directionVectorFun =  { a: Pair<Int, Int> -> directionVector(row, col, a) }
     val neighbourFun = { x: List<Pair<Int, Int>> -> neighbourInDirection(x, seats)}
     return listOfNotNull(
@@ -85,7 +85,7 @@ fun viewNeighbours(row: Int, col: Int, seats: List<List<Seat>>): List<Seat> {
    )
 }
 
-fun executeStep(seats: List<List<Seat>>, limit: Int, neighbourFun: (Int, Int, List<List<Seat>>) -> List<Seat>): List<List<Seat>> {
+private fun executeStep(seats: List<List<Seat>>, limit: Int, neighbourFun: (Int, Int, List<List<Seat>>) -> List<Seat>): List<List<Seat>> {
     val modSeats = seats
         .map { it.toMutableList() }
         .toMutableList()
@@ -100,7 +100,7 @@ fun executeStep(seats: List<List<Seat>>, limit: Int, neighbourFun: (Int, Int, Li
         .toList()
 }
 
-fun executeDay11Part1(path: String): Int {
+fun executeDay11Part1(path: String = "day11.txt"): Int {
     var seats = parseInput(path)
     var before = listOf<List<Seat>>()
     while (seats != before) {
@@ -112,13 +112,13 @@ fun executeDay11Part1(path: String): Int {
         .reduceRight { a, b -> a + b}
 }
 
-fun countOccupiedSeats(seats: List<List<Seat>>): Int {
+private fun countOccupiedSeats(seats: List<List<Seat>>): Int {
     return seats
         .map { it.count { x -> x == Seat.OCCUPIED }}
         .reduceRight { a, b -> a + b}
 }
 
-fun executeDay11Part2(path: String): Int {
+fun executeDay11Part2(path: String = "day11.txt"): Int {
     var seats = parseInput(path)
     var before = listOf<List<Seat>>()
     while (seats != before) {

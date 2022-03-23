@@ -1,3 +1,5 @@
+import kotlin.math.round
+
 fun Char.asLong(): Long =
     this.toString().toLong()
 
@@ -25,4 +27,10 @@ fun <T,S> Collection<T>.splitBy(splitFun: (x: T) -> S): List<List<T>> {
         lastVal = nextVal
     }
     return res.map { it.toList() }
+}
+
+fun Double.round(decimals: Int): Double {
+    var multiplier = 1.0
+    repeat(decimals) { multiplier *= 10 }
+    return round(this * multiplier) / multiplier
 }

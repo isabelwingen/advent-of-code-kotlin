@@ -43,8 +43,7 @@ class Day12Part1 {
     }
 
     private fun turnLeft(degrees: Int) {
-        val x = (degrees / 90)
-        when (x) {
+        when ((degrees / 90)) {
             1 -> {
                 rotate90DegreeAntiClockwise()
             }
@@ -86,9 +85,9 @@ class Day12Part1 {
         }
     }
 
-    fun execute(): Pair<Int, Int> {
-        parseInput("day12.txt").forEach { executeCommand(it) }
-        return x to y
+    fun execute(name: String): Int {
+        parseInput(name).forEach { executeCommand(it) }
+        return abs(x) + abs(y)
     }
 }
 
@@ -98,7 +97,7 @@ class Day12Part2 {
     private var shipX = 0
     private var shipY = 0
 
-    fun rotateClockwise(degree: Int) {
+    private fun rotateClockwise(degree: Int) {
         when (degree) {
             90 -> {
                 val h = waypointX
@@ -117,16 +116,16 @@ class Day12Part2 {
         }
     }
 
-    fun rotateCounterClockwise(degree: Int) {
+    private fun rotateCounterClockwise(degree: Int) {
        rotateClockwise(360 - degree)
     }
 
-    fun moveForward(times: Int) {
+    private fun moveForward(times: Int) {
         shipX += times * waypointX
         shipY += times * waypointY
     }
 
-    fun executeCommand(command: Pair<String, Int>) {
+    private fun executeCommand(command: Pair<String, Int>) {
         when (command.first) {
             "N" -> waypointY += command.second
             "S" -> waypointY -= command.second
@@ -138,14 +137,20 @@ class Day12Part2 {
         }
     }
 
-    fun execute(): Int {
-        parseInput("day12.txt").forEach {
+    fun execute(name: String): Int {
+        parseInput(name).forEach {
             run {
-                println("Ship: $shipX, $shipY, Waypoint: $waypointX, $waypointY")
                 executeCommand(it)
             }
         }
-        println("Ship: $shipX, $shipY, Waypoint: $waypointX, $waypointY")
         return abs(shipX) + abs(shipY)
     }
+}
+
+fun executeDay12Part1(name: String = "day12.txt"): Int {
+    return Day12Part1().execute(name)
+}
+
+fun executeDay12Part2(name: String = "day12.txt"): Int {
+    return Day12Part2().execute(name)
 }

@@ -50,7 +50,7 @@ private fun execute(times: Int, input: List<Int> = parseInput()): List<Int> {
     return cups.toList()
 }
 
-fun executeDay23Part1(): String {
+fun executeDay23Part1(): Int {
     val cups = execute(100)
     val res = mutableListOf<Int>()
     var current = 1
@@ -58,7 +58,7 @@ fun executeDay23Part1(): String {
         current = cups[current]
         res.add(current)
     }
-    return res.joinToString("")
+    return res.joinToString("").toInt()
 }
 
 fun executeDay23Part2(): Long {

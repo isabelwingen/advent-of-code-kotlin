@@ -2,7 +2,7 @@ package aoc2020
 
 import getResourceAsList
 
-class Edge(val from: String, val to: String, val value: Int) {
+private class Edge(val from: String, val to: String, val value: Int) {
     @Override
     override fun toString(): String {
         return "$from -> $to ($value)"
@@ -12,10 +12,10 @@ class Edge(val from: String, val to: String, val value: Int) {
 private fun parseLine(line: String): List<Edge> {
     val x = line.split("bags contain")
     val source = x[0].trim()
-    if (line.contains("no other bags")) {
-        return listOf()
+    return if (line.contains("no other bags")) {
+        listOf()
     } else {
-        return x[1]
+        x[1]
             .trim()
             .split(",")
             .map { it.trim() }
@@ -25,14 +25,18 @@ private fun parseLine(line: String): List<Edge> {
     }
 }
 
-fun executeDay7Part1(): Int {
-    val edges = getResourceAsList("day7.txt")
+private fun parseInput(name: String = "day7.txt"): List<Edge> {
+    return getResourceAsList(name)
         .filter { it.isNotBlank() }
         .map { parseLine(it) }
         .reduceRight { a, b -> a + b}
+}
+
+fun executeDay7Part1(name: String = "day7.txt"): Int {
+    val edges = parseInput(name)
     val res = mutableSetOf<String>()
     var queue = mutableSetOf("shiny gold")
-    while (!queue.isEmpty()) {
+    while (queue.isNotEmpty()) {
         res.addAll(queue)
         queue = edges
             .filter { queue.contains(it.to) }
@@ -43,7 +47,7 @@ fun executeDay7Part1(): Int {
 }
 
 
-fun getPath(edge: Edge, edges: List<Edge>): Int {
+private fun getPath(edge: Edge, edges: List<Edge>): Int {
     val nextEdges = edges
         .filter { it.from == edge.to }
     return if (nextEdges.isEmpty()) {
@@ -56,10 +60,7 @@ fun getPath(edge: Edge, edges: List<Edge>): Int {
     }
 }
 
-fun executeDay7Part2(): Int {
-    val edges = getResourceAsList("day7.txt")
-        .filter { it.isNotBlank() }
-        .map { parseLine(it) }
-        .reduceRight { a, b -> a + b}
+fun executeDay7Part2(name: String = "day7.txt"): Int {
+    val edges = parseInput(name)
     return getPath(Edge("nil", "shiny gold", 1), edges) - 1
 }

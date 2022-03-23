@@ -8,7 +8,7 @@ private fun parseInput(name: String = "day9.txt"): List<Long> {
         .map { it.toLong() }
 }
 
-fun isSumOfPair(list: List<Long>, index: Int): Boolean {
+private fun isSumOfPair(list: List<Long>, index: Int): Boolean {
     val idMin = index - 25
     for (i in idMin until index) {
         for (j in i + 1 until index) {
@@ -48,9 +48,7 @@ fun executeDay9Part2(name: String = "day9.txt"): Long {
         while (currentSum < goal) {
             currentSum += numbers[j]
             if (currentSum == goal) {
-                val min = numbers.subList(i, j + 1).minOrNull()
-                val max = numbers.subList(i, j + 1).maxOrNull()
-                return min!! + max!!
+                return numbers.subList(i, j + 1).minOrNull()!! + numbers.subList(i, j + 1).maxOrNull()!!
             }
             j += 1
         }
