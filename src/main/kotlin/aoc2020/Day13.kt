@@ -3,14 +3,14 @@ package aoc2020
 import getResourceAsList
 import kotlin.math.abs
 
-private fun parseInput(path: String): Pair<Int, List<Int>> {
+private fun parseInput11(path: String): Pair<Int, List<Int>> {
     val coll = getResourceAsList(path)
         .filter { it.isNotBlank() }
     return coll[0].toInt() to coll[1].split(",").filter { it != "x" }.map { it.toInt() }
 }
 
 fun executeDay13Part1(): Int {
-    val (a, busIDs) = parseInput("day13.txt")
+    val (a, busIDs) = parseInput11("day13.txt")
     return busIDs
         .map { it to ((a / it) + 1) * it - a }
         .sortedBy { it.second }

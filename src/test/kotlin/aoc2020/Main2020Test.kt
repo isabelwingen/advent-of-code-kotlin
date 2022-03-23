@@ -17,11 +17,7 @@ internal class Main2020Test {
 
     @Test
     fun measure2() {
-        val res = Main2020().executionTime()
-        val res2 = Main2020().executionTime()
-        for (k in res.keys) {
-            println("$k: ${res[k]}, ${res2[k]}")
-        }
+        Main2020().executionTime().forEach { println("${it.key}: ${it.value}") }
     }
 
     @ParameterizedTest(name = "execute {0} should yield {1}")
@@ -33,6 +29,14 @@ internal class Main2020Test {
         } else {
             assertEquals(expectedResult, Main2020().execute(key))
         }
+    }
+
+    @Test
+    fun testSingleExecution() {
+        val key = "24.2"
+        val actualResult = Main2020().execute(key)
+        val expectedResult = getData().filter { it.get().first().equals(key) }.map { it.get()[1] }.first()
+        assertEquals(expectedResult, actualResult)
     }
 
     companion object {

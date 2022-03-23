@@ -50,16 +50,6 @@ private fun MutableMap<String, Int>.replace(a: String, b: String, with: String):
     return this
 }
 
-private fun MutableMap<String, Int>.replace(path: List<String>, with: List<String>): MutableMap<String, Int> {
-    if (path.all { containsKey(it) }) {
-        val min = path.minOf { this[it]!! }
-        with.forEach { this.putIfAbsent(it, 0) }
-        with.forEach { this[it] = this[it]!! + min  }
-        path.forEach { this[it] = this[it]!! - min }
-    }
-    return this
-}
-
 private fun MutableMap<String, Int>.absorb( a: String, b: String): MutableMap<String, Int> {
     if (containsKey(a) && containsKey(b)) {
         val minSideways = minOf(this[a]!!, this[b]!!)
@@ -136,15 +126,16 @@ fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")
         .toSet()
     val gameOfLife = GameOfLife(
         initialState,
+        null,
         { getNeighbours(it) },
         { neighbours: Set<HexTile>, alive: Set<HexTile> ->
             val aliveNeighbours = neighbours.count { alive.contains(it) }
             aliveNeighbours == 2
-        },
-        { neighbours: Set<HexTile>, alive: Set<HexTile> ->
-            val aliveNeighbours = neighbours.count { alive.contains(it) }
-            aliveNeighbours == 0 || aliveNeighbours > 2
-        })
+        }
+    ) { neighbours: Set<HexTile>, alive: Set<HexTile> ->
+        val aliveNeighbours = neighbours.count { alive.contains(it) }
+        aliveNeighbours == 0 || aliveNeighbours > 2
+    }
     repeat(100) { gameOfLife.step() }
     return gameOfLife.getLivingCells().count()
 }
@@ -152,7 +143,7 @@ fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")
 
 
 
-fun getNeighbours(tile: HexTile): Set<HexTile> {
+private fun getNeighbours(tile: HexTile): Set<HexTile> {
     return listOf("w", "nw", "ne", "e", "se", "sw")
         .map { direction -> tile.path.toMutableMap().increase(direction).toSortedMap(Comparator.comparing {it}) }
         .map { HexTile(it) }

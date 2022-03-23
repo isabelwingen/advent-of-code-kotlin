@@ -23,7 +23,7 @@ private class Instruction(val operator: Operation, val argument: Int) {
     }
 }
 
-private fun parseInput(path: String): List<Instruction> {
+private fun parseInput11(path: String): List<Instruction> {
     return getResourceAsList(path)
         .filter { it.isNotBlank() }
         .map { it.split(" ") }
@@ -53,7 +53,7 @@ private fun executeProgram(program: List<Instruction>): Pair<Int, Boolean> {
 }
 
 fun executeDay8Part1(): Int {
-    val instructions = parseInput("example/day8_2.txt")
+    val instructions = parseInput11("example/day8_2.txt")
     return executeProgram(instructions).first
 }
 
@@ -67,7 +67,7 @@ fun executeDay8Part2(): Int {
         }
     }
 
-    val instructions = parseInput("day8.txt")
+    val instructions = parseInput11("day8.txt")
     val positionsToChange = instructions.mapIndexed { index, op -> Pair(index, op)}
         .filter { it.second.operator == Operation.NOP || it.second.operator == Operation.JMP }
         .map { it.first }

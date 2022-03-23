@@ -3,7 +3,7 @@ package aoc2020
 import asLong
 import getResourceAsList
 
-private fun parseInput(): List<String> {
+private fun parseInput11(): List<String> {
     return getResourceAsList("day18.txt")
         .filter { it.isNotBlank() }
         .map { it.replace(" ", "")}
@@ -46,13 +46,13 @@ private fun solvePart2(equation: CharIterator): Long {
 }
 
 fun executeDay18Part1(): Long {
-    return parseInput()
+    return parseInput11()
         .map { it.toCharArray().iterator() }
         .sumOf { solvePart1(it) }
 }
 
 fun executeDay18Part2(): Long {
-    return parseInput()
+    return parseInput11()
         .map { it.toCharArray().iterator() }
         .sumOf { solvePart2(it) }
 }

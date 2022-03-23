@@ -3,7 +3,7 @@ package aoc2020
 import getResourceAsList
 import kotlin.math.abs
 
-private fun parseInput(path: String): List<Pair<String, Int>> {
+private fun parseInput11(path: String): List<Pair<String, Int>> {
     return getResourceAsList(path)
         .filter { it.isNotBlank() }
         .map { it[0].toString() to it.substring(1, it.length).toInt() }
@@ -86,7 +86,7 @@ class Day12Part1 {
     }
 
     fun execute(name: String): Int {
-        parseInput(name).forEach { executeCommand(it) }
+        parseInput11(name).forEach { executeCommand(it) }
         return abs(x) + abs(y)
     }
 }
@@ -138,7 +138,7 @@ class Day12Part2 {
     }
 
     fun execute(name: String): Int {
-        parseInput(name).forEach {
+        parseInput11(name).forEach {
             run {
                 executeCommand(it)
             }

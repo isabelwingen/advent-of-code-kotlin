@@ -3,7 +3,7 @@ package aoc2020
 import getResourceAsList
 import splitBy
 
-private fun parseInput(): Data {
+private fun parseInput11(): Data {
     val coll = getResourceAsList("day19.txt")
         .splitBy { it.isBlank() }
         .filter { it.all { x -> x.isNotBlank() } }
@@ -56,7 +56,7 @@ private fun checkWord(word: String, allRules: Map<Int, Rule>, checkedRules: List
 }
 
 fun executeDay19Part1(): Int {
-    var data = parseInput()
+    var data = parseInput11()
     return data.words
         .count { checkWord(it, data.rules.associateBy { r -> r.id }, listOf(0)) }
 }
@@ -107,7 +107,7 @@ private fun matchWords(wordsOf42: List<String>, wordsOf31: List<String>, words: 
 }
 
 fun executeDay19Part2(): Int {
-    val data = parseInput()
+    val data = parseInput11()
     val wordsOf42 = calculateWords(
         data.rules.associateBy { it.id },
         listOf(42))

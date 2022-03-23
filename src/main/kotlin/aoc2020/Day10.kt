@@ -3,7 +3,7 @@ package aoc2020
 import kotlin.math.pow
 import getResourceAsList
 
-private fun parseInput(path: String = "day10.txt"): List<Int> {
+private fun parseInput11(path: String = "day10.txt"): List<Int> {
     return getResourceAsList(path)
         .filter { it.isNotBlank() }
         .map { it.toInt() }
@@ -11,7 +11,7 @@ private fun parseInput(path: String = "day10.txt"): List<Int> {
 }
 
 fun executeDay10Part1(name: String = "day10.txt"): Int {
-    val list = parseInput(name)
+    val list = parseInput11(name)
     var ones = 1
     var threes = 1
     for (i in 0 until list.size -1) {
@@ -41,7 +41,7 @@ private fun addMinAndMax(l: List<Int>): List<Int> {
 }
 
 fun executeDay10Part2(name: String = "day10.txt"): Long {
-    val list = addMinAndMax(parseInput(name))
+    val list = addMinAndMax(parseInput11(name))
     val pairs = list
         .windowed(size = 2)
         .map { it[0] to it[1] }
