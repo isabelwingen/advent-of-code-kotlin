@@ -2,10 +2,11 @@ package aoc2020
 
 import getResourceAsList
 
-private fun readInput(name: String): List<List<Char>> {
+private fun readInput(name: String): List<CharArray> {
     return getResourceAsList(name)
         .filter { x -> x.isNotBlank() }
         .map { it.asIterable().toList() }
+        .map { it.toCharArray() }
 
 }
 

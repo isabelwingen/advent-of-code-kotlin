@@ -8,7 +8,7 @@ private class Field(val title: String, val ranges: List<IntRange>) {
     }
 }
 
-private class Input(var fields: List<Field>, var myTicket: List<Int>, var nearbyTickets: List<List<Int>>) {
+private class Input(var fields: List<Field>, var myTicket: IntArray, var nearbyTickets: List<IntArray>) {
     override fun toString(): String {
         return "fields: $fields, myTicket: $myTicket, nearbyTickets: $nearbyTickets"
     }
@@ -31,17 +31,20 @@ private fun parseInput(name: String): Input {
     val y = coll.drop(x.size + 2).get(0)
         .split(",")
         .map { it.toInt() }
+        .toIntArray()
     val z = coll.drop(x.size + 5).dropLast(1)
         .map { it.split(",") }
         .map { d -> d.map { it.toInt() } }
+        .map { it.toIntArray() }
     return Input(x, y, z)
 }
 
 
-fun executeDay16Part1(): Int {
-    val input = parseInput("day16.txt")
+fun executeDay16Part1(name: String = "day16.txt"): Int {
+    val input = parseInput(name)
     val ranges = input.fields.flatMap { it.ranges }.toSet()
     return input.nearbyTickets
+        .map { it.toList() }
         .flatten()
         .filter { !valueIsValid(ranges, it) }
         .sum()
@@ -51,8 +54,8 @@ private fun valueIsValid(ranges: Collection<IntRange>, field: Int): Boolean {
     return ranges.any { it.contains(field) }
 }
 
-fun executeDay16Part2(): Long {
-    val input = cleanInput(parseInput("day16.txt"))
+fun executeDay16Part2(name: String = "day16.txt"): Long {
+    val input = cleanInput(parseInput(name))
     val results = mutableMapOf<Int, List<String>>()
     for (i in input.nearbyTickets[0].indices) {
         val coll = input.nearbyTickets.map { it[i] }

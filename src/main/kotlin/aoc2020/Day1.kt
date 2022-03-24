@@ -2,11 +2,12 @@ package aoc2020
 
 import getResourceAsList
 
-private fun parseInput(name: String = "day1.txt"): List<Int> {
+private fun parseInput(name: String = "day1.txt"): IntArray {
     return getResourceAsList(name)
         .filter { x -> x.isNotBlank() }
         .map { x -> Integer.parseInt(x) }
         .sortedWith(compareBy {it})
+        .toIntArray()
 }
 
 fun executeDay1Part1(name: String = "day1.txt"): Int {

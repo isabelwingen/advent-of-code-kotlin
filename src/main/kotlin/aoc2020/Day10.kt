@@ -3,11 +3,12 @@ package aoc2020
 import kotlin.math.pow
 import getResourceAsList
 
-private fun parseInput(path: String = "day10.txt"): List<Int> {
+private fun parseInput(path: String = "day10.txt"): IntArray {
     return getResourceAsList(path)
         .filter { it.isNotBlank() }
         .map { it.toInt() }
         .sorted()
+        .toIntArray()
 }
 
 fun executeDay10Part1(name: String = "day10.txt"): Int {
@@ -33,16 +34,17 @@ private fun getCombinations(s: Int): Int {
     }
 }
 
-private fun addMinAndMax(l: List<Int>): List<Int> {
+private fun addMinAndMax(l: IntArray): IntArray {
     val coll = l.toMutableList()
     coll.add(0)
     coll.add(l.last() + 3)
-    return coll.sorted()
+    return coll.sorted().toIntArray()
 }
 
 fun executeDay10Part2(name: String = "day10.txt"): Long {
     val list = addMinAndMax(parseInput(name))
     val pairs = list
+        .toList()
         .windowed(size = 2)
         .map { it[0] to it[1] }
 

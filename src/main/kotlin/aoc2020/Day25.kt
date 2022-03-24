@@ -28,7 +28,6 @@ fun findLoopSize(publicKey: Int): Int {
 }
 
 fun executeDay25Part1(): Long {
-    val doorLoopSize = findLoopSize(PUBLIC_KEY_DOOR)
     val cardLoopSize = findLoopSize(PUBLIC_KEY_CARD)
     return squareAndMultiply(PUBLIC_KEY_DOOR, cardLoopSize)
 }

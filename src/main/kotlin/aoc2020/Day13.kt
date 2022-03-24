@@ -9,8 +9,8 @@ private fun parseInput(path: String): Pair<Int, List<Int>> {
     return coll[0].toInt() to coll[1].split(",").filter { it != "x" }.map { it.toInt() }
 }
 
-fun executeDay13Part1(): Int {
-    val (a, busIDs) = parseInput("day13.txt")
+fun executeDay13Part1(name: String = "day13.txt"): Int {
+    val (a, busIDs) = parseInput(name)
     return busIDs
         .map { it to ((a / it) + 1) * it - a }
         .sortedBy { it.second }
@@ -18,7 +18,7 @@ fun executeDay13Part1(): Int {
         .first()
 }
 
-fun extented_euclid(a: Long, b: Long): Triple<Long, Long, Long> {
+private fun extented_euclid(a: Long, b: Long): Triple<Long, Long, Long> {
     if (b == 0L) {
         return Triple(a, 1, 0)
     } else {
@@ -28,19 +28,19 @@ fun extented_euclid(a: Long, b: Long): Triple<Long, Long, Long> {
     }
 }
 
-fun lcm(a: Long, b: Long): Long {
+private fun lcm(a: Long, b: Long): Long {
     return abs(a * b) / extented_euclid(a, b).first
 }
 
-fun lcm(numbers: List<Long>): Long {
+private fun lcm(numbers: List<Long>): Long {
     return numbers.reduceRight { a, b -> lcm(a, b)}
 }
 // t+id_1  mod a1 == 0
 // t+id_2  mod a2 == 0
 // t+id_3  mod a3 == 0
 // t+id_4  mod a4 == 0
-fun executeDay13Part2(): Long {
-    val busIDs = getResourceAsList("day13.txt")
+fun executeDay13Part2(name: String = "day13.txt"): Long {
+    val busIDs = getResourceAsList(name)
         .filter { it.isNotBlank() }[1]
         .split(",")
         .mapIndexed { id, x -> id to x}
