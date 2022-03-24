@@ -62,7 +62,7 @@ data class Tile(val id: Int, val lines: List<CharSequence>) {
     }
 }
 
-private fun parseInput11(path: String = "day20.txt"): List<Tile> {
+private fun parseInput(path: String = "day20.txt"): List<Tile> {
     return getResourceAsList(path)
         .splitBy { it.isBlank() }
         .filter { it.isNotEmpty() }
@@ -89,7 +89,7 @@ private fun getMatches(tiles: List<Tile>, tile: Tile): Int {
 }
 
 fun executeDay20Part1(): Long {
-    val x = parseInput11()
+    val x = parseInput()
     return x
         .map { it.id to getMatches(x, it) }
         .filter { it.second == 2 }
@@ -152,7 +152,7 @@ fun getUpperLeftCorner(tiles: List<Tile>): Tile {
 }
 
 fun createPuzzle(name: String = "day20.txt"): Tile {
-    val tiles = parseInput11(name)
+    val tiles = parseInput(name)
     val upperLeftCorner = getUpperLeftCorner(tiles)
     val stack = ArrayDeque<Tile>()
     stack.push(upperLeftCorner)

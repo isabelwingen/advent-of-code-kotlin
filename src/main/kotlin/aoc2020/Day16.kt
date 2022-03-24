@@ -24,7 +24,7 @@ private fun toField(line: String): Field {
     return Field(title, ranges)
 }
 
-private fun parseInput11(name: String): Input {
+private fun parseInput(name: String): Input {
     val coll = getResourceAsList(name);
     val x = coll.takeWhile { it.isNotBlank() }
         .map { toField(it) }
@@ -39,7 +39,7 @@ private fun parseInput11(name: String): Input {
 
 
 fun executeDay16Part1(): Int {
-    val input = parseInput11("day16.txt")
+    val input = parseInput("day16.txt")
     val ranges = input.fields.flatMap { it.ranges }.toSet()
     return input.nearbyTickets
         .flatten()
@@ -52,7 +52,7 @@ private fun valueIsValid(ranges: Collection<IntRange>, field: Int): Boolean {
 }
 
 fun executeDay16Part2(): Long {
-    val input = cleanInput(parseInput11("day16.txt"))
+    val input = cleanInput(parseInput("day16.txt"))
     val results = mutableMapOf<Int, List<String>>()
     for (i in input.nearbyTickets[0].indices) {
         val coll = input.nearbyTickets.map { it[i] }

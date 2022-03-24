@@ -2,7 +2,7 @@ package aoc2020
 
 private const val INPUT: String = "394618527"
 
-private fun parseInput11(): List<Int> {
+private fun parseInput(): List<Int> {
     return INPUT
         .map { it.toString().toInt() }
 }
@@ -40,7 +40,7 @@ private fun buildArrayList(input: List<Int>): ArrayList<Int> {
     return cups
 }
 
-private fun execute(times: Int, input: List<Int> = parseInput11()): List<Int> {
+private fun execute(times: Int, input: List<Int> = parseInput()): List<Int> {
     var cups = buildArrayList(input)
     var current = input[0]
     for (i in 1 until times+1) {
@@ -62,7 +62,7 @@ fun executeDay23Part1(): Int {
 }
 
 fun executeDay23Part2(): Long {
-    val input = parseInput11().toMutableList()
+    val input = parseInput().toMutableList()
     val maxPlusOne = input.maxOrNull()!! + 1
     for (i in maxPlusOne until 1_000_001) {
         input.add(i)

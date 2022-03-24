@@ -22,7 +22,7 @@ private fun transformLine(line: String): List<Seat> {
         } }
 }
 
-fun parseInput(path: String): Set<Triple<Int, Int, Seat>> {
+private fun parseInput(path: String): Set<Triple<Int, Int, Seat>> {
     return getResourceAsList(path)
         .asSequence()
         .filter { it.isNotBlank() }

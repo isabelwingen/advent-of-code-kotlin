@@ -2,7 +2,7 @@ package aoc2020
 
 import getResourceAsList
 
-private fun parseInput11(): List<List<Char>> {
+private fun parseInput(): List<List<Char>> {
     return getResourceAsList("day17.txt")
         .filter { it.isNotBlank() }
         .map { it.toCharArray().asList() }
@@ -82,7 +82,7 @@ private fun <T> step(cuboid: Map<T, Char>, neighbourFun: (x: T) -> List<T>): Map
 }
 
 fun executeDay17Part1(): Int {
-    var cuboid = buildCuboid(parseInput11()) { a, b -> Triple(0, a, b)}
+    var cuboid = buildCuboid(parseInput()) { a, b -> Triple(0, a, b)}
     for (i in 0 until 6) {
         cuboid = step(cuboid) {x -> neighbourCoordinates3d(x)}
     }
@@ -90,7 +90,7 @@ fun executeDay17Part1(): Int {
 }
 
 fun executeDay17Part2(): Int {
-    var cuboid = buildCuboid(parseInput11()) { a, b -> Quadruple(0, 0, a, b)}
+    var cuboid = buildCuboid(parseInput()) { a, b -> Quadruple(0, 0, a, b)}
     for (i in 0 until 6) {
         cuboid = step(cuboid) {x -> neighbourCoordinates4d(x)}
     }

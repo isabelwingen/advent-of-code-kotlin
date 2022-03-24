@@ -3,7 +3,7 @@ package aoc2020
 import getResourceAsList
 import splitBy
 
-private fun parseInput11(path: String, connect: (a: List<String>) -> Set<Char>): List<Set<Char>> {
+private fun parseInput(path: String, connect: (a: List<String>) -> Set<Char>): List<Set<Char>> {
    return getResourceAsList(path)
        .splitBy { it.isBlank() }
        .filter { line -> line.all { it.isNotBlank() } }
@@ -23,13 +23,13 @@ private  fun joinGroup(lines: List<String>): Set<Char> {
 }
 
 fun executeDay6Part1(name: String = "day6.txt"): Int {
-    return parseInput11(name) { joinGroup(it) }
+    return parseInput(name) { joinGroup(it) }
         .map { it.count() }
         .reduceRight { a, b -> a + b }
 }
 
 fun executeDay6Part2(): Int {
-    return parseInput11("day6.txt") { intersectGroup(it) }
+    return parseInput("day6.txt") { intersectGroup(it) }
         .map { it.count() }
         .reduceRight { a, b -> a + b }
 }
