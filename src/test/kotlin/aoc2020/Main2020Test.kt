@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import round
+import kotlin.system.measureTimeMillis
 
 internal class Main2020Test {
 
@@ -37,6 +39,15 @@ internal class Main2020Test {
         val actualResult = Main2020().execute(key)
         val expectedResult = getData().filter { it.get().first().equals(key) }.map { it.get()[1] }.first()
         assertEquals(expectedResult, actualResult)
+    }
+
+    @Test
+    fun measureSingleExecution() {
+        val main = Main2020()
+        val key = "15.2"
+        val res = IntRange(0, 10).map { measureTimeMillis {  main.execute(key) } }
+
+        println( ((res.sum().toDouble() / res.size) / 1000).round(3) )
     }
 
     companion object {
