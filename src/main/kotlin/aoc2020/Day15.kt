@@ -1,27 +1,27 @@
 package aoc2020
 
 private const val INPUT = "1,0,16,5,17,4"
+private const val LIMIT  = 30_000_000
 
 private fun execute(limit: Int): Int {
     val input = INPUT.split(",").map { it.toInt() }
-    val index = mutableMapOf<Int, Int>()
+    val indexLow = IntArray(LIMIT)
     for (i in 0 until input.size - 1) {
-        index[input[i]] = i
+        indexLow[input[i]] = i
     }
     var nextNumber = input.last()
     var counter = input.size - 1;
     while (counter < limit - 1) {
-        if (index.containsKey(nextNumber)) {
+        if (indexLow[nextNumber] != -1) {
             val old = nextNumber
-            nextNumber = counter - index[old]!!
-            index[old] = counter
+            nextNumber = counter - indexLow[old]
+            indexLow[old] = counter
         } else {
-            index[nextNumber] = counter
+            indexLow[nextNumber] = counter
             nextNumber = 0
         }
         counter++
     }
-
     return nextNumber
 }
 
@@ -30,6 +30,6 @@ fun executeDay15Part1(): Int {
 }
 
 fun executeDay15Part2(): Int {
-    return execute(30000000)
+    return execute(30_000_000)
 }
 

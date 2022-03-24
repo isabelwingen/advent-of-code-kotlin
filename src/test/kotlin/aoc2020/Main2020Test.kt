@@ -19,7 +19,12 @@ internal class Main2020Test {
 
     @Test
     fun measure2() {
-        Main2020().executionTime().forEach { println("${it.key}: ${it.value}") }
+        val res = Main2020()
+            .executionTime()
+            .asSequence()
+            .onEach { println("${it.key}: ${it.value}") }
+            .sumOf { it.value }
+        println("total: $res")
     }
 
     @ParameterizedTest(name = "execute {0} should yield {1}")
