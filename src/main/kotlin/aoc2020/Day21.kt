@@ -62,6 +62,5 @@ fun executeDay21Part2(name: String = "day21.txt"): String {
     return ingredientsWithAllergens(mapping)
         .toList()
         .sortedBy { it.first }
-        .map { it.second }
-        .joinToString(",")
+        .joinToString(",") { it.second }
 }
