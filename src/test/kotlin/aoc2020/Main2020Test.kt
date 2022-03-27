@@ -49,8 +49,8 @@ internal class Main2020Test {
     @Test
     fun measureSingleExecution() {
         val main = Main2020()
-        val key = "20.2"
-        val res = IntRange(0, 50).map { measureTimeMillis {  main.execute(key) } }
+        val key = "15.2"
+        val res = IntRange(0, 20).map { measureTimeMillis {  main.execute(key) } }
 
         println( ((res.sum().toDouble() / res.size) / 1000).round(3) )
         val actualResult = main.execute(key)
