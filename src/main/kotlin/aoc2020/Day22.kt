@@ -37,15 +37,12 @@ private fun roundPart1(game: Game): Game {
 
 fun executeDay22Part1(name: String = "day22.txt"): Int {
     var game = parseInput(name)
-    val deckSize = game.player1.size + game.player2.size
     while (game.player1.isNotEmpty() && game.player2.isNotEmpty()) {
         game = roundPart1(game)
     }
 
-    return listOf(game.player1.toList(), game.player2.toList())
-        .first { it.isNotEmpty() }
-        .mapIndexed {index, v -> (deckSize - index) * v}
-        .sum()
+    val res = game.player1.ifEmpty { game.player2 }.toList()
+    return res.mapIndexed { index, v -> (res.size - index) * v }.sum()
 }
 
 private fun roundPart2(game: Game): Game {
@@ -74,23 +71,18 @@ private fun roundPart2(game: Game): Game {
     return game
 }
 
-fun Game.deepCopy(): Game {
-    val p1 = LinkedList(this.player1)
-    val p2 = LinkedList(this.player2)
-    return Game(p1, p2)
-}
-
 private fun play(gameIn: Game, baseGame: Boolean = true): Int {
     var game = gameIn
-    val previousRounds = mutableListOf<Game>()
+    val previousRounds = mutableSetOf<List<Int>>()
     var breakerEnd = false
     while (game.player1.isNotEmpty() && game.player2.isNotEmpty()) {
-        if (previousRounds.any { it == game }) {
+        val gameAsList = game.player2.toList()
+        if (previousRounds.any { it == gameAsList }) {
             breakerEnd = true
             break
         }
-        previousRounds.add(game)
-        game = roundPart2(game.deepCopy())
+        previousRounds.add(gameAsList)
+        game = roundPart2(Game(LinkedList(game.player1), LinkedList(game.player2)))
     }
     var winningPlayer = 1
     if (!breakerEnd && game.player2.isNotEmpty()) {
