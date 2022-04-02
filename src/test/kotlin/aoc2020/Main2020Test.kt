@@ -40,7 +40,7 @@ internal class Main2020Test {
 
     @Test
     fun testSingleExecution() {
-        val key = "24.2"
+        val key = "17.1"
         val actualResult = Main2020().execute(key)
         val expectedResult = getData().filter { it.get().first().equals(key) }.map { it.get()[1] }.first()
         assertEquals(expectedResult, actualResult)
@@ -49,7 +49,7 @@ internal class Main2020Test {
     @Test
     fun measureSingleExecution() {
         val main = Main2020()
-        val key = "24.2"
+        val key = "11.2"
         val res = IntRange(0, 10).map { measureTimeMillis {  main.execute(key) } }
 
         println( (res.average() / 1000).round(3) )

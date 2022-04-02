@@ -48,7 +48,14 @@ private fun directNeighbours(all: Set<Pair<Int, Int>>, pos: Pair<Int, Int>): Set
         .toSet()
 }
 
+val cache = mutableMapOf<Pair<Int, Int>, Set<Pair<Int, Int>>>()
+
 private fun viewNeighbours(all: Set<Pair<Int, Int>>, pos: Pair<Int, Int>): Set<Pair<Int, Int>> {
+    cache.computeIfAbsent(pos) { viewNeighboursH(all, it) }
+    return cache[pos]!!
+}
+
+private fun viewNeighboursH(all: Set<Pair<Int, Int>>, pos: Pair<Int, Int>): Set<Pair<Int, Int>> {
     return setOf(
         -1 to -1,
         -1 to 0,
@@ -96,11 +103,11 @@ fun executeDay11Part2(path: String = "day11.txt"): Int {
         livingCells,
         allCells,
         getNeighbours = { allNeighbours[it]!! },
-        comeAlive = { neighbours: Set<Pair<Int, Int>>, alive: Set<Pair<Int, Int>> ->
+        comeAlive = { neighbours, alive ->
             val aliveNeighbours = neighbours.count { alive.contains(it) }
             aliveNeighbours == 0
         },
-        die ={ neighbours: Set<Pair<Int, Int>>, alive: Set<Pair<Int, Int>> ->
+        die = { neighbours, alive ->
             val aliveNeighbours = neighbours.count { alive.contains(it) }
             aliveNeighbours >= 5
         })
