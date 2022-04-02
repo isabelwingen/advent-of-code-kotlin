@@ -1,5 +1,6 @@
 package aoc2020
 
+import algorithm.GameOfLife
 import getResourceAsList
 
 private fun parseInput(): List<List<Char>> {
@@ -10,17 +11,27 @@ private fun parseInput(): List<List<Char>> {
 
 data class Quadruple(val a: Int, val b: Int, val c: Int, val d: Int)
 
-private fun <T> buildCuboid(input: List<List<Char>>, coordinateFun: (a: Int, b: Int) -> T): Map<T, Char> {
-    val res = mutableMapOf<T, Char>()
+private fun <T> buildCuboid(input: List<List<Char>>, coordinateFun: (a: Int, b: Int) -> T): Set<T> {
+    val res = mutableSetOf<T>()
     for (i in input.indices) {
         for (j in input[0].indices) {
-            res[coordinateFun(i, j)] = input[i][j]
+            val value = input[i][j]
+            if (value == ACTIVE) {
+                res.add(coordinateFun(i, j))
+            }
         }
     }
-    return res.toMap()
+    return res.toSet()
 }
 
-private fun neighbourCoordinates3d(coord: Triple<Int, Int, Int>): List<Triple<Int, Int, Int>> {
+val neighbours3d = mutableMapOf<Triple<Int, Int, Int>, Set<Triple<Int, Int, Int>>>()
+
+private fun neighbourCoordinates3d(coord: Triple<Int, Int, Int>): Set<Triple<Int, Int, Int>> {
+    neighbours3d.computeIfAbsent(coord) { neighbourCoordinates3dH(it) }
+    return neighbours3d[coord]!!
+}
+
+private fun neighbourCoordinates3dH(coord: Triple<Int, Int, Int>): Set<Triple<Int, Int, Int>> {
     val res = mutableListOf<Triple<Int, Int, Int>>()
     for (z in coord.first - 1 until coord.first + 2) {
         for (x in coord.second - 1 until coord.second + 2) {
@@ -29,10 +40,17 @@ private fun neighbourCoordinates3d(coord: Triple<Int, Int, Int>): List<Triple<In
             }
         }
     }
-    return res.filter { it != coord }
+    return res.filter { it != coord }.toSet()
 }
 
-private fun neighbourCoordinates4d(coord: Quadruple): List<Quadruple> {
+val neighbours4d = mutableMapOf<Quadruple, Set<Quadruple>>()
+
+private fun neighbourCoordinates4d(coord: Quadruple): Set<Quadruple> {
+    neighbours4d.computeIfAbsent(coord) { neighbourCoordinates4dH(it) }
+    return neighbours4d[coord]!!
+}
+
+private fun neighbourCoordinates4dH(coord: Quadruple): Set<Quadruple> {
     val res = mutableListOf<Quadruple>()
     for (w in coord.a -1 until coord.a + 2) {
         for (z in coord.b - 1 until coord.b + 2) {
@@ -43,56 +61,45 @@ private fun neighbourCoordinates4d(coord: Quadruple): List<Quadruple> {
             }
         }
     }
-    return res.filter { it != coord }
+    return res.filter { it != coord }.toSet()
 }
 
-const val INACTIVE = '.'
 const val ACTIVE = '#'
 
-private fun <T> calculateActiveNeighbours(coord: T, cuboid: Map<T, Char>, neighbourFun: (x: T) -> List<T>): Int {
-    return neighbourFun(coord)
-        .map { cuboid.getOrDefault(it, INACTIVE) }
-        .count { it == ACTIVE }
-}
-
-private fun <T> step(cuboid: Map<T, Char>, neighbourFun: (x: T) -> List<T>): Map<T, Char> {
-    val res = mutableMapOf<T, Char>()
-    cuboid.keys
-        .flatMap { neighbourFun(it) }
-        .distinct()
-        .filter { !cuboid.keys.contains(it) }
-        .forEach {
-            if (calculateActiveNeighbours(it, cuboid, neighbourFun)  == 3) {
-                res[it] = ACTIVE
-            }
-        }
-    for (entry in cuboid) {
-        val activeNeighbours = calculateActiveNeighbours(entry.key, cuboid, neighbourFun)
-        if (entry.value == ACTIVE) {
-            if (activeNeighbours == 2 || activeNeighbours == 3) {
-                res[entry.key] = ACTIVE
-            }
-        } else {
-            if (activeNeighbours == 3) {
-                res[entry.key] = ACTIVE
-            }
-        }
-    }
-    return res.toMap()
-}
-
 fun executeDay17Part1(): Int {
-    var cuboid = buildCuboid(parseInput()) { a, b -> Triple(0, a, b)}
-    for (i in 0 until 6) {
-        cuboid = step(cuboid) {x -> neighbourCoordinates3d(x)}
-    }
-    return cuboid.values.count { it == ACTIVE }
+    val cuboid = buildCuboid(parseInput()) { a, b -> Triple(0, a, b)}
+    val gameOfLife = GameOfLife(
+        livingCells = cuboid,
+        allCells = null,
+        getNeighbours = { neighbourCoordinates3d(it) },
+        comeAlive = { neighbours, alive ->
+            val aliveNeighbours = neighbours.count { alive.contains(it) }
+            aliveNeighbours == 3
+        },
+        die = { neighbours, alive ->
+            val aliveNeighbours = neighbours.count { alive.contains(it) }
+            aliveNeighbours != 2 && aliveNeighbours != 3
+        }
+    )
+    repeat(6) { gameOfLife.step() }
+    return gameOfLife.getLivingCells().count()
 }
 
 fun executeDay17Part2(): Int {
-    var cuboid = buildCuboid(parseInput()) { a, b -> Quadruple(0, 0, a, b)}
-    for (i in 0 until 6) {
-        cuboid = step(cuboid) {x -> neighbourCoordinates4d(x)}
-    }
-    return cuboid.values.count { it == ACTIVE }
+    val cuboid = buildCuboid(parseInput()) { a, b -> Quadruple(0, 0, a, b)}
+    val gameOfLife = GameOfLife(
+        livingCells = cuboid,
+        allCells = null,
+        getNeighbours = { neighbourCoordinates4d(it) },
+        comeAlive = { neighbours, alive ->
+            val aliveNeighbours = neighbours.count { alive.contains(it) }
+            aliveNeighbours == 3
+        },
+        die = { neighbours, alive ->
+            val aliveNeighbours = neighbours.count { alive.contains(it) }
+            aliveNeighbours != 2 && aliveNeighbours != 3
+        }
+    )
+    repeat(6) { gameOfLife.step() }
+    return gameOfLife.getLivingCells().count()
 }
