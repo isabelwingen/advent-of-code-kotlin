@@ -2,31 +2,13 @@ package aoc2020
 
 import algorithm.GameOfLife
 import getResourceAsList
-import java.util.Comparator
-import java.util.SortedMap
-
-data class HexTile(val path: SortedMap<String, Int>) {
-    fun transformPath(): HexTile {
-        return HexTile(transformMap(path))
-    }
-
-    override fun toString(): String {
-        return if (path.isEmpty()) {
-            "~"
-        } else {
-            path
-                .map { "${it.key}${it.value}" }
-                .joinToString("")
-        }
-    }
-}
 
 private fun parseLine(line: String): List<String> {
     var i = 0
     val res = mutableListOf<String>()
     while (i < line.length) {
-        var currentChar = line[i]
-        var nextChar = if (i < line.length - 1) line[i + 1] else null
+        val currentChar = line[i]
+        val nextChar = if (i < line.length - 1) line[i + 1] else null
         if (currentChar == 'n' || currentChar == 's') {
             res.add(currentChar.toString() + nextChar.toString())
             i++
@@ -39,75 +21,70 @@ private fun parseLine(line: String): List<String> {
     return res.toList()
 }
 
-private fun MutableMap<String, Int>.replace(a: String, b: String, with: String): MutableMap<String, Int> {
-    if (containsKey(a) && containsKey(b)) {
-        val min = minOf(this[a]!!, this[b]!!)
-        this.putIfAbsent(with, 0)
-        this[with] = this[with]!! + min
-        this[a] = this[a]!! - min
-        this[b] = this[b]!! - min
-    }
-    return this
-}
-
-private fun MutableMap<String, Int>.absorb( a: String, b: String): MutableMap<String, Int> {
-    if (containsKey(a) && containsKey(b)) {
-        val minSideways = minOf(this[a]!!, this[b]!!)
-        this[a] = this[a]!! - minSideways
-        this[b] = this[b]!! - minSideways
-    }
-    return this
-}
-
-private fun MutableMap<String, Int>.increase( a: String): MutableMap<String, Int> {
-    if (containsKey(a)) {
-        this[a] = this[a]!! + 1
-    } else {
-        this[a] = 1
-    }
-    return this
-}
-
-private fun transformMap(line: Map<String, Int>): SortedMap<String, Int> {
-    return line.toMutableMap()
-        .replace("nw", "e", "ne")
-        .replace("ne", "w", "nw")
-
-        .replace("ne", "se", "e")
-        .replace("e", "nw", "ne")
-
-        .replace("e", "sw", "se")
-        .replace("se", "ne", "e")
-
-        .replace("se", "w", "sw")
-        .replace("sw", "e", "se")
-
-        .replace("sw", "nw", "w")
-        .replace("w", "se","sw")
-
-        .replace("w", "ne", "nw")
-        .replace("nw", "sw", "w")
-
-        .absorb("w", "e")
-        .absorb("nw", "se")
-        .absorb("ne", "sw")
-        .filter { it.value != 0 }
-        .toSortedMap(Comparator.comparing {it})
-}
-
 fun executeDay24Part1(input: Collection<String> = getResourceAsList("day24.txt")): Int {
     return input
         .asSequence()
         .filter { it.isNotBlank() }
         .map<String, List<String>> { parseLine(it) }
         .map { x -> x.groupBy { it }.mapValues { it.value.count() } }
-        .map { m -> HexTile(m.toSortedMap(Comparator.comparing { it })) }
-        .map { it.transformPath() }
-        .map { it.transformPath() }
+        .map { transformHexTileToCoordinate(it) }
         .groupBy { it }
         .mapValues { it.value.count() }
         .filter { it.value % 2 == 1 }
         .count()
+}
+
+private fun getNeighbours(coord: HexCoordinate): Set<HexCoordinate> {
+    return listOf(
+        HexCoordinate(-1, 0, +1),
+        HexCoordinate(0, -1, +1),
+        HexCoordinate(+1, -1, 0),
+        HexCoordinate(+1, 0, -1),
+        HexCoordinate(0, +1, -1),
+        HexCoordinate(-1, +1, 0))
+        .map { coord.add(it) }
+        .toSet()
+}
+
+private data class HexCoordinate(val q: Int = 0, val r: Int = 0, val s: Int = 0) {
+    fun add(a: HexCoordinate): HexCoordinate {
+        return HexCoordinate(q + a.q, r + a.r, s + a.s)
+    }
+}
+
+private fun transformHexTileToCoordinate(path: Map<String, Int>): HexCoordinate {
+    var q = 0
+    var r = 0
+    var s = 0
+    for ((dir, times) in path) {
+        when (dir) {
+            "w" -> {
+                q -= times
+                s += times
+            }
+            "nw" -> {
+                s += times
+                r -= times
+            }
+            "ne" -> {
+                q += times
+                r -= times
+            }
+            "e" -> {
+                q += times
+                s -= times
+            }
+            "se" -> {
+                r += times
+                s -= times
+            }
+            "sw" -> {
+                q -= times
+                r += times
+            }
+        }
+    }
+    return HexCoordinate(s = s, q = q, r = r)
 }
 
 fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")): Int {
@@ -116,9 +93,7 @@ fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")
         .filter { it.isNotBlank() }
         .map<String, List<String>> { parseLine(it) }
         .map { x -> x.groupBy { it }.mapValues { it.value.count() } }
-        .map { m -> HexTile(m.toSortedMap(Comparator.comparing { it })) }
-        .map { it.transformPath() }
-        .map { it.transformPath() }
+        .map { transformHexTileToCoordinate(it) }
         .groupBy { it }
         .mapValues { it.value.count() }
         .filter { it.value % 2 == 1 }
@@ -127,15 +102,15 @@ fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")
     val gameOfLife = GameOfLife(
         initialState,
         null,
-        { getNeighbours(it) },
-        { neighbours: Set<HexTile>, alive: Set<HexTile> ->
+        getNeighbours = { getNeighbours(it) },
+        comeAlive = { neighbours: Set<HexCoordinate>, alive: Set<HexCoordinate> ->
             val aliveNeighbours = neighbours.count { alive.contains(it) }
             aliveNeighbours == 2
-        }
-    ) { neighbours: Set<HexTile>, alive: Set<HexTile> ->
-        val aliveNeighbours = neighbours.count { alive.contains(it) }
-        aliveNeighbours == 0 || aliveNeighbours > 2
-    }
+        },
+        die = { neighbours: Set<HexCoordinate>, alive: Set<HexCoordinate> ->
+            val aliveNeighbours = neighbours.count { alive.contains(it) }
+            aliveNeighbours == 0 || aliveNeighbours > 2
+        })
     repeat(100) { gameOfLife.step() }
     return gameOfLife.getLivingCells().count()
 }
@@ -143,10 +118,3 @@ fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")
 
 
 
-private fun getNeighbours(tile: HexTile): Set<HexTile> {
-    return listOf("w", "nw", "ne", "e", "se", "sw")
-        .map { direction -> tile.path.toMutableMap().increase(direction).toSortedMap(Comparator.comparing {it}) }
-        .map { HexTile(it) }
-        .map { it.transformPath() }
-        .toSet()
-}

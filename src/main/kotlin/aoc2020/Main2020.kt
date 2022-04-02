@@ -63,7 +63,8 @@ class Main2020 {
     }
 
     fun executionTime(): Map<String, Double> {
-        return functions.mapValues { measureTimeMillis { it.value.invoke() } }
+        return functions
+            .mapValues { measureTimeMillis { it.value.invoke() } }
             .mapValues { (it.value.toDouble() / 1000).round(3) }
     }
 
