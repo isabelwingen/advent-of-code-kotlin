@@ -9,7 +9,7 @@ private fun parseInput(path: String): Pair<Int, List<Int>> {
     return coll[0].toInt() to coll[1].split(",").filter { it != "x" }.map { it.toInt() }
 }
 
-fun executeDay13Part1(name: String = "day13.txt"): Int {
+fun executeDay13Part1(name: String = "2020/day13.txt"): Int {
     val (a, busIDs) = parseInput(name)
     return busIDs
         .map { it to ((a / it) + 1) * it - a }
@@ -39,7 +39,7 @@ private fun lcm(numbers: List<Long>): Long {
 // t+id_2  mod a2 == 0
 // t+id_3  mod a3 == 0
 // t+id_4  mod a4 == 0
-fun executeDay13Part2(name: String = "day13.txt"): Long {
+fun executeDay13Part2(name: String = "2020/day13.txt"): Long {
     val busIDs = getResourceAsList(name)
         .filter { it.isNotBlank() }[1]
         .split(",")

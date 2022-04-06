@@ -4,7 +4,7 @@ import getResourceAsList
 import splitBy
 
 private fun parseInput(): Data {
-    val coll = getResourceAsList("day19.txt")
+    val coll = getResourceAsList("2020/day19.txt")
         .splitBy { it.isBlank() }
         .filter { it.all { x -> x.isNotBlank() } }
     return Data(coll[0].map { toRule(it) }.sortedBy { it.id }, coll[1])

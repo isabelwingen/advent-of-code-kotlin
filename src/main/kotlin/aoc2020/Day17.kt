@@ -4,7 +4,7 @@ import algorithm.GameOfLife
 import getResourceAsList
 
 private fun parseInput(): List<List<Char>> {
-    return getResourceAsList("day17.txt")
+    return getResourceAsList("2020/day17.txt")
         .filter { it.isNotBlank() }
         .map { it.toCharArray().asList() }
 }

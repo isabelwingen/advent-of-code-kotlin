@@ -101,10 +101,10 @@ private fun readBatchFile(path: String, validFun: (String) -> Int): Int {
     return validPassports
 }
 
-fun executeDay4Part1(name: String = "day4.txt"): Int {
+fun executeDay4Part1(name: String = "2020/day4.txt"): Int {
     return readBatchFile(name) { validPassportPart1(it) }
 }
 
-fun executeDay4Part2(name: String = "day4.txt"): Int {
+fun executeDay4Part2(name: String = "2020/day4.txt"): Int {
     return readBatchFile(name) { validPassportPart2(it) }
 }

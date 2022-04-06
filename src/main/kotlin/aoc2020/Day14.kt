@@ -71,7 +71,7 @@ fun getAllAddressesFromFloatingAddress(address: String): List<Long> {
 }
 
 fun executeDay14Part1(): Long {
-    val commands = parseInput("day14.txt") { transformInputPairPart1(it) }
+    val commands = parseInput("2020/day14.txt") { transformInputPairPart1(it) }
     var mask = ""
     val mem = mutableMapOf<Int, Long>()
     for (command in commands) {
@@ -85,7 +85,7 @@ fun executeDay14Part1(): Long {
 }
 
 fun executeDay14Part2(): Long {
-    val commands = parseInput("day14.txt") { transformInputPairPart2(it) }
+    val commands = parseInput("2020/day14.txt") { transformInputPairPart2(it) }
     var mask = ""
     val mem = mutableMapOf<Long, Long>()
     for (command in commands) {

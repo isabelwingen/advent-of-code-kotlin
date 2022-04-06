@@ -147,10 +147,10 @@ class Day12Part2 {
     }
 }
 
-fun executeDay12Part1(name: String = "day12.txt"): Int {
+fun executeDay12Part1(name: String = "2020/day12.txt"): Int {
     return Day12Part1().execute(name)
 }
 
-fun executeDay12Part2(name: String = "day12.txt"): Int {
+fun executeDay12Part2(name: String = "2020/day12.txt"): Int {
     return Day12Part2().execute(name)
 }

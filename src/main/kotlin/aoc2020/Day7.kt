@@ -25,14 +25,14 @@ private fun parseLine(line: String): List<Edge> {
     }
 }
 
-private fun parseInput(name: String = "day7.txt"): List<Edge> {
+private fun parseInput(name: String = "2020/day7.txt"): List<Edge> {
     return getResourceAsList(name)
         .filter { it.isNotBlank() }
         .map { parseLine(it) }
         .reduceRight { a, b -> a + b}
 }
 
-fun executeDay7Part1(name: String = "day7.txt"): Int {
+fun executeDay7Part1(name: String = "2020/day7.txt"): Int {
     val edges = parseInput(name)
     val res = mutableSetOf<String>()
     var queue = mutableSetOf("shiny gold")
@@ -60,7 +60,7 @@ private fun getPath(edge: Edge, edges: List<Edge>): Int {
     }
 }
 
-fun executeDay7Part2(name: String = "day7.txt"): Int {
+fun executeDay7Part2(name: String = "2020/day7.txt"): Int {
     val edges = parseInput(name)
     return getPath(Edge("nil", "shiny gold", 1), edges) - 1
 }

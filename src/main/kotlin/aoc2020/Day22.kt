@@ -9,7 +9,7 @@ data class Game(val player1: Queue<Int>, val player2: Queue<Int>) {
     override fun toString() = "player1: $player1\nplayer2: $player2"
 }
 
-private fun parseInput(name: String = "day22.txt"): Game {
+private fun parseInput(name: String = "2020/day22.txt"): Game {
     val coll = getResourceAsList(name)
         .splitBy { it.isBlank() }
         .filter { it.all { x -> x.isNotBlank() } }
@@ -35,7 +35,7 @@ private fun roundPart1(game: Game): Game {
     }
 }
 
-fun executeDay22Part1(name: String = "day22.txt"): Int {
+fun executeDay22Part1(name: String = "2020/day22.txt"): Int {
     var game = parseInput(name)
     while (game.player1.isNotEmpty() && game.player2.isNotEmpty()) {
         game = roundPart1(game)
@@ -112,7 +112,7 @@ private fun play(gameIn: Game, baseGame: Boolean = true): Int {
     }
 }
 
-fun executeDay22Part2(name: String = "day22.txt"): Int {
+fun executeDay22Part2(name: String = "2020/day22.txt"): Int {
     val game = parseInput(name)
     return play(game)
 }

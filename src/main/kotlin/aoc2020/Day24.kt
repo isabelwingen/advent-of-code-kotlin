@@ -21,7 +21,7 @@ private fun parseLine(line: String): List<String> {
     return res.toList()
 }
 
-fun executeDay24Part1(input: Collection<String> = getResourceAsList("day24.txt")): Int {
+fun executeDay24Part1(input: Collection<String> = getResourceAsList("2020/day24.txt")): Int {
     return input
         .asSequence()
         .filter { it.isNotBlank() }
@@ -87,7 +87,7 @@ private fun transformHexTileToCoordinate(path: Map<String, Int>): HexCoordinate 
     return HexCoordinate(s = s, q = q, r = r)
 }
 
-fun executeDay24Part2(input: Collection<String> = getResourceAsList("day24.txt")): Int {
+fun executeDay24Part2(input: Collection<String> = getResourceAsList("2020/day24.txt")): Int {
     val initialState =  input
         .asSequence()
         .filter { it.isNotBlank() }

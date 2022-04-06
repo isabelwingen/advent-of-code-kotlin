@@ -4,7 +4,7 @@ import getResourceAsList
 
 private class Policy (val range: IntRange, val char: Char, val password: String)
 
-private fun parseInput(name: String = "day2.txt"): List<Policy> {
+private fun parseInput(name: String = "2020/day2.txt"): List<Policy> {
     return getResourceAsList(name)
         .filter { it.isNotBlank() }
         .map { transformToPolicy(it) }
@@ -23,7 +23,7 @@ private fun validForPart1(policy: Policy): Boolean {
     return policy.range.contains(policy.password.count { policy.char == it })
 }
 
-fun executeDay2Part1(name: String = "day2.txt"): Int {
+fun executeDay2Part1(name: String = "2020/day2.txt"): Int {
     return parseInput(name).count { validForPart1(it) }
 }
 
@@ -34,6 +34,6 @@ private fun validForPart2(policy: Policy): Boolean {
     return (policy.password[a-1] == policy.char).xor(policy.password[b-1] == policy.char)
 }
 
-fun executeDay2Part2(name: String = "day2.txt"): Int {
+fun executeDay2Part2(name: String = "2020/day2.txt"): Int {
     return parseInput(name).count { validForPart2(it) }
 }

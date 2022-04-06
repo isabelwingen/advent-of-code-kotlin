@@ -24,11 +24,11 @@ private fun calculateSlope(path: String, x: Int, y: Int): Int {
     return treeCount
 }
 
-fun executeDay3Part1(name: String = "day3.txt"): Int {
+fun executeDay3Part1(name: String = "2020/day3.txt"): Int {
     return calculateSlope(name, 3, 1)
 }
 
-fun executeDay3Part2(name: String = "day3.txt"): Int {
+fun executeDay3Part2(name: String = "2020/day3.txt"): Int {
     val a = calculateSlope(name, 1, 1)
     val b = calculateSlope(name, 3, 1)
     val c = calculateSlope(name, 5, 1)

@@ -2,7 +2,7 @@ package aoc2020
 
 import getResourceAsList
 
-private fun parseInput(name: String = "day1.txt"): IntArray {
+private fun parseInput(name: String = "2020/day1.txt"): IntArray {
     return getResourceAsList(name)
         .filter { x -> x.isNotBlank() }
         .map { x -> Integer.parseInt(x) }
@@ -10,7 +10,7 @@ private fun parseInput(name: String = "day1.txt"): IntArray {
         .toIntArray()
 }
 
-fun executeDay1Part1(name: String = "day1.txt"): Int {
+fun executeDay1Part1(name: String = "2020/day1.txt"): Int {
     val coll = parseInput(name)
 
     for (i in coll.indices) {
@@ -27,7 +27,7 @@ fun executeDay1Part1(name: String = "day1.txt"): Int {
     return -1
 }
 
-fun executeDay1Part2(name: String = "day1.txt"): Int {
+fun executeDay1Part2(name: String = "2020/day1.txt"): Int {
     val coll = parseInput(name)
 
     for (i in coll.indices) {

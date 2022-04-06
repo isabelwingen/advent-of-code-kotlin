@@ -22,14 +22,14 @@ private  fun joinGroup(lines: List<String>): Set<Char> {
         .reduceRight { a, b -> a.union(b)}
 }
 
-fun executeDay6Part1(name: String = "day6.txt"): Int {
+fun executeDay6Part1(name: String = "2020/day6.txt"): Int {
     return parseInput(name) { joinGroup(it) }
         .map { it.count() }
         .reduceRight { a, b -> a + b }
 }
 
 fun executeDay6Part2(): Int {
-    return parseInput("day6.txt") { intersectGroup(it) }
+    return parseInput("2020/day6.txt") { intersectGroup(it) }
         .map { it.count() }
         .reduceRight { a, b -> a + b }
 }

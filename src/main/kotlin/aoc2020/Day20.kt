@@ -129,7 +129,7 @@ private fun toTile(tile: List<String>): Tile {
     return Tile(name, lines)
 }
 
-private fun parseInput(path: String = "day20.txt"): List<Tile> {
+private fun parseInput(path: String = "2020/day20.txt"): List<Tile> {
     return getResourceAsList(path)
         .splitBy { it.isBlank() }
         .filter { it.isNotEmpty() }

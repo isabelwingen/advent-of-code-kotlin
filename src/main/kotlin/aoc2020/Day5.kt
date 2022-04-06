@@ -18,13 +18,13 @@ private fun parseSeat(seat: String): Int {
     return row * 8 + column
 }
 
-fun executeDay5Part1(name: String = "day5.txt"): Int {
+fun executeDay5Part1(name: String = "2020/day5.txt"): Int {
     return getResourceAsList(name)
         .filter { it.isNotBlank() }
         .maxOf { parseSeat(it) }
 }
 
-fun executeDay5Part2(name: String = "day5.txt"): Int {
+fun executeDay5Part2(name: String = "2020/day5.txt"): Int {
     val coll = getResourceAsList(name)
         .filter { it.isNotBlank() }
         .map { parseSeat(it) }

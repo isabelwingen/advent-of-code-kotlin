@@ -40,7 +40,7 @@ private fun parseInput(name: String): Input {
 }
 
 
-fun executeDay16Part1(name: String = "day16.txt"): Int {
+fun executeDay16Part1(name: String = "2020/day16.txt"): Int {
     val input = parseInput(name)
     val ranges = input.fields.flatMap { it.ranges }.toSet()
     return input.nearbyTickets
@@ -54,7 +54,7 @@ private fun valueIsValid(ranges: Collection<IntRange>, field: Int): Boolean {
     return ranges.any { it.contains(field) }
 }
 
-fun executeDay16Part2(name: String = "day16.txt"): Long {
+fun executeDay16Part2(name: String = "2020/day16.txt"): Long {
     val input = cleanInput(parseInput(name))
     val results = mutableMapOf<Int, List<String>>()
     for (i in input.nearbyTickets[0].indices) {

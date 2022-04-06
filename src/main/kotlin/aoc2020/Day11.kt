@@ -70,7 +70,7 @@ private fun viewNeighboursH(all: Set<Pair<Int, Int>>, pos: Pair<Int, Int>): Set<
         .toSet()
 }
 
-fun executeDay11Part1(path: String = "day11.txt"): Int {
+fun executeDay11Part1(path: String = "2020/day11.txt"): Int {
     val input = parseInput(path)
     val livingCells = input.filter { it.third == Seat.OCCUPIED }.map { it.first to it.second }.toSet()
     val allCells = input.filter { it.third != Seat.FLOOR }.map { it.first to it.second }.toSet()
@@ -94,7 +94,7 @@ fun executeDay11Part1(path: String = "day11.txt"): Int {
     return gameOfLife.getLivingCells().count()
 }
 
-fun executeDay11Part2(path: String = "day11.txt"): Int {
+fun executeDay11Part2(path: String = "2020/day11.txt"): Int {
     val input = parseInput(path)
     val livingCells = input.filter { it.third == Seat.OCCUPIED }.map { it.first to it.second }.toSet()
     val allCells = input.filter { it.third != Seat.FLOOR }.map { it.first to it.second }.toSet()

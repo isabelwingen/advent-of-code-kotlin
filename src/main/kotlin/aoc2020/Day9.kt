@@ -2,7 +2,7 @@ package aoc2020
 
 import getResourceAsList
 
-private fun parseInput(name: String = "day9.txt"): LongArray {
+private fun parseInput(name: String = "2020/day9.txt"): LongArray {
     return getResourceAsList(name)
         .filter { it.isNotBlank() }
         .map { it.toLong() }
@@ -21,7 +21,7 @@ private fun isSumOfPair(list: LongArray, index: Int): Boolean {
     return false
 }
 
-fun executeDay9Part1(name: String = "day9.txt"): Long {
+fun executeDay9Part1(name: String = "2020/day9.txt"): Long {
     val numbers = parseInput(name)
     for (i in 25 until numbers.size) {
         if (!isSumOfPair(numbers, i)) {
@@ -40,7 +40,7 @@ private fun findWeaknessIndex(numbers: LongArray): Long {
     return -1
 }
 
-fun executeDay9Part2(name: String = "day9.txt"): Long {
+fun executeDay9Part2(name: String = "2020/day9.txt"): Long {
     val numbers = parseInput(name)
     val goal = findWeaknessIndex(numbers)
     for (i in numbers.indices) {

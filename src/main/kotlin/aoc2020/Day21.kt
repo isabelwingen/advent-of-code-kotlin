@@ -2,7 +2,7 @@ package aoc2020
 
 import getResourceAsList
 
-private fun parseInput(name: String = "day21.txt"): List<Pair<List<String>, List<String>>> {
+private fun parseInput(name: String = "2020/day21.txt"): List<Pair<List<String>, List<String>>> {
     return getResourceAsList(name)
         .filter { it.isNotBlank() }
         .map { it.split("(contains ") }
@@ -45,7 +45,7 @@ private fun ingredientsWithAllergens(mapping: List<Pair<String, Set<String>>>): 
     return result.toMap()
 }
 
-fun executeDay21Part1(name: String = "day21.txt"): Int {
+fun executeDay21Part1(name: String = "2020/day21.txt"): Int {
     val data = parseInput(name)
     val mapping = getMapping(data)
 
@@ -55,7 +55,7 @@ fun executeDay21Part1(name: String = "day21.txt"): Int {
 
 }
 
-fun executeDay21Part2(name: String = "day21.txt"): String {
+fun executeDay21Part2(name: String = "2020/day21.txt"): String {
     val data = parseInput(name)
     val mapping = getMapping(data)
 

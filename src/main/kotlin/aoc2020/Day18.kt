@@ -4,7 +4,7 @@ import asLong
 import getResourceAsList
 
 private fun parseInput(): List<String> {
-    return getResourceAsList("day18.txt")
+    return getResourceAsList("2020/day18.txt")
         .filter { it.isNotBlank() }
         .map { it.replace(" ", "")}
 }
