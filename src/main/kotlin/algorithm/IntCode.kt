@@ -2,15 +2,16 @@ package algorithm
 
 import java.util.LinkedList
 
-class IntCode(private val intCode: IntArray) {
+class IntCode(private val name: String, private val intCode: IntArray) {
     private var memory = LongArray(intCode.size) { intCode[it].toLong() }
     private var input = LinkedList<Int>()
     private var pointer = 0
-    private var output = mutableListOf<Long>()
+    private var halt = false
+    private var output = -1L
 
-    fun reset(input: List<Int> = listOf()) {
+    fun init(input: List<Int> = listOf()) {
         this.input = LinkedList(input)
-        output = mutableListOf()
+        this.halt = false
         pointer = 0
         memory = LongArray(intCode.size) { intCode[it].toLong() }
     }
@@ -56,9 +57,10 @@ class IntCode(private val intCode: IntArray) {
         pointer += 2
     }
 
-    private fun executeOpCode4(opCode: String) {
-        output.add(getValue(opCode, 1))
+    private fun executeOpCode4(opCode: String): Long {
+        output = getValue(opCode, 1)
         pointer += 2
+        return output
     }
 
     private fun executeOpCode5(opCode: String) {
@@ -105,17 +107,25 @@ class IntCode(private val intCode: IntArray) {
         pointer += 4
     }
 
-    fun execute(): List<Long> {
+    private fun executeOpCode99(): Long {
+        pointer += 1
+        halt = true
+        return if (output == -1L) memory[0] else output
+    }
+
+
+    fun execute(input: Int = 0): Long {
+        this.input.add(input)
         while (pointer < memory.size) {
             val opCodeAsInt = memory[pointer]
             val opCode = memory[pointer].toString().padStart(5, '0')
-            println("Execute opCode $opCode ($opCodeAsInt) at position $pointer")
+            println("$name: Execute opCode $opCode ($opCodeAsInt) at position $pointer")
             when {
-                opCode.endsWith("99") -> break
+                opCode.endsWith("99") -> return executeOpCode99()
                 opCode.endsWith("1") -> executeOpCode1(opCode)
                 opCode.endsWith("2") -> executeOpCode2(opCode)
                 opCode.endsWith("3") -> executeOpCode3(opCode)
-                opCode.endsWith("4") -> executeOpCode4(opCode)
+                opCode.endsWith("4") -> return executeOpCode4(opCode)
                 opCode.endsWith("5") -> executeOpCode5(opCode)
                 opCode.endsWith("6") -> executeOpCode6(opCode)
                 opCode.endsWith("7") -> executeOpCode7(opCode)
@@ -123,6 +133,8 @@ class IntCode(private val intCode: IntArray) {
                 else -> throw java.lang.IllegalStateException()
             }
         }
-        return output.ifEmpty { listOf(memory[0]) }
+        return memory[0]
     }
+
+    fun isHalted() = halt
 }

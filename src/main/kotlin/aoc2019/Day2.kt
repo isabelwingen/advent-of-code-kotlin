@@ -11,8 +11,8 @@ fun executeDay2Part1(name: String = "2019/day2.txt"): Long {
         .toIntArray()
     numbers[1] = 12
     numbers[2] = 2
-    val intCode = IntCode(numbers)
-    return intCode.execute().first()
+    val intCode = IntCode("Day2", numbers)
+    return intCode.execute()
 }
 
 fun executeDay2Part2(name: String = "2019/day2.txt"): Int {
