@@ -113,13 +113,12 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         return if (output == -1L) memory[0] else output
     }
 
-
     fun execute(input: Int = 0): Long {
         this.input.add(input)
         while (pointer < memory.size) {
             val opCodeAsInt = memory[pointer]
             val opCode = memory[pointer].toString().padStart(5, '0')
-            println("$name: Execute opCode $opCode ($opCodeAsInt) at position $pointer")
+            //println("$name: Execute opCode $opCode ($opCodeAsInt) at position $pointer")
             when {
                 opCode.endsWith("99") -> return executeOpCode99()
                 opCode.endsWith("1") -> executeOpCode1(opCode)
