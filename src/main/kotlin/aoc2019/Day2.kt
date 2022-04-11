@@ -3,15 +3,16 @@ package aoc2019
 import algorithm.IntCode
 import getResourceAsText
 
-fun executeDay2Part1(name: String = "2019/day2.txt"): Int {
+fun executeDay2Part1(name: String = "2019/day2.txt"): Long {
     val numbers = getResourceAsText(name)!!
         .trim()
         .split(",")
         .map { it.toInt() }
         .toIntArray()
+    numbers[1] = 12
+    numbers[2] = 2
     val intCode = IntCode(numbers)
-    intCode.reset(listOf(12, 2))
-    return intCode.execute()
+    return intCode.execute().first()
 }
 
 fun executeDay2Part2(name: String = "2019/day2.txt"): Int {

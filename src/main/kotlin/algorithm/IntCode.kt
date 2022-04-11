@@ -1,29 +1,25 @@
 package algorithm
 
 import java.util.LinkedList
-import java.util.Queue
 
 class IntCode(private val intCode: IntArray) {
-    private var memory = IntArray(intCode.size) { intCode[it] }
+    private var memory = LongArray(intCode.size) { intCode[it].toLong() }
     private var input = LinkedList<Int>()
     private var pointer = 0
-    private var output = mutableListOf<Int>()
+    private var output = mutableListOf<Long>()
 
-    fun reset(resetValues: List<Int> = listOf(), input: List<Int> = listOf()) {
+    fun reset(input: List<Int> = listOf()) {
         this.input = LinkedList(input)
         output = mutableListOf()
         pointer = 0
-        memory = IntArray(intCode.size) { intCode[it] }
-        for (i in resetValues.indices) {
-            memory[1 + i] = resetValues[i]
-        }
+        memory = LongArray(intCode.size) { intCode[it].toLong() }
     }
 
     // param starts with 1
-    private fun getValue(opCode: String, param: Int): Int {
+    private fun getValue(opCode: String, param: Int): Long {
         val mode = opCode[3 - param]
         return if (mode == '0') {
-            memory[memory[pointer + param]]
+            memory[memory[pointer + param].toInt()]
         } else {
             memory[pointer + param]
         }
@@ -32,7 +28,7 @@ class IntCode(private val intCode: IntArray) {
     private fun getAddress(opCode: String, param: Int): Int {
         val mode = opCode[3 - param]
         if (mode == '0') {
-            return memory[pointer + param]
+            return memory[pointer + param].toInt()
         } else {
             throw java.lang.IllegalStateException("Goal must always be in position mode. Pointer: $pointer, opCode: $opCode, param: $param")
         }
@@ -56,7 +52,7 @@ class IntCode(private val intCode: IntArray) {
 
     private fun executeOpCode3(opCode: String) {
         val addr = getAddress(opCode, 1)
-        memory[addr] = input.pop()!!
+        memory[addr] = input.pop()!!.toLong()
         pointer += 2
     }
 
@@ -68,8 +64,8 @@ class IntCode(private val intCode: IntArray) {
     private fun executeOpCode5(opCode: String) {
         val firstParam = getValue(opCode, 1)
         val secondParam = getValue(opCode, 2)
-        if (firstParam != 0) {
-            pointer = secondParam
+        if (firstParam != 0L) {
+            pointer = secondParam.toInt()
         } else {
             pointer += 3
         }
@@ -78,8 +74,8 @@ class IntCode(private val intCode: IntArray) {
     private fun executeOpCode6(opCode: String) {
         val firstParam = getValue(opCode, 1)
         val secondParam = getValue(opCode, 2)
-        if (firstParam == 0) {
-            pointer = secondParam
+        if (firstParam == 0L) {
+            pointer = secondParam.toInt()
         } else {
             pointer += 3
         }
@@ -109,11 +105,7 @@ class IntCode(private val intCode: IntArray) {
         pointer += 4
     }
 
-    fun getOutput(): List<Int> {
-        return output.toList()
-    }
-
-    fun execute(): Int {
+    fun execute(): List<Long> {
         while (pointer < memory.size) {
             val opCodeAsInt = memory[pointer]
             val opCode = memory[pointer].toString().padStart(5, '0')
@@ -131,6 +123,6 @@ class IntCode(private val intCode: IntArray) {
                 else -> throw java.lang.IllegalStateException()
             }
         }
-        return memory[0]
+        return output.ifEmpty { listOf(memory[0]) }
     }
 }

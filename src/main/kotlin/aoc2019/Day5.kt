@@ -3,7 +3,7 @@ package aoc2019
 import algorithm.IntCode
 import getResourceAsText
 
-fun executeDay5Part1(name: String = "2019/day5.txt"): List<Int> {
+fun executeDay5Part1(name: String = "2019/day5.txt"): List<Long> {
     val numbers = getResourceAsText(name)!!
         .trim()
         .split(",")
@@ -11,12 +11,11 @@ fun executeDay5Part1(name: String = "2019/day5.txt"): List<Int> {
         .toIntArray()
     println(numbers.toList().take(20))
     val intCode = IntCode(numbers)
-    intCode.reset(input = listOf(1))
-    intCode.execute()
-    return intCode.getOutput()
+    intCode.reset(listOf(1))
+    return intCode.execute()
 }
 
-fun executeDay5Part2(name: String = "2019/day5.txt"): List<Int> {
+fun executeDay5Part2(name: String = "2019/day5.txt"): List<Long> {
     val numbers = getResourceAsText(name)!!
         .trim()
         .split(",")
@@ -24,7 +23,6 @@ fun executeDay5Part2(name: String = "2019/day5.txt"): List<Int> {
         .toIntArray()
     println(numbers.toList().take(20))
     val intCode = IntCode(numbers)
-    intCode.reset(input = listOf(5))
-    intCode.execute()
-    return intCode.getOutput()
+    intCode.reset(listOf(5))
+    return intCode.execute()
 }
