@@ -1,5 +1,6 @@
 package algorithm
 
+import getResourceAsText
 import java.util.LinkedList
 import kotlin.math.abs
 
@@ -11,11 +12,24 @@ class IntCode(private val name: String, private val intCode: IntArray) {
     private var output = -1L
     private var relativeBase = 0
 
+
+    constructor(name: String, file: String) : this(
+        name,
+        getResourceAsText(file)!!
+            .trim()
+            .split(",")
+            .map { it.toInt() }
+            .toIntArray())
+
     fun init(input: List<Int> = listOf()) {
         this.input = LinkedList(input)
         this.halt = false
         pointer = 0
         memory = LongArray(intCode.size) { intCode[it].toLong() }
+    }
+
+    private fun println1(string: String) {
+        //println(string)
     }
 
     private fun getMemory(pointer: Int): Long {
@@ -37,6 +51,7 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         return when(val mode = opCode[3 - param]) {
             '0' -> getMemory(getMemory(pointer + param).toInt())
             '1' -> getMemory(pointer + param)
+            '2' -> getMemory(getMemory(pointer + param).toInt() + relativeBase)
             else -> throw java.lang.IllegalStateException("Illegal mode. $mode")
         }
     }
@@ -44,6 +59,7 @@ class IntCode(private val name: String, private val intCode: IntArray) {
     private fun getAddress(opCode: String, param: Int): Int {
         when (opCode[3 - param]) {
             '0' -> return getMemory(pointer + param).toInt()
+            '2' -> return getMemory(pointer + param).toInt() + relativeBase
             else -> throw java.lang.IllegalStateException("Goal must always be in position mode. Pointer: $pointer, opCode: $opCode, param: $param")
         }
     }
@@ -53,7 +69,7 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         val a = getValue(opCode, 1)
         val b = getValue(opCode, 2)
         val goal = getAddress(opCode, 3)
-        println("$name   Result: Write ${a + b} to $goal*")
+        println1("$name   Result: Write ${a + b} to $goal*")
         setMemory(goal, a + b)
         pointer += 4
     }
@@ -63,7 +79,7 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         val a = getValue(opCode, 1)
         val b = getValue(opCode, 2)
         val goal = getAddress(opCode, 3)
-        println("$name   Result: Write ${a * b} to $goal*")
+        println1("$name   Result: Write ${a * b} to $goal*")
         setMemory(goal, a * b)
         pointer += 4
     }
@@ -72,7 +88,7 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         printCommand(opCode, 1)
         val addr = getAddress(opCode, 1)
         setMemory(addr, input.pop()!!.toLong())
-        println("$name   Result: Write ${getMemory(addr)} to $addr*")
+        println1("$name   Result: Write ${getMemory(addr)} to $addr*")
         pointer += 2
     }
 
@@ -80,7 +96,7 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         printCommand(opCode, 1)
         output = getValue(opCode, 1)
         pointer += 2
-        println("$name:   Result: return $output and pause execution at $pointer")
+        println1("$name:   Result: return $output and pause execution at $pointer")
         return output
     }
 
@@ -89,10 +105,10 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         val firstParam = getValue(opCode, 1)
         val secondParam = getValue(opCode, 2)
         if (firstParam != 0L) {
-            println("$name   Result: not zero. Set Pointer to ${secondParam.toInt()}")
+            println1("$name   Result: not zero. Set Pointer to ${secondParam.toInt()}")
             pointer = secondParam.toInt()
         } else {
-            println("$name   Result: zero. Increase Pointer by 3")
+            println1("$name   Result: zero. Increase Pointer by 3")
             pointer += 3
         }
     }
@@ -102,10 +118,10 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         val firstParam = getValue(opCode, 1)
         val secondParam = getValue(opCode, 2)
         if (firstParam == 0L) {
-            println("$name   Result: zero. Set Pointer to ${secondParam.toInt()}")
+            println1("$name   Result: zero. Set Pointer to ${secondParam.toInt()}")
             pointer = secondParam.toInt()
         } else {
-            println("$name   Result: not zero. Increase Pointer by 3")
+            println1("$name   Result: not zero. Increase Pointer by 3")
             pointer += 3
         }
     }
@@ -116,10 +132,10 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         val secondParam = getValue(opCode, 2)
         val goal = getAddress(opCode, 3)
         if (firstParam < secondParam) {
-            println("$name   Result: true. Set $goal* to 1")
+            println1("$name   Result: true. Set $goal* to 1")
             setMemory(goal,1)
         } else {
-            println("$name   Result: false. Set $goal* to 0")
+            println1("$name   Result: false. Set $goal* to 0")
             setMemory(goal,0)
         }
         pointer += 4
@@ -131,10 +147,10 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         val secondParam = getValue(opCode, 2)
         val goal = getAddress(opCode, 3)
         if (firstParam == secondParam) {
-            println("$name   Result: true. Set $goal* to 1")
+            println1("$name   Result: true. Set $goal* to 1")
             setMemory(goal,1)
         } else {
-            println("$name   Result: false. Set $goal* to 0")
+            println1("$name   Result: false. Set $goal* to 0")
             setMemory(goal,0)
         }
         pointer += 4
@@ -144,11 +160,12 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         printCommand(opCode, 1)
         val firstParam = getValue(opCode, 1)
         if (firstParam > 0) {
-            println("$name   Increase relative base $relativeBase by $firstParam")
+            println1("$name   Increase relative base $relativeBase by $firstParam")
         } else {
-            println("$name   Decrease relative base $relativeBase by ${abs(firstParam)}")
+            println1("$name   Decrease relative base $relativeBase by ${abs(firstParam)}")
         }
         relativeBase += firstParam.toInt()
+        pointer += 2
     }
 
     private fun executeOpCode99(): Long {
@@ -158,12 +175,7 @@ class IntCode(private val name: String, private val intCode: IntArray) {
     }
 
     private fun printCommand(opCode: String, length: Int) {
-        val params = memory.drop(pointer + 1).take(length)
-        val stars = opCode.take(length).reversed()
-        val paramString = params
-            .mapIndexed { index, l -> if (stars[index] == '0') "$l*=${getMemory(l.toInt())}" else "$l" }
-            .joinToString(", ")
-        println("$name: Execute opCode $opCode($paramString) at position $pointer")
+        println1("$name: Execute opCode $opCode at position $pointer")
     }
 
     fun execute(input: Int = 0): Long {
@@ -180,7 +192,7 @@ class IntCode(private val name: String, private val intCode: IntArray) {
                 opCode.endsWith("6") -> executeOpCode6(opCode)
                 opCode.endsWith("7") -> executeOpCode7(opCode)
                 opCode.endsWith("8") -> executeOpCode8(opCode)
-                opCode.endsWith("8") -> executeOpCode9(opCode)
+                opCode.endsWith("9") -> executeOpCode9(opCode)
                 else -> throw java.lang.IllegalStateException()
             }
         }
