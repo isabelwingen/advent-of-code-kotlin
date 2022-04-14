@@ -17,12 +17,7 @@ class Day5: Day {
     }
 
     override fun executePart2(name: String): Long {
-        val numbers = getResourceAsText(name)!!
-            .trim()
-            .split(",")
-            .map { it.toInt() }
-            .toIntArray()
-        val intCode = IntCode("Day5", numbers)
+        val intCode = IntCode("Day5", name)
         intCode.init(listOf(5))
         return intCode.execute()
     }

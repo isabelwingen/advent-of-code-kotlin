@@ -4,8 +4,8 @@ import getResourceAsText
 import java.util.LinkedList
 import kotlin.math.abs
 
-class IntCode(private val name: String, private val intCode: IntArray) {
-    private var memory = LongArray(intCode.size) { intCode[it].toLong() }
+class IntCode(private val name: String, private val intCode: LongArray) {
+    private var memory = LongArray(intCode.size) { intCode[it] }
     private var input = LinkedList<Int>()
     private var pointer = 0
     private var halt = false
@@ -18,8 +18,8 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         getResourceAsText(file)!!
             .trim()
             .split(",")
-            .map { it.toInt() }
-            .toIntArray())
+            .map { it.toLong() }
+            .toLongArray())
 
     fun init(input: List<Int> = listOf()) {
         this.input = LinkedList(input)
@@ -178,8 +178,12 @@ class IntCode(private val name: String, private val intCode: IntArray) {
         println1("$name: Execute opCode $opCode at position $pointer")
     }
 
-    fun execute(input: Int = 0): Long {
+    fun execute(input: Int): Long {
         this.input.add(input)
+        return execute()
+    }
+
+    fun execute(): Long {
         while (pointer < memory.size) {
             val opCode = getMemory(pointer).toString().padStart(5, '0')
             when {

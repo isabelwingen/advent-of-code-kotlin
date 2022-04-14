@@ -8,8 +8,8 @@ class Day2: Day {
         val numbers = getResourceAsText(name)!!
             .trim()
             .split(",")
-            .map { it.toInt() }
-            .toIntArray()
+            .map { it.toLong() }
+            .toLongArray()
         numbers[1] = 12
         numbers[2] = 2
         val intCode = IntCode("Day2", numbers)
