@@ -19,11 +19,6 @@ class Day2: Day {
     override fun expectedResultPart1() = 11590668L
 
     override fun executePart2(name: String): Any {
-        val numbers = getResourceAsText(name)!!
-            .trim()
-            .split(",")
-            .map { it.toInt() }
-            .toIntArray()
         val res2 = 19690720
         val i = (res2 - 1870666) / 810000
         val j = (res2 - 1870666) % 810000

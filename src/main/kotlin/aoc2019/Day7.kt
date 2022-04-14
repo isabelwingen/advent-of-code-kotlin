@@ -5,14 +5,6 @@ import getResourceAsText
 
 class Day7: Day {
 
-    private fun parseInput(name: String): IntArray {
-        return getResourceAsText(name)!!
-            .trim()
-            .split(",")
-            .map { it.toInt() }
-            .toIntArray()
-    }
-
     private fun combinations(lower: Int = 0, upper: Int = 4): Set<IntArray> {
         val res = mutableSetOf<IntArray>()
         for (a in lower until upper + 1) {
@@ -33,18 +25,17 @@ class Day7: Day {
 
     override fun executePart1(name: String): Long {
         val combs = combinations()
-        val input = parseInput(name)
         val res = mutableSetOf<Long>()
         for (comb in combs) {
-            val ampA = IntCode("A", input)
+            val ampA = IntCode("A", name)
             ampA.init(listOf(comb[0]))
-            val ampB = IntCode("B", input)
+            val ampB = IntCode("B", name)
             ampB.init(listOf(comb[1]))
-            val ampC = IntCode("C", input)
+            val ampC = IntCode("C", name)
             ampC.init(listOf(comb[2]))
-            val ampD = IntCode("D", input)
+            val ampD = IntCode("D", name)
             ampD.init(listOf(comb[3]))
-            val ampE = IntCode("E", input)
+            val ampE = IntCode("E", name)
             ampE.init(listOf(comb[4]))
 
             val resA = ampA.execute(0)
@@ -62,19 +53,18 @@ class Day7: Day {
 
     override fun executePart2(name: String): Long {
         val combs = combinations(lower = 5, upper = 9)
-        val input = parseInput(name)
         val res = mutableSetOf<Long>()
         for (comb in combs) {
             val combStr = comb.toList().map { it.toString() }.joinToString("") { it }
-            val ampA = IntCode("$combStr A", input)
+            val ampA = IntCode("$combStr A", name)
             ampA.init(listOf(comb[0]))
-            val ampB = IntCode("$combStr B", input)
+            val ampB = IntCode("$combStr B", name)
             ampB.init(listOf(comb[1]))
-            val ampC = IntCode("$combStr C", input)
+            val ampC = IntCode("$combStr C", name)
             ampC.init(listOf(comb[2]))
-            val ampD = IntCode("$combStr D", input)
+            val ampD = IntCode("$combStr D", name)
             ampD.init(listOf(comb[3]))
-            val ampE = IntCode("$combStr E", input)
+            val ampE = IntCode("$combStr E", name)
             ampE.init(listOf(comb[4]))
 
 
