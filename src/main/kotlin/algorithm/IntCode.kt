@@ -179,8 +179,13 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     fun execute(input: Int): Long {
+        val sizeBefore = this.input.size
         this.input.add(input)
-        return execute()
+        val res = execute()
+        if (this.input.size > sizeBefore) {
+            this.input.removeLast()
+        }
+        return res
     }
 
     fun execute(): Long {
