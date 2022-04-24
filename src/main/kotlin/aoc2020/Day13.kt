@@ -1,6 +1,8 @@
 package aoc2020
 
+import extented_euclid
 import getResourceAsList
+import lcm
 import kotlin.math.abs
 
 private fun parseInput(path: String): Pair<Int, List<Int>> {
@@ -18,23 +20,6 @@ fun executeDay13Part1(name: String = "2020/day13.txt"): Int {
         .first()
 }
 
-private fun extented_euclid(a: Long, b: Long): Triple<Long, Long, Long> {
-    if (b == 0L) {
-        return Triple(a, 1, 0)
-    } else {
-        val (dd, ss, tt) = extented_euclid(b, a % b)
-        val t = ss - (a / b) * tt
-        return Triple(dd, tt, t)
-    }
-}
-
-private fun lcm(a: Long, b: Long): Long {
-    return abs(a * b) / extented_euclid(a, b).first
-}
-
-private fun lcm(numbers: List<Long>): Long {
-    return numbers.reduceRight { a, b -> lcm(a, b)}
-}
 // t+id_1  mod a1 == 0
 // t+id_2  mod a2 == 0
 // t+id_3  mod a3 == 0

@@ -1,101 +1,98 @@
 package aoc2019
 
 import getResourceAsList
+import lcm
 import java.util.LinkedList
 import kotlin.math.ceil
 
 class Day14: Day {
 
-    data class Chemical(val quantity: Int, val name: String) {
+    data class Chemical(val quantity: Long, val name: String) {
         override fun toString(): String = "$name($quantity)"
     }
 
-    private fun parseReaction(reaction: String): Pair<List<Chemical>, Chemical> {
+    data class Reaction(val chemical: Chemical, val sources: List<Chemical>)
+
+    private fun parseReaction(reaction: String): Reaction {
         val (left, right) = reaction.split("=>").map { it.trim() }
         val leftsChemicals = left.split(", ").map { it.trim() }
             .map { it.split(" ") }
-            .map { Chemical(it[0].toInt(), it[1]) }
+            .map { Chemical(it[0].toLong(), it[1]) }
         val (quantity, name) = right.split(" ")
-        return leftsChemicals to Chemical(quantity.toInt(), name)
+        return Reaction(Chemical(quantity.toLong(), name), leftsChemicals)
     }
 
-    private fun parseInput(name: String): Map<Chemical, List<Chemical>> {
+    private fun parseInput(name: String): List<Reaction> {
         return getResourceAsList(name)
             .filter { it.isNotBlank() }
             .map { parseReaction(it) }
-            .associate { it.second to it.first }
     }
 
-    private fun findSources(name: String, quantity: Int, reactions: Map<Chemical, List<Chemical>>): List<Chemical> {
-        val (key, value) = reactions.entries.first { it.key.name == name}
-        return if (quantity <= key.quantity) {
-            value
-        } else {
-            val x = ceil(quantity.toDouble() / key.quantity).toInt()
-            value.map { Chemical(it.quantity * x, it.name) }
-        }
+    override fun executePart1(name: String): Long {
+        return round(parseInput(name), 1)
     }
 
-    private fun findDirectParents(name: String, reactions: Map<Chemical, List<Chemical>>): List<String> {
-        return reactions.entries.first { it.key.name == name }.value.map { it.name }
-    }
+    override fun expectedResultPart1() = 1065255L
 
-    private fun getDepth(name: String, reactions: Map<Chemical, List<Chemical>>): Int {
-        if (name == "ORE") {
-            return 0
-        }
-        val parents = findDirectParents(name, reactions)
-        return if (parents.all { it == "ORE" }) {
-            1
-        } else {
-            parents.maxOf { getDepth(it, reactions) } + 1
-        }
-    }
-
-    fun sortByDepth(queue: LinkedList<Pair<String, Int>>, depths: Map<String, Int>) {
-        queue.sortByDescending { depths[it.first] }
-    }
-
-    fun summarize(queue: LinkedList<Pair<String, Int>>, depths: Map<String, Int>): LinkedList<Pair<String, Int>> {
-        val newQueue = LinkedList<Pair<String, Int>>()
-        queue
-            .groupBy { it.first }
-            .mapValues { it.value.sumOf { t -> t.second } }
-            .toList()
-            .forEach { newQueue.add(it) }
-        sortByDepth(newQueue, depths)
-        return newQueue
-    }
-
-    override fun executePart1(name: String): Int {
-        val reactions = parseInput(name)
-        val depths = reactions.keys.map { it.name }.associateWith { getDepth(it, reactions) }
-
-        var list = LinkedList<Pair<String, Int>>()
-        list.add("FUEL" to 1)
-        var count = 0
-        while (list.isNotEmpty()) {
-            val (chemical, quantity) = list.pop()
+    private fun round(reactions: List<Reaction>, fuel: Long = 1L): Long {
+        val needed = mutableMapOf<String, Long>()
+        val having = mutableMapOf<String, Long>()
+        var ore = 0L
+        needed["FUEL"] = fuel
+        while (needed.isNotEmpty()) {
+            var (chemical, quantity) = needed.entries.first()
+            needed.remove(chemical)
             if (chemical == "ORE") {
-                count += quantity
+                ore += quantity
             } else {
-                findSources(chemical, quantity, reactions)
-                    .forEach { list.add(it.name to it.quantity) }
-                list = summarize(list, depths)
+                val alreadyThere = having.getOrDefault(chemical, 0)
+                val reaction = reactions.first { it.chemical.name == chemical }
+                val throughReaction = reaction.chemical.quantity
+                if (alreadyThere >= quantity) {
+                    //we do not need a reaction, cause we already have enough
+                    having[chemical] = alreadyThere - quantity
+                } else {
+                    quantity -= alreadyThere
+                    val factor = if (throughReaction >= quantity) 1 else ceil(quantity.toDouble() / throughReaction).toLong()
+                    having[chemical] = (throughReaction * factor - quantity)
+                    reaction.sources.forEach {
+                        needed[it.name] = needed.getOrPut(it.name) {0} + it.quantity.toInt() * factor
+                    }
+                }
             }
-        }
-        return count
-    }
 
-    override fun expectedResultPart1() = 1065255
+        }
+        return ore
+    }
 
     override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+        val reactions = parseInput(name)
+        var low = TRILLION / round(reactions, 1)
+        var high = low * 10
+        while (round(reactions, high) < TRILLION) {
+            low = high
+            high = 10 * low
+        }
+        var mid = 0L
+        while (low < high - 1) {
+            mid = (low + high) / 2
+            val ore = round(reactions, mid)
+            if (ore < TRILLION) {
+                low = mid
+            } else if (ore > TRILLION) {
+                high = mid
+            } else {
+                break
+            }
+        }
+        return low
     }
 
-    override fun expectedResultPart2(): Any {
-        TODO("Not yet implemented")
-    }
+    override fun expectedResultPart2() = 1766154L
 
     override fun key() = "14"
+
+    companion object {
+        const val TRILLION = 1_000_000_000_000L
+    }
 }
