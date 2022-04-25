@@ -12,6 +12,9 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     private var output = -1L
     private var relativeBase = 0
 
+    override fun toString(): String {
+        return memory.toList().joinToString(", ")
+    }
 
     constructor(name: String, file: String) : this(
         name,
@@ -209,4 +212,12 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     fun isHalted() = halt
+
+    fun copy(): IntCode {
+        val co = IntCode(name, intCode)
+        co.relativeBase = relativeBase
+        co.memory = memory.clone()
+
+        return co
+    }
 }
