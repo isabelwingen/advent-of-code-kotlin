@@ -71,25 +71,10 @@ private fun roundPart2(game: Game): Game {
     return game
 }
 
-fun mustBeNormalGame(game: Game): Boolean {
-    val cards = game.player1.toMutableList()
-    cards.addAll(game.player2)
-    return cards.count { it < cards.size } < 2
-}
-
 private fun play(gameIn: Game, baseGame: Boolean = true): Int {
     var game = gameIn
     val previousRounds = mutableSetOf<List<Int>>()
     var breakerEnd = false
-    var winningPlayer = 1
-    if (mustBeNormalGame(gameIn)) {
-        breakerEnd = true
-        val maxA = gameIn.player1.maxOrNull()!!
-        val maxB = gameIn.player2.maxOrNull()!!
-        if (maxB > maxA) {
-            winningPlayer = 2
-        }
-    }
     while (game.player1.isNotEmpty() && game.player2.isNotEmpty()) {
         val gameAsList = game.player2.toList()
         if (previousRounds.any { it == gameAsList }) {
@@ -99,6 +84,7 @@ private fun play(gameIn: Game, baseGame: Boolean = true): Int {
         previousRounds.add(gameAsList)
         game = roundPart2(Game(LinkedList(game.player1), LinkedList(game.player2)))
     }
+    var winningPlayer = 1
     if (!breakerEnd && game.player2.isNotEmpty()) {
         winningPlayer = 2
     }
