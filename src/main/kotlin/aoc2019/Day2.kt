@@ -1,11 +1,12 @@
 package aoc2019
 
 import algorithm.IntCode
-import getResourceAsText
+import getInput
+import util.Day
 
-class Day2: Day {
+class Day2: Day("2") {
     override fun executePart1(name: String): Long {
-        val numbers = getResourceAsText(name)!!
+        val numbers = getInput(name)
             .trim()
             .split(",")
             .map { it.toLong() }
@@ -27,7 +28,4 @@ class Day2: Day {
     }
 
     override fun expectedResultPart2() = 2254
-
-    override fun key() = "2"
-
 }

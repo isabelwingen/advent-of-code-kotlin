@@ -1,75 +1,85 @@
 package aoc2020
 
+import util.Day
+
 private const val INPUT: String = "394618527"
 
-private fun parseInput(): IntArray {
-    return INPUT
-        .map { it.toString().toInt() }
-        .toIntArray()
-}
-
-private fun destination(current: Int, cups: IntArray, firstPickUp: Int, secondPickUp: Int, thirdPickup: Int): Int {
-    var dest = if (current != 1) current - 1 else cups.maxOrNull()!!
-    while (firstPickUp == dest || secondPickUp == dest || thirdPickup == dest) {
-        dest = if (dest != 1) dest - 1 else cups.maxOrNull()!!
+class Day23 : Day("23") {
+    private fun parseInput(): IntArray {
+        return INPUT
+            .map { it.toString().toInt() }
+            .toIntArray()
     }
-    return dest
-}
 
-private fun pickUp(cups: IntArray, current: Int): IntArray {
-    val first = cups[current]
-    val second = cups[first]
-    val third = cups[second]
-    val fourth = cups[third]
-    val dest = destination(current, cups, first, second, third)
-    val afterDest = cups[dest]
-
-    cups[current] = fourth
-    cups[dest] = first
-    cups[third] = afterDest
-    return cups
-}
-
-private fun buildArray(input: IntArray): IntArray {
-    val cups = IntArray(input.size + 1) { -1 }
-    for (i in input.indices) {
-        if (i != input.size - 1) {
-            cups[input[i]] = input[i + 1]
+    private fun destination(current: Int, cups: IntArray, firstPickUp: Int, secondPickUp: Int, thirdPickup: Int): Int {
+        var dest = if (current != 1) current - 1 else cups.maxOrNull()!!
+        while (firstPickUp == dest || secondPickUp == dest || thirdPickup == dest) {
+            dest = if (dest != 1) dest - 1 else cups.maxOrNull()!!
         }
+        return dest
     }
-    cups[input[input.size - 1]] = input[0]
-    return cups
-}
 
-private fun execute(times: Int, input: IntArray = parseInput()): IntArray {
-    var cups = buildArray(input)
-    var current = input[0]
-    for (i in 1 until times+1) {
-        cups = pickUp(cups, current)
-        current = cups[current]
-    }
-    return cups
-}
+    private fun pickUp(cups: IntArray, current: Int): IntArray {
+        val first = cups[current]
+        val second = cups[first]
+        val third = cups[second]
+        val fourth = cups[third]
+        val dest = destination(current, cups, first, second, third)
+        val afterDest = cups[dest]
 
-fun executeDay23Part1(): Int {
-    val cups = execute(100)
-    val res = mutableListOf<Int>()
-    var current = 1
-    while (res.size < 9) {
-        current = cups[current]
-        res.add(current)
+        cups[current] = fourth
+        cups[dest] = first
+        cups[third] = afterDest
+        return cups
     }
-    return res.joinToString("").toInt()
-}
 
-fun executeDay23Part2(): Long {
-    val input = parseInput().toMutableList()
-    val maxPlusOne = input.maxOrNull()!! + 1
-    for (i in maxPlusOne until 1_000_001) {
-        input.add(i)
+    private fun buildArray(input: IntArray): IntArray {
+        val cups = IntArray(input.size + 1) { -1 }
+        for (i in input.indices) {
+            if (i != input.size - 1) {
+                cups[input[i]] = input[i + 1]
+            }
+        }
+        cups[input[input.size - 1]] = input[0]
+        return cups
     }
-    val cups = execute(10_000_000, input.toIntArray())
-    val a = cups[1]
-    val b = cups[a]
-    return a.toLong() * b.toLong()
+
+    private fun execute(times: Int, input: IntArray = parseInput()): IntArray {
+        var cups = buildArray(input)
+        var current = input[0]
+        for (i in 1 until times+1) {
+            cups = pickUp(cups, current)
+            current = cups[current]
+        }
+        return cups
+    }
+
+    override fun executePart1(name: String): Int {
+        val cups = execute(100)
+        val res = mutableListOf<Int>()
+        var current = 1
+        while (res.size < 9) {
+            current = cups[current]
+            res.add(current)
+        }
+        return res.joinToString("").toInt()
+    }
+
+    override fun expectedResultPart1(): Any {
+        return 785692341
+    }
+
+    override fun executePart2(name: String): Long {
+        val input = parseInput().toMutableList()
+        val maxPlusOne = input.maxOrNull()!! + 1
+        for (i in maxPlusOne until 1_000_001) {
+            input.add(i)
+        }
+        val cups = execute(10_000_000, input.toIntArray())
+        val a = cups[1]
+        val b = cups[a]
+        return a.toLong() * b.toLong()
+    }
+
+    override fun expectedResultPart2() = 565615814504L
 }

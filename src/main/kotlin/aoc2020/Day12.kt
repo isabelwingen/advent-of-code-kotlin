@@ -1,10 +1,12 @@
 package aoc2020
 
-import getResourceAsList
+import getInputAsLines
+import util.Day
 import kotlin.math.abs
 
+
 private fun parseInput(path: String): List<Pair<String, Int>> {
-    return getResourceAsList(path)
+    return getInputAsLines(path)
         .filter { it.isNotBlank() }
         .map { it[0].toString() to it.substring(1, it.length).toInt() }
 }
@@ -147,10 +149,17 @@ class Day12Part2 {
     }
 }
 
-fun executeDay12Part1(name: String = "2020/day12.txt"): Int {
-    return Day12Part1().execute(name)
-}
+class Day12 : Day("12") {
+    override fun executePart1(name: String): Any {
+        return Day12Part1().execute(name)
+    }
 
-fun executeDay12Part2(name: String = "2020/day12.txt"): Int {
-    return Day12Part2().execute(name)
+    override fun expectedResultPart1() = 364
+
+    override fun executePart2(name: String): Any {
+        return Day12Part2().execute(name)
+    }
+
+    override fun expectedResultPart2() = 39518
+
 }

@@ -1,11 +1,11 @@
 package aoc2019
 
-import getResourceAsList
-import lcm
-import java.util.LinkedList
+
+import getInputAsLines
+import util.Day
 import kotlin.math.ceil
 
-class Day14: Day {
+class Day14: Day("14") {
 
     data class Chemical(val quantity: Long, val name: String) {
         override fun toString(): String = "$name($quantity)"
@@ -23,7 +23,7 @@ class Day14: Day {
     }
 
     private fun parseInput(name: String): List<Reaction> {
-        return getResourceAsList(name)
+        return getInputAsLines(name)
             .filter { it.isNotBlank() }
             .map { parseReaction(it) }
     }
@@ -89,8 +89,6 @@ class Day14: Day {
     }
 
     override fun expectedResultPart2() = 1766154L
-
-    override fun key() = "14"
 
     companion object {
         const val TRILLION = 1_000_000_000_000L

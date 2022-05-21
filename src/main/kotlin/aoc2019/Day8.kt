@@ -1,9 +1,9 @@
 package aoc2019
 
-import getResourceAsList
-import getResourceAsText
+import getInput
+import util.Day
 
-class Day8: Day {
+class Day8: Day("8") {
 
     class Layer(val lines: List<IntArray>) {
         override fun toString(): String {
@@ -12,7 +12,7 @@ class Day8: Day {
     }
 
     private fun parseInput(name: String): IntArray {
-        return getResourceAsText(name)!!
+        return getInput(name)
             .trim()
             .map { it.toString().toInt() }
             .toIntArray()
@@ -38,10 +38,8 @@ class Day8: Day {
             .map { it.toIntArray() }
             .chunked(6)
             .map { Layer(it) }
-        println(layers.first().lines.size)
-        println(layers.first().lines.first().size)
 
-        var result = mutableListOf(
+        val result = mutableListOf(
             IntArray(25) { -1 },
             IntArray(25) { -1 },
             IntArray(25) { -1 },
@@ -61,18 +59,16 @@ class Day8: Day {
             }
         }
 
-        return result
+        return "\n" + result
             .map { it.toList().map { t -> if (t == 1) "#" else " " } }
             .joinToString("\n") { it.joinToString("") }
     }
 
-    override fun expectedResultPart2()=
+    override fun expectedResultPart2()= "\n" +
             "#     ##  #   ##  # ###  \n" +
             "#    #  # #   ##  # #  # \n" +
             "#    #     # # #### ###  \n" +
             "#    # ##   #  #  # #  # \n" +
             "#    #  #   #  #  # #  # \n" +
             "####  ###   #  #  # ###  "
-
-    override fun key()= "8"
 }

@@ -1,6 +1,6 @@
 package algorithm
 
-import getResourceAsText
+import getInput
 import java.util.LinkedList
 import kotlin.math.abs
 
@@ -18,7 +18,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
 
     constructor(name: String, file: String) : this(
         name,
-        getResourceAsText(file)!!
+        getInput(file)
             .trim()
             .split(",")
             .map { it.toLong() }

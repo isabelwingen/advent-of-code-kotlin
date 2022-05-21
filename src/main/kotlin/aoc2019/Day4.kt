@@ -1,12 +1,13 @@
 package aoc2019
 
-import getResourceAsText
+import getInput
 import splitBy
+import util.Day
 
-class Day4: Day {
+class Day4: Day("4") {
 
     private fun parseInput(name: String): Pair<Int, Int> {
-        val coll = getResourceAsText(name)!!
+        val coll = getInput(name)
             .trim()
             .split("-")
             .map { it.toInt() }
@@ -66,7 +67,4 @@ class Day4: Day {
     }
 
     override fun expectedResultPart2() = 1390
-
-    override fun key() = "3"
-
 }

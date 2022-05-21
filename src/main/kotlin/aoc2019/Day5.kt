@@ -1,10 +1,9 @@
 package aoc2019
 
 import algorithm.IntCode
-import getResourceAsText
+import util.Day
 
-class Day5: Day {
-    override fun key(): String = "5"
+class Day5: Day("5") {
 
     override fun executePart1(name: String): Long {
         val intCode = IntCode("Day5", name)

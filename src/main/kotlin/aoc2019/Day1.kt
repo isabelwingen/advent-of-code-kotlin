@@ -1,10 +1,12 @@
 package aoc2019
 
-import getResourceAsList
+import getInputAsLines
+import util.Day
 
-class Day1: Day {
+class Day1: Day("1") {
+
     override fun executePart1(name: String): Long {
-        return getResourceAsList(name)
+        return getInputAsLines(name)
             .asSequence()
             .filter { it.isNotBlank() }
             .map { it.toLong() }
@@ -15,7 +17,7 @@ class Day1: Day {
     override fun expectedResultPart1() = 3210097L
 
     override fun executePart2(name: String): Long {
-        return getResourceAsList(name)
+        return getInputAsLines(name)
             .asSequence()
             .filter { it.isNotBlank() }
             .map { it.toLong() }
@@ -26,8 +28,6 @@ class Day1: Day {
     }
 
     override fun expectedResultPart2() = 4812287L
-
-    override fun key() = "1"
 
     private fun recursiveFuel(value: Long): Long {
         val next = (value / 3) - 2

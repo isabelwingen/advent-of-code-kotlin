@@ -1,10 +1,10 @@
 package aoc2019
 
 import algorithm.IntCode
-import java.util.Comparator
+import util.Day
 
 class Robot(var orientation: String = "UP", var position: Pair<Int, Int> = 0 to 0) {
-    override fun toString() = "Robot is facing $orientation at position $position"
+    override fun toString() = "facing $orientation at position $position"
 
     private fun turnLeft() {
         when (orientation) {
@@ -46,7 +46,7 @@ class Robot(var orientation: String = "UP", var position: Pair<Int, Int> = 0 to 
     }
 }
 
-class Day11: Day {
+class Day11: Day("11") {
     override fun executePart1(name: String): Int {
         val program = IntCode("Robot", name)
         val robot = Robot()
@@ -57,7 +57,6 @@ class Day11: Day {
             val turn = program.execute()
             val next = robot.action(colorToPaint.toInt(), turn.toInt())
             paintedTiles[next.first] = next.second
-            println(robot)
         }
         return paintedTiles.keys.size
     }
@@ -75,7 +74,6 @@ class Day11: Day {
             val turn = program.execute(input)
             val next = robot.action(colorToPaint.toInt(), turn.toInt())
             paintedTiles[next.first] = next.second
-            println(robot)
         }
         val res = mutableListOf<MutableList<String>>()
         for (i in 0 until 6) {
@@ -87,17 +85,16 @@ class Day11: Day {
             .keys
             .forEach { res[it.second][it.first] = "#" }
 
-        return res
+        return "\n" + res
             .map { t -> t.joinToString("") { it } }
             .joinToString("\n") { it }
     }
 
-    override fun expectedResultPart2() = " ###  #### ###  #### ###  ###  #  #  ##    \n" +
+    override fun expectedResultPart2() = "\n" +
+            " ###  #### ###  #### ###  ###  #  #  ##    \n" +
             " #  #    # #  # #    #  # #  # # #  #  #   \n" +
             " #  #   #  #  # ###  #  # #  # ##   #      \n" +
             " ###   #   ###  #    ###  ###  # #  #      \n" +
             " #    #    # #  #    #    # #  # #  #  # # \n" +
             " #    #### #  # #    #    #  # #  #  ##    "
-
-    override fun key(): String = "11"
 }

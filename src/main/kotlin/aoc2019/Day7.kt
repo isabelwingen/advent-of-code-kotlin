@@ -1,9 +1,9 @@
 package aoc2019
 
 import algorithm.IntCode
-import getResourceAsText
+import util.Day
 
-class Day7: Day {
+class Day7: Day("7") {
 
     private fun combinations(lower: Int = 0, upper: Int = 4): Set<IntArray> {
         val res = mutableSetOf<IntArray>()
@@ -86,7 +86,4 @@ class Day7: Day {
     }
 
     override fun expectedResultPart2() = 7818398L
-
-    override fun key() = "7"
-
 }

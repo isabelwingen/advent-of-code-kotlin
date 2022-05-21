@@ -1,12 +1,5 @@
 import kotlin.math.abs
 
-fun getResourceAsText(path: String): String? =
-    object {}.javaClass.getResource(path)?.readText()
-
-fun getResourceAsList(path: String): Collection<String> =
-    getResourceAsText(path)!!
-        .split("\n")
-
 fun extented_euclid(a: Long, b: Long): Triple<Long, Long, Long> {
     if (b == 0L) {
         return Triple(a, 1, 0)

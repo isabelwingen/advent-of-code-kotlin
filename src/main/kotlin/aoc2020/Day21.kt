@@ -1,66 +1,74 @@
 package aoc2020
 
-import getResourceAsList
+import getInputAsLines
+import util.Day
 
-private fun parseInput(name: String = "2020/day21.txt"): List<Pair<List<String>, List<String>>> {
-    return getResourceAsList(name)
-        .filter { it.isNotBlank() }
-        .map { it.split("(contains ") }
-        .map { it[0] to it[1] }
-        .map { it -> it.first.split(" ").filter { it.isNotBlank() } to it.second.replace(")", "").split(", ") }
-}
+class Day21: Day("21") {
 
-private fun getMapping(lines: List<Pair<List<String>, List<String>>>): List<Pair<String, Set<String>>> {
-    val mapping = mutableSetOf<Pair<String, List<String>>>()
-    for (line in lines) {
-        for (allergen in line.second) {
-            mapping.add(allergen to line.first)
-        }
+    private fun parseInput(name: String): List<Pair<List<String>, List<String>>> {
+        return getInputAsLines(name)
+            .filter { it.isNotBlank() }
+            .map { it.split("(contains ") }
+            .map { it[0] to it[1] }
+            .map { it -> it.first.split(" ").filter { it.isNotBlank() } to it.second.replace(")", "").split(", ") }
     }
-    return mapping.toSet()
-        .sortedBy { it.first }
-        .fold(mutableMapOf<String, Set<String>>()) { acc, pair ->
-            if (acc.containsKey(pair.first)) {
-                acc[pair.first] = acc[pair.first]!!.intersect(pair.second.toSet())
-            } else {
-                acc[pair.first] = pair.second.toSet()
+
+    private fun getMapping(lines: List<Pair<List<String>, List<String>>>): List<Pair<String, Set<String>>> {
+        val mapping = mutableSetOf<Pair<String, List<String>>>()
+        for (line in lines) {
+            for (allergen in line.second) {
+                mapping.add(allergen to line.first)
             }
-            acc
         }
-        .toList()
-        .sortedBy { it.second.size }
-}
-
-private fun ingredientsWithAllergens(mapping: List<Pair<String, Set<String>>>): Map<String, String> {
-    val m = mapping.map { it.first to it.second.toMutableSet() }.toMutableList()
-    val result = mutableMapOf<String, String>()
-    while (m.isNotEmpty()) {
-        val next = m.first { it.second.size == 1 }
-        val ingredient = next.second.toList().first()
-        result[next.first] = ingredient
-        m.remove(next)
-        m.forEach { it.second.remove(ingredient) }
+        return mapping.toSet()
+            .sortedBy { it.first }
+            .fold(mutableMapOf<String, Set<String>>()) { acc, pair ->
+                if (acc.containsKey(pair.first)) {
+                    acc[pair.first] = acc[pair.first]!!.intersect(pair.second.toSet())
+                } else {
+                    acc[pair.first] = pair.second.toSet()
+                }
+                acc
+            }
+            .toList()
+            .sortedBy { it.second.size }
     }
 
-    return result.toMap()
-}
+    private fun ingredientsWithAllergens(mapping: List<Pair<String, Set<String>>>): Map<String, String> {
+        val m = mapping.map { it.first to it.second.toMutableSet() }.toMutableList()
+        val result = mutableMapOf<String, String>()
+        while (m.isNotEmpty()) {
+            val next = m.first { it.second.size == 1 }
+            val ingredient = next.second.toList().first()
+            result[next.first] = ingredient
+            m.remove(next)
+            m.forEach { it.second.remove(ingredient) }
+        }
 
-fun executeDay21Part1(name: String = "2020/day21.txt"): Int {
-    val data = parseInput(name)
-    val mapping = getMapping(data)
+        return result.toMap()
+    }
 
-    val withAllergens = ingredientsWithAllergens(mapping)
+    override fun executePart1(name: String): Int {
+        val data = parseInput(name)
+        val mapping = getMapping(data)
 
-    return data.flatMap { it.first }.count { !withAllergens.values.toSet().contains(it) }
+        val withAllergens = ingredientsWithAllergens(mapping)
 
-}
+        return data.flatMap { it.first }.count { !withAllergens.values.toSet().contains(it) }
 
-fun executeDay21Part2(name: String = "2020/day21.txt"): String {
-    val data = parseInput(name)
-    val mapping = getMapping(data)
+    }
 
-    return ingredientsWithAllergens(mapping)
-        .toList()
-        .sortedBy { it.first }
-        .joinToString(",") { it.second }
+    override fun expectedResultPart1() = 2423
+
+    override fun executePart2(name: String): String {
+        val data = parseInput(name)
+        val mapping = getMapping(data)
+
+        return ingredientsWithAllergens(mapping)
+            .toList()
+            .sortedBy { it.first }
+            .joinToString(",") { it.second }
+    }
+
+    override fun expectedResultPart2() = "jzzjz,bxkrd,pllzxb,gjddl,xfqnss,dzkb,vspv,dxvsp"
 }

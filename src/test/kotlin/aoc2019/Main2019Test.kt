@@ -11,14 +11,14 @@ internal class Main2019Test {
     @ParameterizedTest(name = "result should be as expected for Day {0} Part 1")
     @MethodSource("getData")
     fun testExecutionsPart1(key: String) {
-        val day = days.first { it.key() == key }
+        val day = days.first { it.key == key }
         assertEquals(day.expectedResultPart1(), day.executePart1())
     }
 
     @ParameterizedTest(name = "result should be as expected for Day {0} Part 2")
     @MethodSource("getData")
     fun testExecutionsPart2(key: String) {
-        val day = days.first { it.key() == key }
+        val day = days.first { it.key == key }
         assertEquals(day.expectedResultPart2(), day.executePart2())
     }
 
@@ -27,14 +27,14 @@ internal class Main2019Test {
 
         @JvmStatic
         fun getData(): List<Arguments> {
-            return days.map { Arguments.of(it.key()) }
+            return days.map { Arguments.of(it.key) }
         }
     }
 
     @Test
     fun testSingleExecution() {
         val key = "5"
-        val day = days.first { it.key() == key }
+        val day = days.first { it.key == key }
         assertEquals(day.expectedResultPart1(), day.executePart1())
         assertEquals(day.expectedResultPart2(), day.executePart2())
     }

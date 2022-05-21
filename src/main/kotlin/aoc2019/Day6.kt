@@ -1,8 +1,10 @@
 package aoc2019
 
-import getResourceAsList
 
-class Day6: Day {
+import getInputAsLines
+import util.Day
+
+class Day6: Day("6") {
 
     private data class Orbit(val center: String, val planet: String)
 
@@ -30,7 +32,7 @@ class Day6: Day {
     }
 
     private fun parseInput(name: String): List<Orbit> {
-        return getResourceAsList(name)
+        return getInputAsLines(name)
             .filter { it.isNotBlank() }
             .map { it.split(")") }
             .map { Orbit(it[0], it[1]) }
@@ -64,6 +66,4 @@ class Day6: Day {
     }
 
     override fun expectedResultPart2() = 496
-
-    override fun key() = "6"
 }

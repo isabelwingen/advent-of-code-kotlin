@@ -1,10 +1,10 @@
 package aoc2019
 
 import algorithm.IntCode
-import getResourceAsText
-import kotlin.coroutines.suspendCoroutine
+import getInput
+import util.Day
 
-class Day13: Day {
+class Day13: Day("13") {
 
     override fun executePart1(name: String): Int {
         val program = IntCode("Day13", name)
@@ -70,7 +70,7 @@ class Day13: Day {
     }
 
     override fun executePart2(name: String): Any {
-        val intCode =  getResourceAsText(name)!!
+        val intCode = getInput(name)
             .trim()
             .split(",")
             .map { it.toLong() }
@@ -105,8 +105,6 @@ class Day13: Day {
     }
 
     override fun expectedResultPart2() = 8942L
-
-    override fun key() = "13"
 
     companion object {
         const val PADDLE: Int = 3

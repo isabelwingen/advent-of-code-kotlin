@@ -1,9 +1,11 @@
 package aoc2019
 
-import getResourceAsList
+
+import getInputAsLines
+import util.Day
 import kotlin.math.abs
 
-class Day12: Day {
+class Day12: Day("12") {
 
     data class Vector(var x: Int, var y: Int, var z: Int) {
         fun plus(otherVector: Vector) {
@@ -43,7 +45,7 @@ class Day12: Day {
     }
 
     private fun parseInput(name: String): List<Moon> {
-        return getResourceAsList(name)
+        return getInputAsLines(name)
             .asSequence()
             .filter { it.isNotBlank() }
             .map { it.split(",") }
@@ -90,13 +92,13 @@ class Day12: Day {
     }
 
     private fun print(io: Moon, europa: Moon, ganymede: Moon, callisto: Moon, id: Int) {
-        println("After $id steps")
-        println(io)
-        println(europa)
-        println(ganymede)
-        println(callisto)
-        println("Sum of total energy: ${io.totalEnergy() + europa.totalEnergy() + ganymede.totalEnergy() + callisto.totalEnergy()}")
-        println()
+//        println("After $id steps")
+//        println(io)
+//        println(europa)
+//        println(ganymede)
+//        println(callisto)
+//        println("Sum of total energy: ${io.totalEnergy() + europa.totalEnergy() + ganymede.totalEnergy() + callisto.totalEnergy()}")
+//        println()
     }
 
     private fun step(io: Moon, europa: Moon, ganymede: Moon, callisto: Moon, id: Int = 0) {
@@ -153,6 +155,4 @@ class Day12: Day {
     }
 
     override fun expectedResultPart2()= 281691380235984L
-
-    override fun key() = "12"
 }

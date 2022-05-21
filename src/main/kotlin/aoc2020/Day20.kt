@@ -1,7 +1,8 @@
 package aoc2020
 
-import getResourceAsList
+import getInputAsLines
 import splitBy
+import util.Day
 import java.lang.IllegalStateException
 
 private data class Tile(val id: Int, val lines: List<IntArray>) {
@@ -117,148 +118,156 @@ private data class Tile(val id: Int, val lines: List<IntArray>) {
             else -> throw IllegalStateException()
         }
     }
-
-
 }
 
-private fun toTile(tile: List<String>): Tile {
-    val name = tile[0].split(" ")[1].dropLast(1).toInt()
-    val lines = tile.subList(1, tile.size)
-        .map { it.map { c -> if (c == '#') 1 else 0 } }
-        .map { it.toIntArray() }
-    return Tile(name, lines)
-}
+class Day20: Day("20") {
 
-private fun parseInput(path: String = "2020/day20.txt"): List<Tile> {
-    return getResourceAsList(path)
-        .splitBy { it.isBlank() }
-        .filter { it.isNotEmpty() }
-        .filter { it.all { x -> x.isNotEmpty() } }
-        .map { toTile(it) }
-}
-
-private fun buildMap(tiles: Map<Int, Tile>): Map<Int, Set<Tile>> {
-    val map = tiles.mapValues { mutableSetOf<Tile>() }
-    for ((id, tile) in tiles) {
-        for ((_, otherTile) in tiles) {
-            if (map[id]!!.size >= 4) {
-                continue
-            }
-            if (tile == otherTile) {
-                continue
-            }
-            val mb = tile.matchingBorder(otherTile)
-            if (mb != null) {
-                map[id]!!.add(otherTile)
-            }
-        }
+    private fun toTile(tile: List<String>): Tile {
+        val name = tile[0].split(" ")[1].dropLast(1).toInt()
+        val lines = tile.subList(1, tile.size)
+            .map { it.map { c -> if (c == '#') 1 else 0 } }
+            .map { it.toIntArray() }
+        return Tile(name, lines)
     }
-    return map.toMap()
-}
 
-fun executeDay20Part1(): Long {
-    val tiles = parseInput().associateBy { it.id }
-    return buildMap(tiles)
-        .filter { it.value.size == 2 }
-        .map { it.key.toLong() }
-        .reduceRight { a, b -> a * b }
-}
-
-fun IntArray.str(): String {
-    return this.joinToString("") { it.toString() }
-}
-
-private fun getNeighbourMap(tile: Tile, map: Map<Int, Set<Tile>>): Map<String, Tile> {
-    return map[tile.id]!!.associateBy { tile.directionOfNeighbour(it)!! }
-}
-
-private fun findStartTile(tiles: Map<Int, Tile>, map: Map<Int, Set<Tile>>): Tile? {
-    val cornerTiles = map
-        .filter { it.value.size == 2 }
-    for ((id, neighbours) in cornerTiles) {
-        val tile = tiles[id]!!
-        val neighbourMap = neighbours.associateBy { tile.directionOfNeighbour(it)!! }
-        if (neighbourMap.keys.sortedBy { it }.joinToString("") == "RU") {
-           return tile.flipUpToDown()
-        }
+    private fun parseInput(path: String): List<Tile> {
+        return getInputAsLines(path)
+            .splitBy { it.isBlank() }
+            .filter { it.isNotEmpty() }
+            .filter { it.all { x -> x.isNotEmpty() } }
+            .map { toTile(it) }
     }
-   return null
-}
 
-private fun getLines(): List<String> {
-    val tiles = parseInput()
-        .associateBy { it.id }
-    val map = buildMap(tiles)
-    var start = findStartTile(tiles, map)!!
-    var left = start
-    var n = getNeighbourMap(start, map)
-    var m = n.toMap()
-    val result = mutableListOf<MutableList<Tile>>()
-    for (i in 0 until 12) {
-        result.add(mutableListOf())
-    }
-    for (row in 0 until 12) {
-        for (col in 0 until 12) {
-            result[row].add(start)
-            if (n["R"] != null) {
-                start = n["R"]!!.matchingOrientationToLeftBorder(start.rightBorder)
-                n = getNeighbourMap(start, map)
+    private fun buildMap(tiles: Map<Int, Tile>): Map<Int, Set<Tile>> {
+        val map = tiles.mapValues { mutableSetOf<Tile>() }
+        for ((id, tile) in tiles) {
+            for ((_, otherTile) in tiles) {
+                if (map[id]!!.size >= 4) {
+                    continue
+                }
+                if (tile == otherTile) {
+                    continue
+                }
+                val mb = tile.matchingBorder(otherTile)
+                if (mb != null) {
+                    map[id]!!.add(otherTile)
+                }
             }
         }
-        if (m["D"] == null) {
-            break
-        }
-        start = m["D"]!!.matchingOrientationToUpperBorder(left.lowerBorder)
-        n = getNeighbourMap(start, map)
-        left = start
-        m = n.toMap()
+        return map.toMap()
     }
-    val strBuilder = StringBuilder()
-    for (row in 0 until 12) {
-        for (i in 1 until 9) {
+
+    override fun executePart1(name: String): Long {
+        val tiles = parseInput(name).associateBy { it.id }
+        return buildMap(tiles)
+            .filter { it.value.size == 2 }
+            .map { it.key.toLong() }
+            .reduceRight { a, b -> a * b }
+    }
+
+    override fun expectedResultPart1() = 15405893262491L
+
+    fun IntArray.str(): String {
+        return this.joinToString("") { it.toString() }
+    }
+
+    private fun getNeighbourMap(tile: Tile, map: Map<Int, Set<Tile>>): Map<String, Tile> {
+        return map[tile.id]!!.associateBy { tile.directionOfNeighbour(it)!! }
+    }
+
+    private fun findStartTile(tiles: Map<Int, Tile>, map: Map<Int, Set<Tile>>): Tile? {
+        val cornerTiles = map
+            .filter { it.value.size == 2 }
+        for ((id, neighbours) in cornerTiles) {
+            val tile = tiles[id]!!
+            val neighbourMap = neighbours.associateBy { tile.directionOfNeighbour(it)!! }
+            if (neighbourMap.keys.sortedBy { it }.joinToString("") == "RU") {
+                return tile.flipUpToDown()
+            }
+        }
+        return null
+    }
+
+    private fun getLines(name: String): List<String> {
+        val tiles = parseInput(name)
+            .associateBy { it.id }
+        val map = buildMap(tiles)
+        var start = findStartTile(tiles, map)!!
+        var left = start
+        var n = getNeighbourMap(start, map)
+        var m = n.toMap()
+        val result = mutableListOf<MutableList<Tile>>()
+        for (i in 0 until 12) {
+            result.add(mutableListOf())
+        }
+        for (row in 0 until 12) {
             for (col in 0 until 12) {
-                strBuilder.append(result[row][col].lines[i].drop(1).dropLast(1).joinToString("") {it.toString()})
+                result[row].add(start)
+                if (n["R"] != null) {
+                    start = n["R"]!!.matchingOrientationToLeftBorder(start.rightBorder)
+                    n = getNeighbourMap(start, map)
+                }
             }
-            strBuilder.append("\n")
+            if (m["D"] == null) {
+                break
+            }
+            start = m["D"]!!.matchingOrientationToUpperBorder(left.lowerBorder)
+            n = getNeighbourMap(start, map)
+            left = start
+            m = n.toMap()
         }
-    }
-    return strBuilder.toString().trim().split("\n")
-}
-
-private const val FIRST_LINE : String =  "..................1."
-private const val SECOND_LINE : String = "1....11....11....111"
-private const val THIRD_LINE : String =  ".1..1..1..1..1..1..."
-
-private fun allMatches(regex: Regex, line: CharSequence): List<Int> {
-    return line.indices
-        .mapNotNull { regex.find(line, it) }
-        .map { it.range.first }
-        .distinct()
-}
-private fun findLinesContainingSeamonsterTop(lines: List<String>): List<Pair<Int, Int>> {
-    val firstLineMatches = lines
-        .indices
-        .flatMap { allMatches(FIRST_LINE.toRegex(), lines[it]).map { x -> it to x } }
-    val secondLineMatches = lines
-        .indices
-        .flatMap { allMatches(SECOND_LINE.toRegex(), lines[it]).map { x -> it to x } }
-    val thirdLineMatches = lines
-        .indices
-        .flatMap { allMatches(THIRD_LINE.toRegex(), lines[it]).map { x -> it to x } }
-    val res = mutableListOf<Pair<Int, Int>>()
-    for (p in firstLineMatches) {
-        if (secondLineMatches.contains(p.first + 1 to p.second) && thirdLineMatches.contains(p.first + 2 to p.second)) {
-            res.add(p)
+        val strBuilder = StringBuilder()
+        for (row in 0 until 12) {
+            for (i in 1 until 9) {
+                for (col in 0 until 12) {
+                    strBuilder.append(result[row][col].lines[i].drop(1).dropLast(1).joinToString("") { it.toString() })
+                }
+                strBuilder.append("\n")
+            }
         }
+        return strBuilder.toString().trim().split("\n")
     }
-    return res.toList()
-}
 
-fun executeDay20Part2(): Int {
-    val tile = Tile(0, getLines().map { it.map { s -> s.toString().toInt() }.toIntArray() }).rotate180()
-    val lines = tile.lines.map { it.joinToString("") { s -> s.toString() } }
-    val allHashes = lines.joinToString("").count { it == '1' }
-    return allHashes - findLinesContainingSeamonsterTop(lines).count() * 15
+    private fun allMatches(regex: Regex, line: CharSequence): List<Int> {
+        return line.indices
+            .mapNotNull { regex.find(line, it) }
+            .map { it.range.first }
+            .distinct()
+    }
+
+    private fun findLinesContainingSeamonsterTop(lines: List<String>): List<Pair<Int, Int>> {
+        val firstLineMatches = lines
+            .indices
+            .flatMap { allMatches(Companion.FIRST_LINE.toRegex(), lines[it]).map { x -> it to x } }
+        val secondLineMatches = lines
+            .indices
+            .flatMap { allMatches(Companion.SECOND_LINE.toRegex(), lines[it]).map { x -> it to x } }
+        val thirdLineMatches = lines
+            .indices
+            .flatMap { allMatches(Companion.THIRD_LINE.toRegex(), lines[it]).map { x -> it to x } }
+        val res = mutableListOf<Pair<Int, Int>>()
+        for (p in firstLineMatches) {
+            if (secondLineMatches.contains(p.first + 1 to p.second) && thirdLineMatches.contains(p.first + 2 to p.second)) {
+                res.add(p)
+            }
+        }
+        return res.toList()
+    }
+
+    override fun executePart2(name: String): Int {
+        val tile = Tile(0, getLines(name).map { it.map { s -> s.toString().toInt() }.toIntArray() }).rotate180()
+        val lines = tile.lines.map { it.joinToString("") { s -> s.toString() } }
+        val allHashes = lines.joinToString("").count { it == '1' }
+        return allHashes - findLinesContainingSeamonsterTop(lines).count() * 15
+    }
+
+    override fun expectedResultPart2() = 2133
+
+    companion object {
+        private const val FIRST_LINE: String = "..................1."
+        private const val SECOND_LINE: String = "1....11....11....111"
+        private const val THIRD_LINE: String = ".1..1..1..1..1..1..."
+    }
 }
 
 

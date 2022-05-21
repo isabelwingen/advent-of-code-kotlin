@@ -1,13 +1,13 @@
 package aoc2019
 
-import getResourceAsList
-import java.util.Comparator
+import getInputAsLines
+import util.Day
 import kotlin.math.*
 
-class Day10: Day {
+class Day10: Day("10") {
 
     private fun parseInput(name: String): Pair<Int, Set<Point>> {
-        val lines = getResourceAsList(name)
+        val lines = getInputAsLines(name)
             .filter { it.isNotBlank() }
         val n = lines.size
         val comets = lines.asSequence()
@@ -72,12 +72,9 @@ class Day10: Day {
             .mapValues { it.value.sortedBy { t -> t.second.length }.map { t -> t.first } }
             .mapKeys { getDegree(it.key) }
             .toSortedMap()
-        println(station)
         val point = map.toList()[199].second.first()
         return (point.x * 100 + point.y).toInt()
     }
 
     override fun expectedResultPart2()= 416
-
-    override fun key() = "10"
 }

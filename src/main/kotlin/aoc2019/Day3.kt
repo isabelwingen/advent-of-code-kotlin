@@ -1,10 +1,11 @@
 package aoc2019
 
-import getResourceAsList
+import getInputAsLines
+import util.Day
 import java.util.LinkedList
 import kotlin.math.abs
 
-class Day3: Day {
+class Day3: Day("3") {
 
     private enum class Direction {
         R, L, U, D
@@ -55,8 +56,8 @@ class Day3: Day {
         return points.toList()
     }
 
-    private fun parseInput(name: String = "2019/day3.txt"): Pair<List<Operation>, List<Operation>> {
-        val coll = getResourceAsList(name).toList()
+    private fun parseInput(name: String): Pair<List<Operation>, List<Operation>> {
+        val coll = getInputAsLines(name).toList()
         val first = coll[0].split(",")
             .filter { it.isNotBlank() }
             .map { it.trim() }
@@ -67,7 +68,6 @@ class Day3: Day {
             .map { toOperation(it) }
         return first to second
     }
-
 
     override fun executePart1(name: String): Int {
         val (first, second) = parseInput(name)
@@ -99,6 +99,4 @@ class Day3: Day {
     }
 
     override fun expectedResultPart2() = 112316
-
-    override fun key() = "3"
 }

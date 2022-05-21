@@ -1,46 +1,55 @@
 package aoc2020
 
-import getResourceAsList
 
-private fun parseInput(name: String = "2020/day1.txt"): IntArray {
-    return getResourceAsList(name)
-        .filter { x -> x.isNotBlank() }
-        .map { x -> Integer.parseInt(x) }
-        .sortedWith(compareBy {it})
-        .toIntArray()
-}
+import getInputAsLines
+import util.Day
 
-fun executeDay1Part1(name: String = "2020/day1.txt"): Int {
-    val coll = parseInput(name)
+class Day1: Day("1") {
 
-    for (i in coll.indices) {
-        for (j in coll.size-1 downTo i+1) {
-            val x = coll[i]
-            val y = coll[j]
-            if (x + y == 2020) {
-                return x * y
-            } else if (x + y < 2020) {
-                break
-            }
-        }
+    private fun parseInput(name: String): IntArray {
+        return getInputAsLines(name)
+            .filter { x -> x.isNotBlank() }
+            .map { x -> Integer.parseInt(x) }
+            .sortedWith(compareBy {it})
+            .toIntArray()
     }
-    return -1
-}
 
-fun executeDay1Part2(name: String = "2020/day1.txt"): Int {
-    val coll = parseInput(name)
+    override fun executePart1(name: String): Int {
+        val coll = parseInput(name)
 
-    for (i in coll.indices) {
-        for (j in coll.size-1 downTo i+1) {
-            for (k in i+1 until j-1) {
+        for (i in coll.indices) {
+            for (j in coll.size-1 downTo i+1) {
                 val x = coll[i]
                 val y = coll[j]
-                val z = coll[k]
-                if (x + y + z == 2020) {
-                    return x * y * z
+                if (x + y == 2020) {
+                    return x * y
+                } else if (x + y < 2020) {
+                    break
                 }
             }
         }
+        return -1
     }
-    return -1
+
+    override fun expectedResultPart1() = 605364
+
+    override fun executePart2(name: String): Any {
+        val coll = parseInput(name)
+
+        for (i in coll.indices) {
+            for (j in coll.size-1 downTo i+1) {
+                for (k in i+1 until j-1) {
+                    val x = coll[i]
+                    val y = coll[j]
+                    val z = coll[k]
+                    if (x + y + z == 2020) {
+                        return x * y * z
+                    }
+                }
+            }
+        }
+        return -1
+    }
+
+    override fun expectedResultPart2() = 128397680
 }

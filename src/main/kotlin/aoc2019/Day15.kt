@@ -1,11 +1,11 @@
 package aoc2019
 
 import algorithm.IntCode
+import util.Day
 import java.lang.IllegalStateException
 import java.util.LinkedList
-import kotlin.math.E
 
-class Day15: Day {
+class Day15: Day("15") {
 
     private fun back(dir: Int): Int {
         return when(dir) {
@@ -98,10 +98,7 @@ class Day15: Day {
 
     override fun expectedResultPart2() = 326
 
-    override fun key() = "15"
-
     companion object {
-        val WALL = 0L
         val HALLWAY = 1L
         val GOAL = 2L
 
@@ -109,7 +106,5 @@ class Day15: Day {
         val SOUTH = 2
         val WEST = 3
         val EAST = 4
-
-        val OFFSET = 21
     }
 }
