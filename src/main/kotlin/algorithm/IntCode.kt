@@ -28,7 +28,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
         this.input = LinkedList(input)
         this.halt = false
         pointer = 0
-        memory = LongArray(intCode.size) { intCode[it].toLong() }
+        memory = LongArray(intCode.size) { intCode[it] }
     }
 
     private fun println1(string: String) {
@@ -47,6 +47,10 @@ class IntCode(private val name: String, private val intCode: LongArray) {
             memory = LongArray(pointer + 2) { if (it < memory.size) memory[it] else 0}
         }
         memory[pointer] = value
+    }
+
+    fun changeMemoryValue(address: Int, value: Long) {
+        memory[address] = value
     }
 
     // param starts with 1
@@ -187,6 +191,16 @@ class IntCode(private val name: String, private val intCode: LongArray) {
         val res = execute()
         if (this.input.size > sizeBefore) {
             this.input.removeLast()
+        }
+        return res
+    }
+
+    fun execute(input: List<Int>): Long {
+        val sizeBefore = this.input.size
+        this.input.addAll(input)
+        val res = execute()
+        if (this.input.size > sizeBefore) {
+            repeat(sizeBefore - input.size) { this.input.removeLast() }
         }
         return res
     }
