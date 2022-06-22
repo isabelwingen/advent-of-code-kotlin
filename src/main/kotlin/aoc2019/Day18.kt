@@ -3,6 +3,7 @@ package aoc2019
 import getInputAsLines
 import util.Day
 import java.util.LinkedList
+import java.util.Stack
 
 class Day18: Day("18") {
 
@@ -133,30 +134,76 @@ class Day18: Day("18") {
         return s.toSet()
     }
 
-    private fun nextStates(state: State): Collection<State> {
+    private fun nextStates(state: State): List<State> {
         val (graph, currentPosition, keys, steps) = state
-        val edges = graph.edges.filter { it.start ==  currentPosition }
-        return edges
-            .mapNotNull{ edge ->
-                val goalNode = graph.nodes.first { it.coordinate == edge.goal }
-                if (goalNode.value == '.') {
-                    State(graph, edge.goal, keys, steps)
-                } else if (goalNode.value.isLowerCase()) {
-                    val key = goalNode.value
-                    val r = State(graph.openDoor(key), edge.goal, keys.add(key), steps + edge.weight)
-                    r
-                } else {
-                    null
-                }
+
+        val queue = LinkedList<MutableList<Edge>>()
+        val nodesSeen = mutableSetOf<Position>()
+        val paths = mutableSetOf<List<Edge>>()
+        queue.add(mutableListOf(Edge(Position(-1, -1), currentPosition, 0)))
+        while (queue.isNotEmpty()) {
+            val path = queue.pop()
+            val goal = path.last().goal
+            nodesSeen.add(goal)
+            val goalNode = graph.nodes.first { it.coordinate == goal }
+            if (goalNode.value.isUpperCase()) {
+                // there is a door and we cannot go on
+            } else if (goalNode.value.isLowerCase()) {
+                // we have found a key
+                paths.add(path.toList())
+            } else {
+                // go on
+                val newEdges = graph.edges
+                    .filter { it.start == goal }
+                    .filter { !nodesSeen.contains(it.goal) }
+                    .map {
+                        MutableList<Edge>(path.size + 1) { i -> if (i < path.size) path[i] else it }
+                    }
+               newEdges.forEach { queue.add(it) }
             }
-     }
+        }
+        return paths.map { path ->
+            val goalNode = graph.nodes.first { it.coordinate == path.last().goal }
+            val key = goalNode.value
+            State(graph.openDoor(key), path.last().goal, keys.add(key), steps + path.sumOf { it.weight })
+        }
+
+    }
+
+    private fun isThereAlreadyAFasterPath(queue: Stack<State>, state: State): Boolean {
+        val sameStates = queue
+            .filter { it.graph == state.graph }
+            .filter { it.keys == state.keys }
+            .filter { it.currentPosition == state.currentPosition }
+            .filter { it.steps <= state.steps }
+        return sameStates.isNotEmpty()
+    }
 
 
     override fun executePart1(name: String): Any {
         val (s, g) = getGraph(name)
+        val numberOfKeys = g.nodes.count { it.value != EMPTY && it.value.isLowerCase()}
         val startState = State(g, s)
-        val a = nextStates(startState).first()
-        return nextStates(a)
+        val queue = Stack<State>()
+        queue.add(startState)
+        var smallestPath = Int.MAX_VALUE
+        while (queue.isNotEmpty()) {
+            val currentState = queue.pop()
+            val nextStates = nextStates(currentState).groupBy { it.keys.size == numberOfKeys }
+            val x = nextStates[true]
+                ?.filter { it.steps < smallestPath }
+                ?.minByOrNull { it.steps }
+            if (x != null) {
+                smallestPath = x.steps
+                println(smallestPath)
+            }
+            nextStates[false]
+                ?.filter { it.steps < smallestPath }
+                ?.filter { !queue.contains(it) }
+                ?.filter { !isThereAlreadyAFasterPath(queue, it) }
+                ?.forEach { queue.add(it) }
+        }
+        return smallestPath
     }
 
 
