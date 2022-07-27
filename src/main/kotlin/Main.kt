@@ -6,6 +6,8 @@ import java.io.File
 import java.net.URL
 import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 fun getInput(file: String): String {
     return if (dir == "resources") {
@@ -23,6 +25,7 @@ fun getInputAsLines(file: String): List<String> {
 var dir = "resources"
 var chosenYear = "2019"
 
+@OptIn(ExperimentalTime::class)
 private fun executeDay(year: String, day: String, part: String) {
     val p = object {}.javaClass.classLoader.loadClass("aoc$year.Day$day")
     val dayInstance = p.constructors[0].newInstance() as Day
@@ -32,12 +35,15 @@ private fun executeDay(year: String, day: String, part: String) {
         val res2 = dayInstance.executePart2()
         println("Results of $year/$day: Part 1=$res1 and Part2=$res2")
     } else {
-        val res = if (part == "1") {
-             dayInstance.executePart1()
-        } else {
-            dayInstance.executePart2()
+        val (value, elapsed) = measureTimedValue {
+            if (part == "1") {
+                dayInstance.executePart1()
+            } else {
+                dayInstance.executePart2()
+            }
         }
-        println("Result of $year/$day.$part is $res")
+
+        println("Result of $year/$day.$part is $value.\nIt took $elapsed")
     }
 }
 
