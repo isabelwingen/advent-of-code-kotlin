@@ -9,137 +9,100 @@ import kotlin.time.measureTime
 
 class Day18: Day("18") {
 
-    companion object {
-        const val WALL = '#'
-        const val EMPTY = '.'
-        const val SECTION = '+'
-    }
-
-    data class Coordinate(val row: Int, val col: Int) {
-        fun goRight(): Coordinate {
-            return Coordinate(row, col + 1)
-        }
-
-        fun goLeft(): Coordinate {
-            return Coordinate(row, col - 1)
-        }
-
-        fun goUp(): Coordinate {
-            return Coordinate(row - 1, col)
-        }
-
-        fun goDown(): Coordinate {
-            return Coordinate(row + 1, col)
-        }
-
-        fun manhattan(other: Day18.Coordinate): Int {
-            return abs(this.col - other.col) + abs(this.row - other.row)
-        }
-    }
-
-    data class Node(val coordinate: Coordinate, val value: Char)
-
     private fun readMaze(name: String): List<List<Char>> {
         return getInputAsLines(name)
             .map { it.map { x -> x } }
             .filter { it.isNotEmpty() }
     }
 
-    private fun getNeighbourIndices(row: Int, col: Int, rows: Int, cols: Int): List<Coordinate> {
-        val res = mutableListOf<Coordinate>()
-        if (row < rows - 1) {
-            res.add(Coordinate(row + 1, col))
-        }
-        if (row > 0) {
-            res.add(Coordinate(row - 1, col))
-        }
-        if (col < cols - 1) {
-            res.add(Coordinate(row, col + 1))
-        }
-        if (col > 0) {
-            res.add(Coordinate(row, col - 1))
+    data class Graph(val edges: Set<Set<Triple<Int, Int, Char>>>)
 
-        }
-        return res.toList()
-    }
-
-    private fun getNodes(maze: List<List<Char>>): Map<Coordinate, Char> {
-        val result = HashMap<Coordinate, Char>()
+    private fun createGraph(maze: List<List<Char>>): Graph {
+        val res = mutableSetOf<Set<Triple<Int, Int, Char>>>()
         for (row in maze.indices) {
             for (col in maze[0].indices) {
-                val value = maze[row][col]
-                if (value != WALL && value != EMPTY) {
-                    result[Coordinate(row, col)] = value
-                } else if (value == EMPTY) {
-                    val neighbors = getNeighbourIndices(row, col, maze.size, maze[0].size)
-                        .map { maze[it.row][it.col] }
-                        .count { it != WALL }
-                    if (neighbors >= 2) {
-                        result[Coordinate(row, col)] = SECTION
+                val pos = Triple(row, col, maze[row][col])
+                if (maze[row][col] != '#') {
+                    res.addAll(
+                        setOf(row-1 to col, row+1 to col, row to col+1, row to col-1)
+                            .filter { maze.indices.contains(it.first) && maze[0].indices.contains(it.second) }
+                            .filter { maze[it.first][it.second] != '#' }
+                            .map { setOf(pos, Triple(it.first, it.second, maze[it.first][it.second])) })
+                }
+            }
+        }
+        return Graph(res.toSet())
+    }
+
+    private fun edgeContraction(g: Graph): Graph {
+        val allEdges = g.edges.toMutableSet()
+        while (true) {
+            val nodes = allEdges.flatten().toSet()
+            val nodesThatCanBeRemoved = nodes
+                .filter { n -> allEdges.filter { edge -> edge.contains(n) }.size == 2 }
+                .filter { it.third == '.' }
+            if (nodesThatCanBeRemoved.isEmpty()) {
+                return Graph(allEdges.toSet());
+            } else {
+                val toBeRemoved = nodesThatCanBeRemoved.first()
+                val edges = allEdges.filter { it.contains(toBeRemoved) }
+                assert(edges.size == 2)
+                val otherNodes = edges.flatten().filter { it != toBeRemoved }.toSet()
+                assert(otherNodes.size == 2)
+                allEdges.removeIf { it.contains(toBeRemoved) }
+                allEdges.add(otherNodes)
+            }
+        }
+    }
+
+    private fun removeEmptyCulDeSacs(graph: Graph): Graph {
+        val culDeSacs = graph.edges
+            .flatten()
+            .distinct()
+            .filter { it.third == '.' }
+            .filter { n -> graph.edges.filter { edge -> edge.contains(n) }.size == 1 }
+        val newEdges = graph.edges.toMutableSet()
+        newEdges.removeIf { e -> culDeSacs.any { e.contains(it) } }
+        return Graph(newEdges.toSet())
+    }
+
+    private fun removeEmptyNodes(graph: Graph): Graph {
+        val edges = graph.edges.toMutableSet()
+
+        while (true) {
+            val emptyNodes = edges.flatten().toSet()
+                .filter { it.third == '.' }
+            if (emptyNodes.isEmpty()) {
+                return Graph(edges.toSet())
+            } else {
+                val toBeRemoved = emptyNodes.first()
+                val otherNodes = edges.filter { it.contains(toBeRemoved) }
+                    .flatten()
+                    .filter { it != toBeRemoved }
+                    .toSet()
+                edges.removeIf { it.contains(toBeRemoved) }
+                for (a in otherNodes) {
+                    for (b in otherNodes.filter { it != a }) {
+                        edges.add(setOf(a, b))
                     }
                 }
             }
         }
-        return result.toMap()
-    }
-
-    data class Edge(val start: Coordinate, val end: Coordinate, val weight: Int, val doors: Set<Char> = emptySet())
-
-    private fun getEdges(nodes: Map<Coordinate, Char>, maze: List<List<Char>>): List<Edge> {
-        val edges = mutableListOf<Edge>()
-        for (nodeA in nodes) {
-            for (nodeB in nodes) {
-                if (nodeA != nodeB && nodeA.key.manhattan(nodeB.key) == 1) {
-                    edges.add(Edge(nodeA.key, nodeB.key, 1))
-                }
-            }
-        }
-        return edges.toList()
-    }
-
-    private fun findAllDirectNeighbours(start: Coordinate, edges: Set<Edge>, nodes: Map<Coordinate, Char>): List<Edge> {
-        val res = mutableListOf<List<Coordinate>>()
-        val queue = LinkedList<MutableList<Coordinate>>()
-        queue.add(mutableListOf(start))
-        while (queue.isNotEmpty()) {
-            val path = queue.pop()
-            val endOfPath = path.last()
-            val successors = edges
-                .filter { it.start == endOfPath }
-                .filter { !path.toSet().contains(it.end) }
-                .map { MutableList(path.size + 1) { i -> if (i < path.size) path[i] else it.end } }
-            for (newPath in successors) {
-                val newEnd = newPath.last()
-                if (nodes[newEnd]!!.isLowerCase() || nodes[newEnd]!! == '@') {
-                    res.add(newPath.toList())
-                } else {
-                    queue.add(newPath)
-                }
-            }
-        }
-        val q = res
-            .map { path -> Edge(path.first(), path.last(), path.size - 1, path.map { nodes[it]!! }.filter { it.isUpperCase() }.toSet()) }
-        return q
-    }
-
-    private fun simplifyGraph(nodes: Map<Coordinate, Char>, edges: Set<Edge>): Any {
-        val relevantNodes = nodes.filter { it.value.isLowerCase() || it.value == '@' }
-        val result = relevantNodes.flatMap { findAllDirectNeighbours(it.key, edges, nodes) }
-            .groupBy { it.copy(weight = 0) }
-            .mapValues { it.value.minByOrNull { k -> k.weight }!! }
-            .values
-            .toSet()
-        return result
     }
 
     override fun executePart1(name: String): Any {
-        val maze = readMaze(name)
-        val nodes = getNodes(maze)
-        val edges = getEdges(nodes, maze)
-        return measureTimeMillis {
-            simplifyGraph(nodes, edges.toSet())
-        }
+        return listOf(name)
+            .map { readMaze(it) }
+            .map { createGraph(it) }
+            .map { edgeContraction(it) }
+            .map { removeEmptyCulDeSacs(it) }
+            .map { removeEmptyNodes(it) }
+            .first()
+            .edges
+            .map { "${it.toList()[0].third} <-> ${it.toList()[1].third}"  }
+
     }
+
 
     override fun expectedResultPart1(): Any {
         TODO("Not yet implemented")

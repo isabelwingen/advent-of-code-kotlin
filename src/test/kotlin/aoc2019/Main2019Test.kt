@@ -35,7 +35,7 @@ internal class Main2019Test {
 
     @Test
     fun testSingleExecution() {
-        val key = "5"
+        val key = "18"
         val day = days.first { it.key == key }
         assertEquals(day.expectedResultPart1(), day.executePart1())
         assertEquals(day.expectedResultPart2(), day.executePart2())
