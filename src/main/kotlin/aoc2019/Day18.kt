@@ -3,9 +3,7 @@ package aoc2019
 import getInputAsLines
 import util.Day
 import java.util.LinkedList
-import kotlin.math.abs
-import kotlin.system.measureTimeMillis
-import kotlin.time.measureTime
+import java.util.Queue
 
 class Day18: Day("18") {
 
@@ -15,92 +13,82 @@ class Day18: Day("18") {
             .filter { it.isNotEmpty() }
     }
 
-    data class Graph(val edges: Set<Set<Triple<Int, Int, Char>>>)
+    data class Node(val pos: Pair<Int, Int>, val value: Char)
 
-    private fun createGraph(maze: List<List<Char>>): Graph {
-        val res = mutableSetOf<Set<Triple<Int, Int, Char>>>()
-        for (row in maze.indices) {
-            for (col in maze[0].indices) {
-                val pos = Triple(row, col, maze[row][col])
-                if (maze[row][col] != '#') {
-                    res.addAll(
-                        setOf(row-1 to col, row+1 to col, row to col+1, row to col-1)
-                            .filter { maze.indices.contains(it.first) && maze[0].indices.contains(it.second) }
-                            .filter { maze[it.first][it.second] != '#' }
-                            .map { setOf(pos, Triple(it.first, it.second, maze[it.first][it.second])) })
+    data class Graph(private val map: Map<Set<Node>, Int>) {
+
+        private val mmap = map.toMutableMap()
+
+        fun removeNode(node: Node): Graph {
+            mmap.entries.removeIf { it.key.contains(node) }
+            return this
+        }
+
+        fun addEdge(nodeA: Node, nodeB: Node, weight: Int): Graph {
+            val edge = setOf(nodeA, nodeB)
+            if (mmap.getOrDefault(edge, Int.MAX_VALUE) > weight) {
+                mmap[edge] = weight
+            }
+            return this
+        }
+
+        fun contractNode(node: Node): Graph {
+            val edges = mmap.entries
+                .filter { it.key.contains(node) }
+                .map { it.key.first { k -> k != node } to it.value }
+            for (i in 1 until edges.size) {
+                for (j in 0 until i) {
+                    addEdge(edges[i].first, edges[j].first, edges[i].second + edges[j].second)
                 }
             }
+            removeNode(node)
+            return this
         }
-        return Graph(res.toSet())
-    }
 
-    private fun edgeContraction(g: Graph): Graph {
-        val allEdges = g.edges.toMutableSet()
-        while (true) {
-            val nodes = allEdges.flatten().toSet()
-            val nodesThatCanBeRemoved = nodes
-                .filter { n -> allEdges.filter { edge -> edge.contains(n) }.size == 2 }
-                .filter { it.third == '.' }
-            if (nodesThatCanBeRemoved.isEmpty()) {
-                return Graph(allEdges.toSet());
-            } else {
-                val toBeRemoved = nodesThatCanBeRemoved.first()
-                val edges = allEdges.filter { it.contains(toBeRemoved) }
-                assert(edges.size == 2)
-                val otherNodes = edges.flatten().filter { it != toBeRemoved }.toSet()
-                assert(otherNodes.size == 2)
-                allEdges.removeIf { it.contains(toBeRemoved) }
-                allEdges.add(otherNodes)
-            }
+        fun simplify(): Graph {
+            mmap.keys.flatten().distinct().filter { it.value == '.' }.forEach { contractNode(it) }
+            return this
         }
+
+        override fun toString(): String {
+            return mmap.toString()
+        }
+
     }
 
-    private fun removeEmptyCulDeSacs(graph: Graph): Graph {
-        val culDeSacs = graph.edges
-            .flatten()
-            .distinct()
-            .filter { it.third == '.' }
-            .filter { n -> graph.edges.filter { edge -> edge.contains(n) }.size == 1 }
-        val newEdges = graph.edges.toMutableSet()
-        newEdges.removeIf { e -> culDeSacs.any { e.contains(it) } }
-        return Graph(newEdges.toSet())
-    }
+    private fun createGraph(maze: List<List<Char>>): Graph {
+        val map = mutableMapOf<Set<Node>, Int>()
+        for (row in maze.indices) {
+            for (col in maze[0].indices) {
+                val value = maze[row][col]
+                if (value != '#') {
+                val node = Node(row to col, value)
+                    if (row > 0 && maze[row-1][col] != '#') {
+                        map[setOf(node, Node(row - 1 to col, maze[row-1][col]))] = 1
+                    }
+                    if (row < maze.size - 1 && maze[row+1][col] != '#') {
+                        map[setOf(node, Node(row + 1 to col, maze[row+1][col]))] = 1
 
-    private fun removeEmptyNodes(graph: Graph): Graph {
-        val edges = graph.edges.toMutableSet()
+                    }
+                    if (col > 0 && maze[row][col-1] != '#') {
+                        map[setOf(node, Node(row to col - 1, maze[row][col-1]))] = 1
+                    }
+                    if (col < maze[0].size - 1 && maze[row][col+1] != '#') {
+                        map[setOf(node, Node(row to col + 1, maze[row][col+1]))] = 1
 
-        while (true) {
-            val emptyNodes = edges.flatten().toSet()
-                .filter { it.third == '.' }
-            if (emptyNodes.isEmpty()) {
-                return Graph(edges.toSet())
-            } else {
-                val toBeRemoved = emptyNodes.first()
-                val otherNodes = edges.filter { it.contains(toBeRemoved) }
-                    .flatten()
-                    .filter { it != toBeRemoved }
-                    .toSet()
-                edges.removeIf { it.contains(toBeRemoved) }
-                for (a in otherNodes) {
-                    for (b in otherNodes.filter { it != a }) {
-                        edges.add(setOf(a, b))
                     }
                 }
             }
         }
+        return Graph(map.toMap())
     }
+
 
     override fun executePart1(name: String): Any {
         return listOf(name)
             .map { readMaze(it) }
             .map { createGraph(it) }
-            .map { edgeContraction(it) }
-            .map { removeEmptyCulDeSacs(it) }
-            .map { removeEmptyNodes(it) }
-            .first()
-            .edges
-            .map { "${it.toList()[0].third} <-> ${it.toList()[1].third}"  }
-
+            .map { it.simplify() }
     }
 
 
