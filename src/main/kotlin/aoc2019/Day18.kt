@@ -2,7 +2,6 @@ package aoc2019
 
 import getInputAsLines
 import util.Day
-import java.security.cert.TrustAnchor
 import java.util.LinkedList
 import java.util.PriorityQueue
 
@@ -83,7 +82,7 @@ class Day18: Day("18") {
         fun toInitialState(): State {
             val startNode = this.getStartNode()
             val visited = LinkedList(listOf(startNode))
-            return State(this, startNode, visited, 0)
+            return State(this, listOf(startNode), visited, 0)
         }
 
         fun numberOfKeys(): Int {
@@ -123,7 +122,7 @@ class Day18: Day("18") {
         return Graph(map.toMap())
     }
 
-    data class State(val graph: Graph, val currentPosition: Node, val visited: LinkedList<Node>, val steps: Int) {
+    data class State(val graph: Graph, val currentPositions: List<Node>, val visited: LinkedList<Node>, val steps: Int) {
 
         override fun toString(): String {
             return "$visited ($steps)"
@@ -138,29 +137,25 @@ class Day18: Day("18") {
             }
         }
 
-        fun collectKey(keyValue: Char): State {
-            val keyNode = graph.findMatchingNode(keyValue)
-            val steps = graph.steps(keyNode, currentPosition)
-            return collectKey(keyNode, steps)
-        }
-
-        fun collectKey(keyNode: Node, stepsToKey: Int): State {
+        fun collectKey(keyNode: Node, stepsToKey: Int, replacer: (Node) -> List<Node>): State {
             assert(keyNode.value.isLowerCase())
             assert(!visited.contains(keyNode))
             val newGraph = removeDoor(keyNode)
             val newVisited = LinkedList(visited)
             newVisited.add(keyNode)
-            return State(newGraph, keyNode, newVisited, steps + stepsToKey)
+            return State(newGraph, replacer.invoke(keyNode), newVisited, steps + stepsToKey)
         }
 
         fun branchToCollectableKeys(): List<State> {
-            return graph.getNeighbours(currentPosition)
-                .filter { it.first.value.isLowerCase() && !visited.contains(it.first) }
-                .map { collectKey(it.first, it.second) }
+            return currentPositions.flatMapIndexed {  index, currentPosition ->
+                graph.getNeighbours(currentPosition)
+                    .filter { it.first.value.isLowerCase() && !visited.contains(it.first) }
+                    .map { collectKey(it.first, it.second) { v -> currentPositions.replace(index, v) } }
+            }
         }
 
         fun isBadStateInComparisonTo(otherState: State) =
-            currentPosition == otherState.currentPosition
+            currentPositions == otherState.currentPositions
                     && visited.all { otherState.visited.contains(it) }
                     && steps >= otherState.steps
     }
@@ -216,6 +211,12 @@ private fun PriorityQueue<Day18.State>.addAndImprove(newStates: List<Day18.State
             this.add(state)
         }
     }
+}
+
+private fun <E> List<E>.replace(i: Int, e: E): List<E> {
+    val p = this.toMutableList()
+    p[i] = e
+    return p.toList()
 }
 
 
