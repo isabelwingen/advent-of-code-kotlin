@@ -2,8 +2,9 @@ package aoc2019
 
 import getInputAsLines
 import util.Day
+import java.security.cert.TrustAnchor
 import java.util.LinkedList
-import java.util.Queue
+import java.util.PriorityQueue
 
 class Day18: Day("18") {
 
@@ -13,7 +14,9 @@ class Day18: Day("18") {
             .filter { it.isNotEmpty() }
     }
 
-    data class Node(val pos: Pair<Int, Int>, val value: Char)
+    data class Node(val pos: Pair<Int, Int>, val value: Char) {
+        override fun toString()= "$value"
+    }
 
     data class Graph(private val map: Map<Set<Node>, Int>) {
 
@@ -51,7 +54,44 @@ class Day18: Day("18") {
         }
 
         override fun toString(): String {
-            return mmap.toString()
+            return mmap.entries
+                .map { it.key.toList() to it.value }
+                .map { Triple(it.first[0].value, it.first[1].value, it.second) }
+                .map { "${it.first} <- ${it.third} -> ${it.second}" }
+                .joinToString("\n") { it }
+        }
+
+        fun getNeighbours(node: Node): List<Pair<Node, Int>> {
+            return mmap
+                .entries
+                .filter { it.key.contains(node) }
+                .map { it.key.find { k -> k != node }!! to it.value }
+        }
+
+        fun getStartNode(): Node {
+            return mmap.keys.flatten().distinct().find { it.value == '@' }!!
+        }
+
+        fun findMatchingDoor(key: Char) = mmap.keys.flatten().find { it.value == key.uppercaseChar() }
+
+        fun findMatchingNode(key: Char) = mmap.keys.flatten().find { it.value == key }!!
+
+        fun deepCopy(): Graph {
+            return Graph(mmap.toMap())
+        }
+
+        fun toInitialState(): State {
+            val startNode = this.getStartNode()
+            val visited = LinkedList(listOf(startNode))
+            return State(this, startNode, visited, 0)
+        }
+
+        fun numberOfKeys(): Int {
+            return mmap.keys.flatten().filter { it.value.isLowerCase() }.distinct().size
+        }
+
+        fun steps(from: Node, to: Node): Int {
+            return mmap.get(setOf(from, to))!!
         }
 
     }
@@ -83,12 +123,76 @@ class Day18: Day("18") {
         return Graph(map.toMap())
     }
 
+    data class State(val graph: Graph, val currentPosition: Node, val visited: LinkedList<Node>, val steps: Int) {
+
+        override fun toString(): String {
+            return "$visited ($steps)"
+        }
+
+        private fun removeDoor(keyNode: Node): Graph {
+            val doorNode = graph.findMatchingDoor(keyNode.value)
+            if (doorNode != null) {
+                return graph.deepCopy().contractNode(doorNode).contractNode(visited.last)
+            } else {
+                return graph.deepCopy().contractNode(visited.last)
+            }
+        }
+
+        fun collectKey(keyValue: Char): State {
+            val keyNode = graph.findMatchingNode(keyValue)
+            val steps = graph.steps(keyNode, currentPosition)
+            return collectKey(keyNode, steps)
+        }
+
+        fun collectKey(keyNode: Node, stepsToKey: Int): State {
+            assert(keyNode.value.isLowerCase())
+            assert(!visited.contains(keyNode))
+            val newGraph = removeDoor(keyNode)
+            val newVisited = LinkedList(visited)
+            newVisited.add(keyNode)
+            return State(newGraph, keyNode, newVisited, steps + stepsToKey)
+        }
+
+        fun branchToCollectableKeys(): List<State> {
+            return graph.getNeighbours(currentPosition)
+                .filter { it.first.value.isLowerCase() && !visited.contains(it.first) }
+                .map { collectKey(it.first, it.second) }
+        }
+
+        fun isBadStateInComparisonTo(otherState: State) =
+            currentPosition == otherState.currentPosition
+                    && visited.all { otherState.visited.contains(it) }
+                    && steps >= otherState.steps
+    }
+
+    private fun findAllKeys(graph: Graph): State {
+        val compareByLength: Comparator<State> = compareBy { it.steps }
+
+        val queue = PriorityQueue(compareByLength)
+        val initialState = graph.toInitialState()
+        queue.add(initialState)
+        var result = initialState
+        val numberOfKeys = graph.numberOfKeys()
+        while (queue.isNotEmpty()) {
+            val currentState = queue.poll()
+            if (currentState.visited.size == numberOfKeys + 1) {
+                if (result == initialState || result.steps > currentState.steps) {
+                    result = currentState
+                }
+            } else {
+                queue.addAndImprove(currentState.branchToCollectableKeys())
+            }
+        }
+        return result
+    }
 
     override fun executePart1(name: String): Any {
-        return listOf(name)
+        val graph = listOf(name)
             .map { readMaze(it) }
             .map { createGraph(it) }
             .map { it.simplify() }
+            .first()
+        return findAllKeys(graph)
     }
 
 
@@ -104,3 +208,14 @@ class Day18: Day("18") {
         TODO("Not yet implemented")
     }
 }
+
+private fun PriorityQueue<Day18.State>.addAndImprove(newStates: List<Day18.State>) {
+    for (state in newStates) {
+        if (this.none { queueState -> state.isBadStateInComparisonTo(queueState) }) {
+            this.removeIf { it.isBadStateInComparisonTo(state) }
+            this.add(state)
+        }
+    }
+}
+
+
