@@ -21,12 +21,12 @@ class Day18: Day("18") {
 
         private val mmap = map.toMutableMap()
 
-        fun removeNode(node: Node): Graph {
+        private fun removeNode(node: Node): Graph {
             mmap.entries.removeIf { it.key.contains(node) }
             return this
         }
 
-        fun addEdge(nodeA: Node, nodeB: Node, weight: Int): Graph {
+        private fun addEdge(nodeA: Node, nodeB: Node, weight: Int): Graph {
             val edge = setOf(nodeA, nodeB)
             if (mmap.getOrDefault(edge, Int.MAX_VALUE) > weight) {
                 mmap[edge] = weight
@@ -67,30 +67,24 @@ class Day18: Day("18") {
                 .map { it.key.find { k -> k != node }!! to it.value }
         }
 
-        fun getStartNode(): Node {
-            return mmap.keys.flatten().distinct().find { it.value == '@' }!!
+        private fun getStartNodes(): List<Node> {
+            return mmap.keys.flatten().distinct().filter { it.value == '@' }
         }
 
         fun findMatchingDoor(key: Char) = mmap.keys.flatten().find { it.value == key.uppercaseChar() }
-
-        fun findMatchingNode(key: Char) = mmap.keys.flatten().find { it.value == key }!!
 
         fun deepCopy(): Graph {
             return Graph(mmap.toMap())
         }
 
         fun toInitialState(): State {
-            val startNode = this.getStartNode()
-            val visited = LinkedList(listOf(startNode))
-            return State(this, listOf(startNode), visited, 0)
+            val startNodes = this.getStartNodes()
+            val visited = LinkedList<Node>()
+            return State(this, startNodes, visited, 0)
         }
 
         fun numberOfKeys(): Int {
             return mmap.keys.flatten().filter { it.value.isLowerCase() }.distinct().size
-        }
-
-        fun steps(from: Node, to: Node): Int {
-            return mmap.get(setOf(from, to))!!
         }
 
     }
@@ -125,33 +119,38 @@ class Day18: Day("18") {
     data class State(val graph: Graph, val currentPositions: List<Node>, val visited: LinkedList<Node>, val steps: Int) {
 
         override fun toString(): String {
-            return "$visited ($steps)"
+            return "Current Positions: ${currentPositions}, Path: $visited ($steps)"
         }
 
         private fun removeDoor(keyNode: Node): Graph {
             val doorNode = graph.findMatchingDoor(keyNode.value)
-            if (doorNode != null) {
-                return graph.deepCopy().contractNode(doorNode).contractNode(visited.last)
+            return if (doorNode != null) {
+                graph.deepCopy().contractNode(doorNode)
             } else {
-                return graph.deepCopy().contractNode(visited.last)
+                graph.deepCopy()
             }
         }
 
-        fun collectKey(keyNode: Node, stepsToKey: Int, replacer: (Node) -> List<Node>): State {
+        private fun collectKey(currentNode: Node, keyNode: Node, stepsToKey: Int): State {
             assert(keyNode.value.isLowerCase())
             assert(!visited.contains(keyNode))
-            val newGraph = removeDoor(keyNode)
+            val newGraph = removeDoor(keyNode).contractNode(currentNode)
             val newVisited = LinkedList(visited)
             newVisited.add(keyNode)
-            return State(newGraph, replacer.invoke(keyNode), newVisited, steps + stepsToKey)
+            val index = currentPositions.indexOf(currentNode)
+            return State(newGraph,  currentPositions.replace(index, keyNode), newVisited, steps + stepsToKey)
+        }
+
+        fun branchToCollectableKeys(currentPosition: Node): List<State> {
+            val y = graph.getNeighbours(currentPosition)
+                .filter { it.first.value.isLowerCase() && !visited.contains(it.first) }
+                .map { collectKey(currentPosition, it.first, it.second) }
+            return y
         }
 
         fun branchToCollectableKeys(): List<State> {
-            return currentPositions.flatMapIndexed {  index, currentPosition ->
-                graph.getNeighbours(currentPosition)
-                    .filter { it.first.value.isLowerCase() && !visited.contains(it.first) }
-                    .map { collectKey(it.first, it.second) { v -> currentPositions.replace(index, v) } }
-            }
+            val x = currentPositions.flatMapIndexed {  index, currentPosition -> branchToCollectableKeys(currentPosition) }
+            return x
         }
 
         fun isBadStateInComparisonTo(otherState: State) =
@@ -170,7 +169,7 @@ class Day18: Day("18") {
         val numberOfKeys = graph.numberOfKeys()
         while (queue.isNotEmpty()) {
             val currentState = queue.poll()
-            if (currentState.visited.size == numberOfKeys + 1) {
+            if (currentState.visited.filter { it.value != '@' }.size == numberOfKeys) {
                 if (result == initialState || result.steps > currentState.steps) {
                     result = currentState
                 }
@@ -181,27 +180,45 @@ class Day18: Day("18") {
         return result
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Int {
         val graph = listOf(name)
             .map { readMaze(it) }
             .map { createGraph(it) }
             .map { it.simplify() }
             .first()
-        return findAllKeys(graph)
+        return findAllKeys(graph).steps
     }
 
+    override fun expectedResultPart1() = 5858
 
-    override fun expectedResultPart1(): Any {
-        TODO("Not yet implemented")
+    private fun readMazeAndChangeEntrance(name: String): List<List<Char>> {
+        val origMaze = readMaze(name).map { it.toMutableList() }.toMutableList()
+        val (row,col) = origMaze.mapIndexed { i, chars -> chars.mapIndexed { j, c -> i to j to c } }
+            .first { line -> line.any { it.second == '@' } }
+            .first { it.second == '@' }
+            .first
+        origMaze[row-1][col-1] = '@'
+        origMaze[row-1][col] = '#'
+        origMaze[row-1][col+1] = '@'
+        origMaze[row][col-1] = '#'
+        origMaze[row][col] = '#'
+        origMaze[row][col+1] = '#'
+        origMaze[row+1][col-1] = '@'
+        origMaze[row+1][col] = '#'
+        origMaze[row+1][col+1] = '@'
+        return origMaze.map { it.toList() }.toList()
     }
 
-    override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+    override fun executePart2(name: String): Int {
+        val graph = listOf(name)
+            .map { readMazeAndChangeEntrance(it) }
+            .map { createGraph(it) }
+            .map { it.simplify() }
+            .first()
+        return findAllKeys(graph).steps
     }
 
-    override fun expectedResultPart2(): Any {
-        TODO("Not yet implemented")
-    }
+    override fun expectedResultPart2() = 2144
 }
 
 private fun PriorityQueue<Day18.State>.addAndImprove(newStates: List<Day18.State>) {
