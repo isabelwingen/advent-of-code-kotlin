@@ -2,6 +2,9 @@ package aoc2019
 
 import getInputAsLines
 import util.Day
+import util.Dijkstra
+import util.DijkstraEdge
+import util.DijkstraNode
 
 class Day20: Day("20") {
 
@@ -95,6 +98,14 @@ class Day20: Day("20") {
                 .joinToString("\n") { it }
         }
 
+        fun nodes(): List<Node> {
+            return mmap.entries.flatMap { it.key }.distinct()
+        }
+
+        fun edges(): Map<Set<Node>, Int> {
+            return mmap.toMap()
+        }
+
     }
 
     private fun createGraph(maze: List<List<String>>): Graph {
@@ -138,19 +149,27 @@ class Day20: Day("20") {
         return Graph(map.toMap())
     }
 
-    override fun executePart1(name: String): Any {
-        return listOf(name)
+    private fun dijkstra(graph: Graph): Int {
+        val toNode = { node: Node -> DijkstraNode(node.pos, node.value, Int.MAX_VALUE, null) }
+        val nodeMap = graph.nodes().associateWith(toNode)
+        val dijkstraEdges = graph.edges().map { DijkstraEdge(it.key.map { n -> nodeMap[n]!! }.toSet(), it.value) }.toSet()
+        val dijkstra = Dijkstra(dijkstraEdges, "AA")
+        return dijkstra.findShortestPathTo("ZZ")
+    }
+
+    override fun executePart1(name: String): Int {
+        val graph = listOf(name)
             .asSequence()
             .map { readMaze(it) }
             .map { readHorizontalPortal(it) }
             .map { createGraph(it) }
             .map { it.simplify() }
             .first()
+        return dijkstra(graph)
+
     }
 
-    override fun expectedResultPart1(): Any {
-        TODO("Not yet implemented")
-    }
+    override fun expectedResultPart1() = 528
 
     override fun executePart2(name: String): Any {
         TODO("Not yet implemented")
