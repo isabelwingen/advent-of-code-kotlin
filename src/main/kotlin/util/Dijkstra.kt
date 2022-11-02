@@ -25,6 +25,9 @@ class Dijkstra<E>(private val edges: Set<DijkstraEdge<E>>, private val startNode
         while (notVisited.isNotEmpty()) {
             val u = notVisited.minByOrNull { it.distance }!!
             notVisited.remove(u)
+            if (u == endNode) {
+                break
+            }
             for ((v,d) in getNeighbours(u.id)) {
                 if (notVisited.contains(v)) {
                     val alternative = u.distance + d
@@ -41,8 +44,17 @@ class Dijkstra<E>(private val edges: Set<DijkstraEdge<E>>, private val startNode
 
 class DijkstraEdge<E>(val nodes: Set<E>, val weight: Int) {
     override fun toString() = "${nodes.toList()[0]} <- $weight -> ${nodes.toList()[1]}"
-}
 
+    override fun hashCode() = (nodes to weight).hashCode()
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is DijkstraEdge<*>) {
+            nodes == other.nodes && weight == other.weight
+        } else {
+            false
+        }
+    }
+}
 
 class DijkstraNode<E>(val id: E, var distance: Int, var successor: DijkstraNode<E>?) {
 

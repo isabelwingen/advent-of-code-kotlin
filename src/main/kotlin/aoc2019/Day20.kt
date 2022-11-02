@@ -165,11 +165,71 @@ class Day20: Day("20") {
     }
     override fun expectedResultPart1() = 528
 
-    private fun dijkstra2(graph: Graph, isOuter: (Pair<Int, Int>) -> Boolean) {
-
+    private fun directEdges(graph: Graph, level: Int): Set<DijkstraEdge<Triple<Int, Int, Int>>> {
+        return graph.edges()
+            .filter { it.key.map { n -> n.value }.toSet().size != 1}
+            .map { (t, u) -> DijkstraEdge(t.map { x -> Triple(x.pos.first, x.pos.second, level) }.toSet(), u) }
+            .toSet()
     }
 
-    override fun executePart2(name: String): Any {
+    private fun edgesToInnerDonuts(graph: Graph, level: Int, isOuter: (Pair<Int, Int>) -> Boolean ): Set<DijkstraEdge<Triple<Int, Int, Int>>> {
+        return graph.edges()
+            .filter { it.key.map { n -> n.value }.toSet().size == 1 }
+            .map { edge ->
+                val outerPortal = edge.key.first { isOuter.invoke(it.pos) }
+                val innerPortal = edge.key.first { !isOuter.invoke(it.pos) }
+                val dijkstraNodes = setOf(
+                    Triple(innerPortal.pos.first, innerPortal.pos.second, level),
+                    Triple(outerPortal.pos.first, outerPortal.pos.second, level + 1)
+                )
+                DijkstraEdge(dijkstraNodes, edge.value)
+            }
+            .toSet()
+    }
+
+    private fun edgesToOuterDonuts(graph: Graph, level: Int, isOuter: (Pair<Int, Int>) -> Boolean ): Set<DijkstraEdge<Triple<Int, Int, Int>>> {
+        return graph.edges()
+            .filter { it.key.map { n -> n.value }.toSet().size == 1 }
+            .map { edge ->
+                val outerPortal = edge.key.first { isOuter.invoke(it.pos) }
+                val innerPortal = edge.key.first { !isOuter.invoke(it.pos) }
+                val dijkstraNodes = setOf(
+                    Triple(innerPortal.pos.first, innerPortal.pos.second, level - 1),
+                    Triple(outerPortal.pos.first, outerPortal.pos.second, level)
+                )
+                DijkstraEdge(dijkstraNodes, edge.value)
+            }
+            .toSet()
+    }
+
+    private fun edgesFromLevel0(graph: Graph, isOuter: (Pair<Int, Int>) -> Boolean): MutableSet<DijkstraEdge<Triple<Int, Int, Int>>> {
+        val dijkstraEdges = mutableSetOf<DijkstraEdge<Triple<Int, Int, Int>>>()
+        dijkstraEdges.addAll(directEdges(graph, 0))
+        dijkstraEdges.addAll(edgesToInnerDonuts(graph, 0, isOuter))
+        return dijkstraEdges
+    }
+
+    private fun edgesFromOtherLevels(graph: Graph, isOuter: (Pair<Int, Int>) -> Boolean, level: Int): MutableSet<DijkstraEdge<Triple<Int, Int, Int>>> {
+        val dijkstraEdges = mutableSetOf<DijkstraEdge<Triple<Int, Int, Int>>>()
+        dijkstraEdges.addAll(directEdges(graph, level))
+        dijkstraEdges.addAll(edgesToInnerDonuts(graph, level, isOuter))
+        dijkstraEdges.addAll(edgesToOuterDonuts(graph, level, isOuter))
+        return dijkstraEdges
+    }
+
+    private fun dijkstra2(graph: Graph, isOuter: (Pair<Int, Int>) -> Boolean): Int {
+        val dijkstraEdges = mutableSetOf<DijkstraEdge<Triple<Int, Int, Int>>>()
+        dijkstraEdges.addAll(edgesFromLevel0(graph, isOuter))
+        for (i in 1 until 26) {
+            dijkstraEdges.addAll(edgesFromOtherLevels(graph, isOuter, i))
+        }
+        val startPos = graph.nodes().first { it.value == "AA" }.pos
+        val endPos = graph.nodes().first { it.value == "ZZ" }.pos
+        return Dijkstra(dijkstraEdges.toSet(), Triple(startPos.first, startPos.second, 0))
+            .findShortestPathTo(Triple(endPos.first, endPos.second, 0))
+    }
+
+    override fun executePart2(name: String): Int {
         val maze = listOf(name)
             .asSequence()
             .map { readMaze(it) }
@@ -188,7 +248,8 @@ class Day20: Day("20") {
         return dijkstra2(graph, isOuter)
     }
 
-    override fun expectedResultPart2(): Any {
-        TODO("Not yet implemented")
-    }
+    override fun expectedResultPart2() = 6214
 }
+
+
+
