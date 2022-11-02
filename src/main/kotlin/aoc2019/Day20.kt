@@ -153,8 +153,8 @@ class Day20: Day("20") {
         val toNode = { node: Node -> DijkstraNode(node.pos, node.value, Int.MAX_VALUE, null) }
         val nodeMap = graph.nodes().associateWith(toNode)
         val dijkstraEdges = graph.edges().map { DijkstraEdge(it.key.map { n -> nodeMap[n]!! }.toSet(), it.value) }.toSet()
-        val dijkstra = Dijkstra(dijkstraEdges, "AA")
-        return dijkstra.findShortestPathTo("ZZ")
+        val dijkstra = Dijkstra(dijkstraEdges, 2 to 63)
+        return dijkstra.findShortestPathTo(116 to 61)
     }
 
     override fun executePart1(name: String): Int {

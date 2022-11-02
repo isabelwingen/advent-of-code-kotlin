@@ -1,15 +1,12 @@
 package util
 
-import aoc2019.Day18
-import java.util.PriorityQueue
-
-class Dijkstra(private val edges: Set<DijkstraEdge>, private val startNodeValue: String) {
+class Dijkstra(private val edges: Set<DijkstraEdge>, private val startNodeId: Any) {
 
     private val nodes = edges.flatMap { it.nodes }.toSet()
-    private val startNode = nodes.first { it.value == startNodeValue }
+    private val startNode = nodes.first { it.id == startNodeId }
 
-    fun findShortestPathTo(endNodeValue: String): Int {
-        val endNode = nodes.first { it.value == endNodeValue }
+    fun findShortestPathTo(endNodeId: Any): Int {
+        val endNode = nodes.first { it.id == endNodeId }
         nodes.forEach { it.distance = Int.MAX_VALUE }
         startNode.distance = 0
 
@@ -37,9 +34,9 @@ class DijkstraEdge(val nodes: Set<DijkstraNode>, val weight: Int) {
     override fun toString() = "${nodes.toList()[0]} <- $weight -> ${nodes.toList()[1]}"
 }
 
-class DijkstraNode(val id: Any, val value: String, var distance: Int, var successor: DijkstraNode?) {
+class DijkstraNode(val id: Any, val value: Any, var distance: Int, var successor: DijkstraNode?) {
 
-    override fun toString() = value
+    override fun toString() = value.toString()
 
     fun getNeighbours(edges: Set<DijkstraEdge>): Map<DijkstraNode, Int> {
         return edges
@@ -48,10 +45,10 @@ class DijkstraNode(val id: Any, val value: String, var distance: Int, var succes
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other is DijkstraNode) {
-            return this.id == other.id
+        return if (other is DijkstraNode) {
+            this.id == other.id
         } else {
-            return false
+            false
         }
     }
 
