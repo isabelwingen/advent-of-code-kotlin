@@ -1,22 +1,31 @@
 package util
 
-class Dijkstra(private val edges: Set<DijkstraEdge>, private val startNodeId: Any) {
+class Dijkstra<E>(private val edges: Set<DijkstraEdge<E>>, private val startNodeId: E) {
 
-    private val nodes = edges.flatMap { it.nodes }.toSet()
+    private val nodes = edges.flatMap { it.nodes }.distinct().map { DijkstraNode(it, Int.MAX_VALUE, null) }.toSet()
     private val startNode = nodes.first { it.id == startNodeId }
 
-    fun findShortestPathTo(endNodeId: Any): Int {
+    private fun getNodeFromId(id: E): DijkstraNode<E> {
+        return nodes.first { it.id == id }
+    }
+
+    private fun getNeighbours(id: E): Map<DijkstraNode<E>, Int> {
+        return edges
+            .filter { it.nodes.contains(id) }
+            .associate { it.nodes.filter { n -> n != id }.map { n -> getNodeFromId(n) }.first() to it.weight }
+    }
+
+    fun findShortestPathTo(endNodeId: E): Int {
         val endNode = nodes.first { it.id == endNodeId }
-        nodes.forEach { it.distance = Int.MAX_VALUE }
         startNode.distance = 0
 
-        val notVisited = mutableSetOf<DijkstraNode>()
+        val notVisited = mutableSetOf<DijkstraNode<E>>()
         notVisited.addAll(nodes)
 
         while (notVisited.isNotEmpty()) {
             val u = notVisited.minByOrNull { it.distance }!!
             notVisited.remove(u)
-            for ((v,d) in u.getNeighbours(edges)) {
+            for ((v,d) in getNeighbours(u.id)) {
                 if (notVisited.contains(v)) {
                     val alternative = u.distance + d
                     if (alternative < v.distance) {
@@ -30,22 +39,15 @@ class Dijkstra(private val edges: Set<DijkstraEdge>, private val startNodeId: An
     }
 }
 
-class DijkstraEdge(val nodes: Set<DijkstraNode>, val weight: Int) {
+class DijkstraEdge<E>(val nodes: Set<E>, val weight: Int) {
     override fun toString() = "${nodes.toList()[0]} <- $weight -> ${nodes.toList()[1]}"
 }
 
-class DijkstraNode(val id: Any, val value: Any, var distance: Int, var successor: DijkstraNode?) {
 
-    override fun toString() = value.toString()
-
-    fun getNeighbours(edges: Set<DijkstraEdge>): Map<DijkstraNode, Int> {
-        return edges
-            .filter { it.nodes.contains(this) }
-            .associate { it.nodes.first { n -> n != this } to it.weight }
-    }
+class DijkstraNode<E>(val id: E, var distance: Int, var successor: DijkstraNode<E>?) {
 
     override fun equals(other: Any?): Boolean {
-        return if (other is DijkstraNode) {
+        return if (other is DijkstraNode<*>) {
             this.id == other.id
         } else {
             false

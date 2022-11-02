@@ -1,10 +1,7 @@
 package aoc2019
 
 import getInputAsLines
-import util.Day
-import util.Dijkstra
-import util.DijkstraEdge
-import util.DijkstraNode
+import util.*
 
 class Day20: Day("20") {
 
@@ -21,7 +18,7 @@ class Day20: Day("20") {
             .toList()
     }
 
-    private fun readHorizontalPortal(maze: List<List<Char>>): List<List<String>> {
+    private fun readPortals(maze: List<List<Char>>): List<List<String>> {
         val newMaze = MutableList(maze.size) { r -> MutableList(maze[0].size) {c -> maze[r][c].toString() } }
         for (row in maze.indices) {
             for (col in maze[0].indices) {
@@ -150,9 +147,7 @@ class Day20: Day("20") {
     }
 
     private fun dijkstra(graph: Graph): Int {
-        val toNode = { node: Node -> DijkstraNode(node.pos, node.value, Int.MAX_VALUE, null) }
-        val nodeMap = graph.nodes().associateWith(toNode)
-        val dijkstraEdges = graph.edges().map { DijkstraEdge(it.key.map { n -> nodeMap[n]!! }.toSet(), it.value) }.toSet()
+        val dijkstraEdges = graph.edges().map { DijkstraEdge(it.key.map { n -> n.pos }.toSet(), it.value) }.toSet()
         val dijkstra = Dijkstra(dijkstraEdges, 2 to 63)
         return dijkstra.findShortestPathTo(116 to 61)
     }
@@ -161,18 +156,36 @@ class Day20: Day("20") {
         val graph = listOf(name)
             .asSequence()
             .map { readMaze(it) }
-            .map { readHorizontalPortal(it) }
+            .map { readPortals(it) }
             .map { createGraph(it) }
             .map { it.simplify() }
             .first()
         return dijkstra(graph)
 
     }
-
     override fun expectedResultPart1() = 528
 
+    private fun dijkstra2(graph: Graph, isOuter: (Pair<Int, Int>) -> Boolean) {
+
+    }
+
     override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+        val maze = listOf(name)
+            .asSequence()
+            .map { readMaze(it) }
+            .map { readPortals(it) }
+            .map { it.drop(2) }
+            .map { it.dropLast(2) }
+            .first()
+            .map { it.drop(2) }
+            .map { it.dropLast(2) }
+        val isOuter = { pos: Pair<Int, Int> -> pos.first == 0 || pos.first == maze.size-1 || pos.second == 0 || pos.second == maze[0].size-1 }
+        val graph = listOf(maze)
+            .asSequence()
+            .map { createGraph(it) }
+            .map { it.simplify() }
+            .first()
+        return dijkstra2(graph, isOuter)
     }
 
     override fun expectedResultPart2(): Any {
