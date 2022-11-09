@@ -185,28 +185,28 @@ class IntCode(private val name: String, private val intCode: LongArray) {
         println1("$name: Execute opCode $opCode at position $pointer")
     }
 
-    fun execute(input: Int): Long {
+    fun execute(input: Int, single: Boolean = false): Long {
         val sizeBefore = this.input.size
         this.input.add(input)
-        val res = execute()
+        val res = execute(single)
         if (this.input.size > sizeBefore) {
             this.input.removeLast()
         }
         return res
     }
 
-    fun execute(input: List<Int>): Long {
+    fun execute(input: List<Int>, single: Boolean = false): Long {
         val sizeBefore = this.input.size
         this.input.addAll(input)
-        val res = execute()
+        val res = execute(single)
         if (this.input.size > sizeBefore) {
             repeat(sizeBefore - input.size) { this.input.removeLast() }
         }
         return res
     }
 
-    fun execute(): Long {
-        while (pointer < memory.size) {
+    fun execute(single: Boolean = false): Long {
+        do {
             val opCode = getMemory(pointer).toString().padStart(5, '0')
             when {
                 opCode.endsWith("99") -> return executeOpCode99()
@@ -221,8 +221,8 @@ class IntCode(private val name: String, private val intCode: LongArray) {
                 opCode.endsWith("9") -> executeOpCode9(opCode)
                 else -> throw java.lang.IllegalStateException()
             }
-        }
-        return getMemory(0)
+        } while (pointer < memory.size && !single)
+        return -42
     }
 
     fun isHalted() = halt
