@@ -6,7 +6,7 @@ import kotlin.math.abs
 
 class IntCode(private val name: String, private val intCode: LongArray) {
     private var memory = LongArray(intCode.size) { intCode[it] }
-    private var input = LinkedList<Int>()
+    var input = LinkedList<Int>()
     private var pointer = 0
     private var halt = false
     private var output = -1L
@@ -186,23 +186,13 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     fun execute(input: Int, single: Boolean = false): Long {
-        val sizeBefore = this.input.size
         this.input.add(input)
-        val res = execute(single)
-        if (this.input.size > sizeBefore) {
-            this.input.removeLast()
-        }
-        return res
+        return execute(single)
     }
 
     fun execute(input: List<Int>, single: Boolean = false): Long {
-        val sizeBefore = this.input.size
         this.input.addAll(input)
-        val res = execute(single)
-        if (this.input.size > sizeBefore) {
-            repeat(sizeBefore - input.size) { this.input.removeLast() }
-        }
-        return res
+        return execute(single)
     }
 
     fun execute(single: Boolean = false): Long {

@@ -84,6 +84,7 @@ class Day13: Day("13") {
             val x = program.execute(joystick).toInt()
             val y = program.execute(joystick).toInt()
             val v = program.execute(joystick)
+            program.input.clear()
             if (x == -1 && y == 0) {
                 score = v
             } else if (!done(screen)) {
