@@ -94,6 +94,9 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     private fun executeOpCode3(opCode: String) {
         printCommand(opCode, 1)
         val addr = getAddress(opCode, 1)
+        if (input.isEmpty()) {
+            throw java.lang.IllegalArgumentException("Needs input")
+        }
         setMemory(addr, input.pop()!!.toLong())
         println1("$name   Result: Write ${getMemory(addr)} to $addr*")
         pointer += 2
