@@ -1,10 +1,8 @@
 package aoc2020
 
-import extented_euclid
 import getInputAsLines
-
-import lcm
 import util.Day
+import kotlin.math.abs
 
 class Day13 : Day("13") {
 
@@ -47,5 +45,23 @@ class Day13 : Day("13") {
     }
 
     override fun expectedResultPart2() = 556100168221141L
+}
+
+fun extented_euclid(a: Long, b: Long): Triple<Long, Long, Long> {
+    if (b == 0L) {
+        return Triple(a, 1, 0)
+    } else {
+        val (dd, ss, tt) = extented_euclid(b, a % b)
+        val t = ss - (a / b) * tt
+        return Triple(dd, tt, t)
+    }
+}
+
+fun lcm(a: Long, b: Long): Long {
+    return abs(a * b) / extented_euclid(a, b).first
+}
+
+fun lcm(numbers: List<Long>): Long {
+    return numbers.reduceRight { a, b -> lcm(a, b)}
 }
 
