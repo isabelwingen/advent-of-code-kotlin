@@ -27,7 +27,7 @@ internal class Main2022Test {
     }
 
     companion object {
-        val days = setOf(Day1())
+        val days = setOf(Day1(), Day2())
 
         @JvmStatic
         fun getData(): List<Arguments> {
