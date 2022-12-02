@@ -23,7 +23,7 @@ fun getInputAsLines(file: String): List<String> {
 }
 
 var dir = "resources"
-var chosenYear = "2019"
+var chosenYear = "1000"
 
 @OptIn(ExperimentalTime::class)
 private fun executeDay(year: String, day: String, part: String) {
