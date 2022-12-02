@@ -1,6 +1,6 @@
 package aoc2019
 
-import algorithm.IntCode
+import aoc2019.util.IntCode
 import util.Day
 
 class Day21: Day("21") {

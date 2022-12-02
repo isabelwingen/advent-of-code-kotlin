@@ -1,6 +1,6 @@
 package aoc2019
 
-import algorithm.IntCode
+import aoc2019.util.IntCode
 import util.Day
 
 class Robot(var orientation: String = "UP", var position: Pair<Int, Int> = 0 to 0) {

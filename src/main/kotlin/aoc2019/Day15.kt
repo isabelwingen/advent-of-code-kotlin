@@ -1,6 +1,6 @@
 package aoc2019
 
-import algorithm.IntCode
+import aoc2019.util.IntCode
 import util.Day
 import java.lang.IllegalStateException
 import java.util.LinkedList

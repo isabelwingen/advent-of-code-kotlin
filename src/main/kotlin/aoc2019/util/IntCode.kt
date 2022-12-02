@@ -1,4 +1,4 @@
-package algorithm
+package aoc2019.util
 
 import getInput
 import java.util.LinkedList

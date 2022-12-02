@@ -1,8 +1,6 @@
 package aoc2019
 
-import algorithm.IntCode
-import asLong
-import getInput
+import aoc2019.util.IntCode
 import splitBy
 import util.Day
 

@@ -1,6 +1,6 @@
 package aoc2020
 
-import algorithm.GameOfLife
+import aoc2020.util.GameOfLife
 import getInputAsLines
 import util.Day
 

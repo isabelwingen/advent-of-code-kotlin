@@ -1,5 +1,6 @@
 package algorithm
 
+import aoc2019.util.IntCode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

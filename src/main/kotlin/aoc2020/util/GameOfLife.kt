@@ -1,4 +1,4 @@
-package algorithm
+package aoc2020.util
 
 class GameOfLife <T>(
     private var livingCells: Set<T>,
