@@ -26,7 +26,7 @@ class Day21: Day("21") {
             "WALK"))
         var x = 0L
         while (!prog.isHalted()) {
-            x = prog.execute(code)
+            x = prog.execute(code.map { it.toLong() })
             if (x < Int.MAX_VALUE) {
                 print(x.toInt().toChar())
             }
@@ -49,7 +49,7 @@ class Day21: Day("21") {
             "RUN"))
         var x = 0L
         while (!prog.isHalted()) {
-            x = prog.execute(code)
+            x = prog.execute(code.map { it.toLong() })
             if (x < Int.MAX_VALUE) {
                 print(x.toInt().toChar())
             }

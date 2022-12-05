@@ -53,7 +53,7 @@ class Day11: Day("11") {
         val paintedTiles = mutableMapOf<Pair<Int, Int>, Int>()
 
         while (!program.isHalted()) {
-            val colorToPaint = program.execute(paintedTiles.getOrDefault(robot.position, 0))
+            val colorToPaint = program.execute(paintedTiles.getOrDefault(robot.position, 0).toInt())
             val turn = program.execute()
             val next = robot.action(colorToPaint.toInt(), turn.toInt())
             paintedTiles[next.first] = next.second

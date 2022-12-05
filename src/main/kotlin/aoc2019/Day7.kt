@@ -5,14 +5,14 @@ import util.Day
 
 class Day7: Day("7") {
 
-    private fun combinations(lower: Int = 0, upper: Int = 4): Set<IntArray> {
-        val res = mutableSetOf<IntArray>()
+    private fun combinations(lower: Long = 0, upper: Long = 4): Set<LongArray> {
+        val res = mutableSetOf<LongArray>()
         for (a in lower until upper + 1) {
             for (b in lower until upper + 1) {
                 for (c in lower until upper + 1) {
                     for (d in lower until upper + 1) {
                         for (e in lower until upper + 1) {
-                            res.add(listOf(a, b, c, d, e).toIntArray())
+                            res.add(listOf(a, b, c, d, e).toLongArray())
                         }
                     }
                 }

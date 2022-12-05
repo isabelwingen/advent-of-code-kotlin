@@ -144,15 +144,15 @@ class Day17: Day("17") {
         val main = "A,B,B,C,B,C,B,C,A,A\n"
 
         repeat(5) { print(prog.execute().toInt().toChar()) }
-        print(prog.execute(main.map { it.code }).toInt().toChar())
+        print(prog.execute(main.map { it.code.toLong() }).toInt().toChar())
         repeat(12) { print(prog.execute().toInt().toChar()) }
-        print(prog.execute(progA.map { it.code }).toInt().toChar())
+        print(prog.execute(progA.map { it.code.toLong() }).toInt().toChar())
         repeat(11) { print(prog.execute().toInt().toChar()) }
-        print(prog.execute(progB.map { it.code }).toInt().toChar())
+        print(prog.execute(progB.map { it.code.toLong() }).toInt().toChar())
         repeat(11) { print(prog.execute().toInt().toChar()) }
-        print(prog.execute(progC.map { it.code }).toInt().toChar())
+        print(prog.execute(progC.map { it.code.toLong() }).toInt().toChar())
         repeat(22) { print(prog.execute().toInt().toChar()) }
-        print(prog.execute("n\n".map { it.code }).toInt().toChar())
+        print(prog.execute("n\n".map { it.code.toLong() }).toInt().toChar())
         repeat(3000) {
             val res = prog.execute()
             if (res < 255) {

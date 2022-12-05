@@ -8,7 +8,7 @@ class Day19: Day("19") {
         var sum = 0
         for (x in 0 until 50) {
             for (y in 0 until 50) {
-                val prog = IntCode("Day19", name).execute(listOf(x, y)).toInt()
+                val prog = IntCode("Day19", name).execute(listOf(x.toLong(), y.toLong())).toInt()
                 if (x == 1 && prog == 1) {
                     println("$x, $y: $prog")
                 }
@@ -62,7 +62,7 @@ class Day19: Day("19") {
 
     private fun findStart(x: Int, start: Int, end: Int, name: String): Int {
         for (y in start until end + 1) {
-            val res = IntCode("", name).execute(listOf(x,y )).toInt()
+            val res = IntCode("", name).execute(listOf(x.toLong(), y.toLong())).toInt()
             if (res == 1) {
                 return y
             }
@@ -72,7 +72,7 @@ class Day19: Day("19") {
 
     private fun findEnd(x: Int, start: Int, end: Int, name: String): Int {
         for (y in start until end + 1) {
-            val res = IntCode("", name).execute(listOf(x,y )).toInt()
+            val res = IntCode("", name).execute(listOf(x.toLong(), y.toLong())).toInt()
             if (res == 0) {
                 return y - 1
             }

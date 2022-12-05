@@ -6,7 +6,7 @@ import kotlin.math.abs
 
 class IntCode(private val name: String, private val intCode: LongArray) {
     private var memory = LongArray(intCode.size) { intCode[it] }
-    var input = LinkedList<Int>()
+    var input = LinkedList<Long>()
     private var pointer = 0
     private var halt = false
     private var output = -1L
@@ -24,7 +24,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
             .map { it.toLong() }
             .toLongArray())
 
-    fun init(input: List<Int> = listOf()) {
+    fun init(input: List<Long> = listOf()) {
         this.input = LinkedList(input)
         this.halt = false
         pointer = 0
@@ -95,7 +95,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
         printCommand(opCode, 1)
         val addr = getAddress(opCode, 1)
         if (input.isEmpty()) {
-            throw java.lang.IllegalArgumentException("Needs input")
+            input.add(-1)
         }
         setMemory(addr, input.pop()!!.toLong())
         println1("$name   Result: Write ${getMemory(addr)} to $addr*")
@@ -188,12 +188,16 @@ class IntCode(private val name: String, private val intCode: LongArray) {
         println1("$name: Execute opCode $opCode at position $pointer")
     }
 
-    fun execute(input: Int, single: Boolean = false): Long {
+    fun execute(input: Long, single: Boolean = false): Long {
         this.input.add(input)
         return execute(single)
     }
 
-    fun execute(input: List<Int>, single: Boolean = false): Long {
+    fun execute(input: Int, single: Boolean = false): Long {
+        return execute(input.toLong(), single)
+    }
+
+    fun execute(input: List<Long>, single: Boolean = false): Long {
         this.input.addAll(input)
         return execute(single)
     }
@@ -215,7 +219,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
                 else -> throw java.lang.IllegalStateException()
             }
         } while (pointer < memory.size && !single)
-        return -42
+        return -123456789L
     }
 
     fun isHalted() = halt
