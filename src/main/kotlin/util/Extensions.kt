@@ -1,3 +1,4 @@
+import java.text.FieldPosition
 import kotlin.math.round
 
 fun Char.asLong(): Long =
@@ -33,4 +34,22 @@ fun Double.round(decimals: Int): Double {
     var multiplier = 1.0
     repeat(decimals) { multiplier *= 10 }
     return round(this * multiplier) / multiplier
+}
+
+fun <E> List<List<E>>.getNeighbouringIndices(position: Pair<Int, Int>): List<Pair<Int, Int>> {
+    val (x,y) = position
+    val neighbours = mutableListOf<Pair<Int, Int>>()
+    if (x > 0) {
+        neighbours.add((x-1) to y)
+    }
+    if (x < this.size - 1) {
+        neighbours.add((x+1) to y)
+    }
+    if (y > 0) {
+        neighbours.add(x to (y-1))
+    }
+    if (y < this[0].size - 1) {
+        neighbours.add(x to (y+1))
+    }
+    return neighbours.toList()
 }
