@@ -82,7 +82,8 @@ class Day11: Day("11") {
 
     override fun executePart2(name: String): Any {
         val monkeys = getMonkeys(name)
-        return monkeyEngine(monkeys, 10_000) { it.mod(monkeys.map { t -> t.test.toLong() }.reduceRight {a,b -> a*b}) }
+        val div = monkeys.map { it.test.toLong() }.reduceRight { a, b -> a * b }
+        return monkeyEngine(monkeys, 10_000) { it.mod(div) }
     }
 
     override fun expectedResultPart2() = 14399640002L
