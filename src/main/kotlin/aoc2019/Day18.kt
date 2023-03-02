@@ -180,16 +180,14 @@ class Day18: Day("18") {
         return result
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val graph = listOf(name)
             .map { readMaze(it) }
             .map { createGraph(it) }
             .map { it.simplify() }
             .first()
-        return findAllKeys(graph).steps
+        return findAllKeys(graph).steps.toLong()
     }
-
-    override fun expectedResultPart1() = 5858
 
     private fun readMazeAndChangeEntrance(name: String): List<List<Char>> {
         val origMaze = readMaze(name).map { it.toMutableList() }.toMutableList()
@@ -209,16 +207,15 @@ class Day18: Day("18") {
         return origMaze.map { it.toList() }.toList()
     }
 
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val graph = listOf(name)
             .map { readMazeAndChangeEntrance(it) }
             .map { createGraph(it) }
             .map { it.simplify() }
             .first()
-        return findAllKeys(graph).steps
+        return findAllKeys(graph).steps.toLong()
     }
 
-    override fun expectedResultPart2() = 2144
 }
 
 private fun PriorityQueue<Day18.State>.addAndImprove(newStates: List<Day18.State>) {

@@ -89,8 +89,6 @@ class Day12: Day("12") {
 
     }
 
-    override fun expectedResultPart1() = 380
-
     override fun executePart2(name: String): Int {
         val charGrid = getGrid(name)
 
@@ -111,7 +109,6 @@ class Day12: Day("12") {
         return dijkstra(Node(end, 25), starts, reverseGraph)
     }
 
-    override fun expectedResultPart2() = 375
 }
 
 data class DirectedEdge(val from: Node, val to: Node)

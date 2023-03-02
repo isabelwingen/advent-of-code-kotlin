@@ -4,8 +4,8 @@ import aoc2019.util.IntCode
 import util.Day
 
 class Day19: Day("19") {
-    override fun executePart1(name: String): Int {
-        var sum = 0
+    override fun executePart1(name: String): Long {
+        var sum = 0L
         for (x in 0 until 50) {
             for (y in 0 until 50) {
                 val prog = IntCode("Day19", name).execute(listOf(x.toLong(), y.toLong())).toInt()
@@ -17,8 +17,6 @@ class Day19: Day("19") {
         }
         return sum
     }
-
-    override fun expectedResultPart1() = 226
 
     fun IntRange.intersect(other: IntRange): IntRange {
         val intersectSet = this.toSet().intersect(other)
@@ -33,7 +31,7 @@ class Day19: Day("19") {
         return this.toList().size;
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val MAX = 1000
         val ranges = HashMap<Int, IntRange>()
         for (x in 0 until MAX) {
@@ -45,10 +43,10 @@ class Day19: Day("19") {
             val otherRange = ranges.getOrPut(goal) { findRange(goal, name) }
             val intersection = range.intersect(otherRange)
             if (intersection.size() >= 100) {
-                return x * 10_000 + intersection.first
+                return x * 10_000 + intersection.first.toLong()
             }
         }
-        return false
+        return 0L
     }
 
     private fun findRange(x: Int, name: String): IntRange {
@@ -80,5 +78,4 @@ class Day19: Day("19") {
         return -1
     }
 
-    override fun expectedResultPart2() = 7900946
 }

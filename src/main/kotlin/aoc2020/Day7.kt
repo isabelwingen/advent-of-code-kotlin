@@ -35,7 +35,7 @@ class Day7 : Day("7") {
             .reduceRight { a, b -> a + b }
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         val edges = parseInput(name)
         val res = mutableSetOf<String>()
         var queue = mutableSetOf("shiny gold")
@@ -46,10 +46,8 @@ class Day7 : Day("7") {
                 .map { it.from }
                 .toMutableSet()
         }
-        return res.toSet().count() - 1
+        return res.toSet().count() - 1L
     }
-
-    override fun expectedResultPart1() = 335
 
     private fun getPath(edge: Edge, edges: List<Edge>): Int {
         val nextEdges = edges
@@ -64,10 +62,9 @@ class Day7 : Day("7") {
         }
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val edges = parseInput(name)
-        return getPath(Edge("nil", "shiny gold", 1), edges) - 1
+        return getPath(Edge("nil", "shiny gold", 1), edges) - 1L
     }
 
-    override fun expectedResultPart2() = 2125
 }

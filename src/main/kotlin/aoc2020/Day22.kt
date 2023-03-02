@@ -38,17 +38,15 @@ class Day22 : Day("22") {
         }
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         var game = parseInput(name)
         while (game.player1.isNotEmpty() && game.player2.isNotEmpty()) {
             game = roundPart1(game)
         }
 
         val res = game.player1.ifEmpty { game.player2 }.toList()
-        return res.mapIndexed { index, v -> (res.size - index) * v }.sum()
+        return res.mapIndexed { index, v -> (res.size - index) * v }.sum().toLong()
     }
-
-    override fun expectedResultPart1() = 34127
 
     private fun roundPart2(game: Game): Game {
         val a = game.player1.poll()
@@ -103,10 +101,9 @@ class Day22 : Day("22") {
         }
     }
 
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val game = parseInput(name)
-        return play(game)
+        return play(game).toLong()
     }
 
-    override fun expectedResultPart2() = 32054
 }

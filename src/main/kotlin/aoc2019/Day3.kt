@@ -19,10 +19,10 @@ class Day3: Day("3") {
         return Operation(dir, steps)
     }
 
-    private fun executePath(commands: List<Operation>): List<Pair<Int, Int>> {
-        var x = 0
-        var y = 0
-        val points = mutableListOf(0 to 0)
+    private fun executePath(commands: List<Operation>): List<Pair<Long, Long>> {
+        var x = 0L
+        var y = 0L
+        val points = mutableListOf(0L to 0L)
         val queue = LinkedList(commands)
         while (queue.isNotEmpty()) {
             val command = queue.pop()!!
@@ -69,34 +69,31 @@ class Day3: Day("3") {
         return first to second
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val (first, second) = parseInput(name)
         val firstPath = executePath(first)
         val secondPath = executePath(second)
         return firstPath.toSet().intersect(secondPath.toSet())
-            .filter { it.first != 0 ||  it.second != 0 }
+            .filter { it.first != 0L ||  it.second != 0L }
             .minOf { abs(it.first) + abs(it.second) }
     }
 
-    override fun expectedResultPart1() = 2180
-
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val (first, second) = parseInput(name)
         val firstPath = executePath(first)
         val secondPath = executePath(second)
         val intersections = firstPath.toSet().intersect(secondPath.toSet())
-            .filter { it.first != 0 || it.second != 0 }
-        var res = Int.MAX_VALUE
+            .filter { it.first != 0L || it.second != 0L }
+        var res = Long.MAX_VALUE
         for (intersection in intersections) {
             val stepsA = firstPath.indexOf(intersection)
             val stepsB = secondPath.indexOf(intersection)
             val sum = stepsA + stepsB
             if (sum < res) {
-                res = sum
+                res = sum.toLong()
             }
         }
         return res
     }
 
-    override fun expectedResultPart2() = 112316
 }

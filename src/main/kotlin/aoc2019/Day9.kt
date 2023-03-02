@@ -14,8 +14,6 @@ class Day9: Day("9") {
         return res
     }
 
-    override fun expectedResultPart1() = 3013554615L
-
     override fun executePart2(name: String): Long {
         val prog = IntCode("Day9", name)
         var res = prog.execute(2)
@@ -25,5 +23,4 @@ class Day9: Day("9") {
         return res
     }
 
-    override fun expectedResultPart2()= 50158L
 }

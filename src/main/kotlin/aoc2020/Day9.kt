@@ -33,8 +33,6 @@ class Day9: Day("9") {
         return -1
     }
 
-    override fun expectedResultPart1() = 133015568L
-
     private fun findWeaknessIndex(numbers: LongArray): Long {
         for (i in 25 until numbers.size) {
             if (!isSumOfPair(numbers, i)) {
@@ -62,6 +60,5 @@ class Day9: Day("9") {
         return -1
     }
 
-    override fun expectedResultPart2() = 16107959L
 }
 

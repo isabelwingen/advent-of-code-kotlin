@@ -66,7 +66,7 @@ class Day17 : Day("17") {
         return res.filter { it != coord }.toSet()
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val cuboid = buildCuboid(parseInput(name)) { a, b -> Triple(0, a, b) }
         val gameOfLife = GameOfLife(
             livingCells = cuboid,
@@ -82,12 +82,10 @@ class Day17 : Day("17") {
             }
         )
         repeat(6) { gameOfLife.step() }
-        return gameOfLife.getLivingCells().count()
+        return gameOfLife.getLivingCells().count().toLong()
     }
 
-    override fun expectedResultPart1() = 286
-
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val cuboid = buildCuboid(parseInput(name)) { a, b -> Quadruple(0, 0, a, b) }
         val gameOfLife = GameOfLife(
             livingCells = cuboid,
@@ -103,10 +101,8 @@ class Day17 : Day("17") {
             }
         )
         repeat(6) { gameOfLife.step() }
-        return gameOfLife.getLivingCells().count()
+        return gameOfLife.getLivingCells().count().toLong()
     }
-
-    override fun expectedResultPart2() = 960
 
     companion object {
         const val ACTIVE = '#'

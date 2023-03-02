@@ -46,12 +46,10 @@ class Day10: Day("10") {
             .count()
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val (_, asteroids) = parseInput(name)
-        return asteroids.maxOf { getAsteroidsInView(it, asteroids) }
+        return asteroids.maxOf { getAsteroidsInView(it, asteroids) }.toLong()
     }
-
-    override fun expectedResultPart1() = 309
 
     private fun getDegree(point: Point): Double {
         val degree = Math.toDegrees(atan(point.y / point.x))
@@ -62,7 +60,7 @@ class Day10: Day("10") {
         }
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val (_, asteroids) = parseInput(name)
         val station = asteroids.maxByOrNull { getAsteroidsInView(it, asteroids) }!!
         val map = asteroids
@@ -73,8 +71,7 @@ class Day10: Day("10") {
             .mapKeys { getDegree(it.key) }
             .toSortedMap()
         val point = map.toList()[199].second.first()
-        return (point.x * 100 + point.y).toInt()
+        return (point.x * 100 + point.y).toLong()
     }
 
-    override fun expectedResultPart2()= 416
 }

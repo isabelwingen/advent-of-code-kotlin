@@ -32,8 +32,6 @@ class Day14: Day("14") {
         return round(parseInput(name), 1)
     }
 
-    override fun expectedResultPart1() = 1065255L
-
     private fun round(reactions: List<Reaction>, fuel: Long = 1L): Long {
         val needed = mutableMapOf<String, Long>()
         val having = mutableMapOf<String, Long>()
@@ -87,8 +85,6 @@ class Day14: Day("14") {
         }
         return low
     }
-
-    override fun expectedResultPart2() = 1766154L
 
     companion object {
         const val TRILLION = 1_000_000_000_000L

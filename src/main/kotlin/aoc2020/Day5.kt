@@ -20,15 +20,14 @@ class Day5: Day("5") {
         return row * 8 + column
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         return getInputAsLines(name)
             .filter { it.isNotBlank() }
             .maxOf { parseSeat(it) }
+            .toLong()
     }
 
-    override fun expectedResultPart1() = 959
-
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val coll = getInputAsLines(name)
             .filter { it.isNotBlank() }
             .map { parseSeat(it) }
@@ -36,11 +35,10 @@ class Day5: Day("5") {
         val minSeat = coll[0]
         for (i in coll.indices) {
             if (coll[i] != minSeat + i) {
-                return coll[i] - 1
+                return coll[i] - 1L
             }
         }
         return -1
     }
 
-    override fun expectedResultPart2() = 527
 }

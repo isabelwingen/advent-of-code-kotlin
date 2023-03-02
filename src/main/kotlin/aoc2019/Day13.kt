@@ -6,7 +6,7 @@ import util.Day
 
 class Day13: Day("13") {
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val program = IntCode("Day13", name)
         val res = mutableListOf<Long>()
         while(!program.isHalted()) {
@@ -22,9 +22,8 @@ class Day13: Day("13") {
             .values
             .flatten()
             .count { it == 2L }
+            .toLong()
     }
-
-    override fun expectedResultPart1() = 173
 
     private fun matchToString(tile: Int): String {
         return when (tile) {
@@ -69,7 +68,7 @@ class Day13: Day("13") {
         }
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val intCode = getInput(name)
             .trim()
             .split(",")
@@ -104,8 +103,6 @@ class Day13: Day("13") {
         }
         return score
     }
-
-    override fun expectedResultPart2() = 8942L
 
     companion object {
         const val PADDLE: Int = 3

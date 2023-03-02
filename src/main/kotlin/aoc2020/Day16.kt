@@ -42,7 +42,7 @@ class Day16 : Day("16") {
     }
 
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val input = parseInput(name)
         val ranges = input.fields.flatMap { it.ranges }.toSet()
         return input.nearbyTickets
@@ -50,15 +50,14 @@ class Day16 : Day("16") {
             .flatten()
             .filter { !valueIsValid(ranges, it) }
             .sum()
+            .toLong()
     }
-
-    override fun expectedResultPart1() = 19060
 
     private fun valueIsValid(ranges: Collection<IntRange>, field: Int): Boolean {
         return ranges.any { it.contains(field) }
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val input = cleanInput(parseInput(name))
         val results = mutableMapOf<Int, List<String>>()
         for (i in input.nearbyTickets[0].indices) {
@@ -84,9 +83,8 @@ class Day16 : Day("16") {
             .map { input.myTicket[it] }
             .map { it.toLong() }
             .reduce { a, b -> a * b }
+            .toLong()
     }
-
-    override fun expectedResultPart2() = 953713095011L
 
     private fun valueIsValidForField(field: Field, values: List<Int>): Boolean {
         return values.all { v -> field.ranges.any { it.contains(v) } }

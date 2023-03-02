@@ -54,14 +54,12 @@ class Day8: Day("8") {
         return Pair(acc, currentInstruction == program.size)
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val instructions = parseInput(name)
-        return executeProgram(instructions).first
+        return executeProgram(instructions).first.toLong()
     }
 
-    override fun expectedResultPart1() = 1489
-
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         fun switchCommand(instruction: Instruction): Instruction {
             return when (instruction.operator) {
                 Operation.NOP -> Instruction(Operation.JMP, instruction.argument)
@@ -85,7 +83,7 @@ class Day8: Day("8") {
             .map { executeProgram(it) }
             .first { it.second }
             .first
+            .toLong()
     }
 
-    override fun expectedResultPart2() = 1539
 }

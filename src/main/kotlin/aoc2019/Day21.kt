@@ -34,8 +34,6 @@ class Day21: Day("21") {
         return x
     }
 
-    override fun expectedResultPart1() = 19362259L
-
     override fun executePart2(name: String): Long {
         val prog = IntCode("Day21", name)
         val code = toProgram(listOf(
@@ -57,5 +55,4 @@ class Day21: Day("21") {
         return x
     }
 
-    override fun expectedResultPart2() = 1141066762L
 }

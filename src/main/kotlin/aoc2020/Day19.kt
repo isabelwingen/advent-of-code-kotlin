@@ -58,13 +58,12 @@ class Day19 : Day("19") {
         }
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         val data = parseInput(name)
         return data.words
             .count { checkWord(it, data.rules.associateBy { r -> r.id }, listOf(0)) }
+            .toLong()
     }
-
-    override fun expectedResultPart1() = 162
 
     private fun calculateLiteralRules(allRules: Map<Int, Rule>, start: List<Int>): List<List<Rule>> {
         if (start.isEmpty()) {
@@ -111,7 +110,7 @@ class Day19 : Day("19") {
             .count { wordMatches(wordsOf42, wordsOf31, it) }
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val data = parseInput(name)
         val wordsOf42 = calculateWords(
             data.rules.associateBy { it.id },
@@ -121,8 +120,7 @@ class Day19 : Day("19") {
             data.rules.associateBy { it.id },
             listOf(31)
         )
-        return matchWords(wordsOf42, wordsOf31, data.words)
+        return matchWords(wordsOf42, wordsOf31, data.words).toLong()
     }
 
-    override fun expectedResultPart2() = 267
 }

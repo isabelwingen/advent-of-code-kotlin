@@ -29,8 +29,6 @@ class Day2: Day("2") {
 
     }
 
-    override fun expectedResultPart1() = 14264
-
     private fun determineScorePart2(pair: Pair<Char, Char>): Int {
         val rock = 1
         val paper = 2
@@ -60,5 +58,4 @@ class Day2: Day("2") {
             .sumOf { determineScorePart2(it) }
     }
 
-    override fun expectedResultPart2() = 12382
 }

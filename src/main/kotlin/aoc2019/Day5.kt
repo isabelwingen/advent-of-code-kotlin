@@ -21,7 +21,4 @@ class Day5: Day("5") {
         return intCode.execute()
     }
 
-    override fun expectedResultPart1() = 13087969L
-
-    override fun expectedResultPart2() = 14110739L
 }

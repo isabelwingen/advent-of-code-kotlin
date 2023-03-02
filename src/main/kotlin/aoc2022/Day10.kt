@@ -42,8 +42,6 @@ class Day10: Day("10") {
         return result
     }
 
-    override fun expectedResultPart1() = 14620
-
     override fun executePart2(name: String): Any {
         val commands = LinkedList(readInput(name))
         var c = 0
@@ -79,7 +77,4 @@ class Day10: Day("10") {
         return "\n" + image.joinToString("\n") { it.joinToString("") }
     }
 
-    override fun expectedResultPart2(): Any {
-        TODO("Not yet implemented")
-    }
 }

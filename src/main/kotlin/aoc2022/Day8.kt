@@ -24,8 +24,6 @@ class Day8: Day("8") {
             .count { visible(board[it.first], it.second) || visible(board.map { t -> t[it.second] }, it.first) }
     }
 
-    override fun expectedResultPart1() = 1715
-
     private fun scenicScoreOfPart(line: List<Int>, value: Int): Int {
         return if (line.any { it >= value }) {
             line.indexOfFirst { it >= value }.inc()
@@ -52,5 +50,4 @@ class Day8: Day("8") {
             .maxOf { scenicScore(board, it.first, it.second) }
     }
 
-    override fun expectedResultPart2() = 374400
 }

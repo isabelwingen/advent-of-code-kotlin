@@ -35,9 +35,6 @@ class Day25 : Day("25") {
         return squareAndMultiply(PUBLIC_KEY_CARD, cardLoopSize)
     }
 
-    override fun expectedResultPart1() = 9177528L
-
     override fun executePart2(name: String) = 0
 
-    override fun expectedResultPart2() = 0
 }

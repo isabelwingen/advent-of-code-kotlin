@@ -58,14 +58,12 @@ class Day15: Day("15") {
         return emptyList()
     }
 
-    override fun executePart1(name: String): Int {
-        return findOxygenTank(name).size
+    override fun executePart1(name: String): Long {
+        return findOxygenTank(name).size.toLong()
     }
 
-    override fun expectedResultPart1(): Int = 216
 
-
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         // move robotor to oxygen tank
         val pathToOxygenTank = findOxygenTank(name)
         val intCode = IntCode("Day15", name)
@@ -93,10 +91,8 @@ class Day15: Day("15") {
                 }
             }
         }
-        return longestPath
+        return longestPath.toLong()
     }
-
-    override fun expectedResultPart2() = 326
 
     companion object {
         val HALLWAY = 1L

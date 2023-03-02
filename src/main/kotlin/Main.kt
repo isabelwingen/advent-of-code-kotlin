@@ -10,20 +10,13 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 fun getInput(file: String): String {
-    return if (dir == "resources") {
-        val dirUrl = object {}.javaClass.getResource(chosenYear)!!
-        File(dirUrl.file!!, file).readText()
-    } else {
-        File(dir, file).readText()
-    }
+    val dirUrl = object {}.javaClass.getResource(file)!!
+    return File(dirUrl.file).readText()
 }
 
 fun getInputAsLines(file: String): List<String> {
     return getInput(file).split("\n")
 }
-
-var dir = "resources"
-var chosenYear = "1000"
 
 @OptIn(ExperimentalTime::class)
 private fun executeDay(year: String, day: String, part: String) {
@@ -56,13 +49,7 @@ fun main(args: Array<String>) {
     val year by parser.option(ArgType.Choice(listOf("2019", "2020"), { it }), shortName = "y", description = "Advent of code year").required()
     val day by parser.option(ArgType.Choice(dayOptions, { it }), shortName = "d", description = "Day of the year").required()
     val part by parser.option(ArgType.Choice(listOf("1", "2", "--all"), { it }), shortName = "p", description = "Part 1 or Part 2").required()
-    val directory by parser.option(ArgType.String, shortName = "dir", description = "Absolute path to directory with resource files")
     parser.parse(args)
-
-    if (directory != null) {
-        dir = directory!!
-    }
-    chosenYear = year
 
     if (day == "--all") {
         IntRange(1, 25).forEach { executeDay(year, it.toString(), part) }

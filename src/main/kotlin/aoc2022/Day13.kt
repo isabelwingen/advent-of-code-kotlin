@@ -3,7 +3,6 @@ package aoc2022
 import getInputAsLines
 import kotlinx.serialization.json.*
 import util.Day
-import java.util.Comparator
 import kotlin.streams.toList
 
 class Day13: Day("13") {
@@ -81,8 +80,6 @@ class Day13: Day("13") {
             .sumOf { it.second }
     }
 
-    override fun expectedResultPart1() = 6072
-
     override fun executePart2(name: String): Any {
         val lines = getInputAsLines(name).toMutableList()
         lines.add("[[2]]")
@@ -102,5 +99,4 @@ class Day13: Day("13") {
         return sorted.indexOf(div1).inc() * sorted.indexOf(div2).inc()
     }
 
-    override fun expectedResultPart2() = 22184
 }

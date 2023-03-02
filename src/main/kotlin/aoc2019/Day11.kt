@@ -47,7 +47,7 @@ class Robot(var orientation: String = "UP", var position: Pair<Int, Int> = 0 to 
 }
 
 class Day11: Day("11") {
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val program = IntCode("Robot", name)
         val robot = Robot()
         val paintedTiles = mutableMapOf<Pair<Int, Int>, Int>()
@@ -58,12 +58,10 @@ class Day11: Day("11") {
             val next = robot.action(colorToPaint.toInt(), turn.toInt())
             paintedTiles[next.first] = next.second
         }
-        return paintedTiles.keys.size
+        return paintedTiles.keys.size.toLong()
     }
 
-    override fun expectedResultPart1() = 2441
-
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): String {
         val program = IntCode("Robot", name)
         val robot = Robot()
         val paintedTiles = mutableMapOf((0 to 0) to 1)
@@ -90,11 +88,4 @@ class Day11: Day("11") {
             .joinToString("\n") { it }
     }
 
-    override fun expectedResultPart2() = "\n" +
-            " ###  #### ###  #### ###  ###  #  #  ##    \n" +
-            " #  #    # #  # #    #  # #  # # #  #  #   \n" +
-            " #  #   #  #  # ###  #  # #  # ##   #      \n" +
-            " ###   #   ###  #    ###  ###  # #  #      \n" +
-            " #    #    # #  #    #    # #  # #  #  # # \n" +
-            " #    #### #  # #    #    #  # #  #  ##    "
 }

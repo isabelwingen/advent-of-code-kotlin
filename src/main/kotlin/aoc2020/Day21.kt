@@ -48,17 +48,15 @@ class Day21: Day("21") {
         return result.toMap()
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val data = parseInput(name)
         val mapping = getMapping(data)
 
         val withAllergens = ingredientsWithAllergens(mapping)
 
-        return data.flatMap { it.first }.count { !withAllergens.values.toSet().contains(it) }
+        return data.flatMap { it.first }.count { !withAllergens.values.toSet().contains(it) }.toLong()
 
     }
-
-    override fun expectedResultPart1() = 2423
 
     override fun executePart2(name: String): String {
         val data = parseInput(name)
@@ -70,5 +68,4 @@ class Day21: Day("21") {
             .joinToString(",") { it.second }
     }
 
-    override fun expectedResultPart2() = "jzzjz,bxkrd,pllzxb,gjddl,xfqnss,dzkb,vspv,dxvsp"
 }

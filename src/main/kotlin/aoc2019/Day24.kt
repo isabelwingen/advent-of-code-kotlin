@@ -6,7 +6,7 @@ import kotlin.math.pow
 
 class Day24: Day("24") {
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         var board = getInputAsLines(name)
             .filter { it.isNotEmpty() }
             .map { it.toCharArray().toMutableList() }
@@ -48,7 +48,7 @@ class Day24: Day("24") {
             }
             val boardAsString = newBoard.flatten().joinToString("")
             if (seen.contains(boardAsString)) {
-                return newBoard.flatten().withIndex().sumOf { if (it.value == '#') 2.0.pow(it.index.toDouble()).toInt() else 0 }
+                return newBoard.flatten().withIndex().sumOf { if (it.value == '#') 2.0.pow(it.index.toDouble()).toLong() else 0L }
             } else {
                 seen.add(boardAsString)
             }
@@ -56,13 +56,8 @@ class Day24: Day("24") {
         }
     }
 
-    override fun expectedResultPart1() = 18852849
-
     override fun executePart2(name: String): Any {
         TODO("Not yet implemented")
     }
 
-    override fun expectedResultPart2(): Any {
-        TODO("Not yet implemented")
-    }
 }

@@ -154,7 +154,7 @@ class Day20: Day("20") {
         return dijkstra.findShortestPathTo(116 to 61)
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val graph = listOf(name)
             .asSequence()
             .map { readMaze(it) }
@@ -162,10 +162,9 @@ class Day20: Day("20") {
             .map { createGraph(it) }
             .map { it.simplify() }
             .first()
-        return dijkstra(graph)
+        return dijkstra(graph).toLong()
 
     }
-    override fun expectedResultPart1() = 528
 
     private fun directEdges(graph: Graph, level: Int): Set<DijkstraEdge<Triple<Int, Int, Int>>> {
         return graph.edges()
@@ -231,7 +230,7 @@ class Day20: Day("20") {
             .findShortestPathTo(Triple(endPos.first, endPos.second, 0))
     }
 
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val maze = listOf(name)
             .asSequence()
             .map { readMaze(it) }
@@ -247,10 +246,9 @@ class Day20: Day("20") {
             .map { createGraph(it) }
             .map { it.simplify() }
             .first()
-        return dijkstra2(graph, isOuter)
+        return dijkstra2(graph, isOuter).toLong()
     }
 
-    override fun expectedResultPart2() = 6214
 }
 
 

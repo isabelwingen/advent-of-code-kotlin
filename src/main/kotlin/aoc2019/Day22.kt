@@ -67,13 +67,11 @@ class Day22: Day("22") {
         return l
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         val commands = readInput(name)
         val list = LongRange(0, 10006).toList()
-        return executeCommands(commands, list).indexOf(2019)
+        return executeCommands(commands, list).indexOf(2019).toLong()
     }
-
-    override fun expectedResultPart1() = 2519
 
     fun mergeTwoCommands(c1: Pair<String, Long>, c2: Pair<String, Long>, count: Long): Pair<Pair<String, Long>, Pair<String, Long>> {
         val (a1, v1) = c1
@@ -141,7 +139,7 @@ class Day22: Day("22") {
         return size - 1 - goal
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         var commands = readInput(name)
         commands = simplifyCommands(commands, SIZE)
         val newCommands = times(commands, TIMES, SIZE)
@@ -156,7 +154,5 @@ class Day22: Day("22") {
         }
         return goal
     }
-
-    override fun expectedResultPart2() = 58966729050483L
 
 }

@@ -11,7 +11,7 @@ class Day23: Day("23") {
         progs.add(0, progs.removeAt(pos))
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         val progs = MutableList(50) { index -> index to IntCode("$index", name) }
         progs.forEach { it.second.execute(it.first.toLong(), true) }
         val outputs = HashMap<Int, LinkedList<Long>>()
@@ -46,8 +46,6 @@ class Day23: Day("23") {
             }
         }
     }
-
-    override fun expectedResultPart1() = 24268L
 
     override fun executePart2(name: String): Any {
         val progs = MutableList(50) { index -> index to IntCode("$index", name) }
@@ -108,5 +106,4 @@ class Day23: Day("23") {
         }
     }
 
-    override fun expectedResultPart2() = 19316L
 }

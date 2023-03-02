@@ -165,8 +165,6 @@ class Day20: Day("20") {
             .reduceRight { a, b -> a * b }
     }
 
-    override fun expectedResultPart1() = 15405893262491L
-
     fun IntArray.str(): String {
         return this.joinToString("") { it.toString() }
     }
@@ -238,13 +236,13 @@ class Day20: Day("20") {
     private fun findLinesContainingSeamonsterTop(lines: List<String>): List<Pair<Int, Int>> {
         val firstLineMatches = lines
             .indices
-            .flatMap { allMatches(Companion.FIRST_LINE.toRegex(), lines[it]).map { x -> it to x } }
+            .flatMap { allMatches(FIRST_LINE.toRegex(), lines[it]).map { x -> it to x } }
         val secondLineMatches = lines
             .indices
-            .flatMap { allMatches(Companion.SECOND_LINE.toRegex(), lines[it]).map { x -> it to x } }
+            .flatMap { allMatches(SECOND_LINE.toRegex(), lines[it]).map { x -> it to x } }
         val thirdLineMatches = lines
             .indices
-            .flatMap { allMatches(Companion.THIRD_LINE.toRegex(), lines[it]).map { x -> it to x } }
+            .flatMap { allMatches(THIRD_LINE.toRegex(), lines[it]).map { x -> it to x } }
         val res = mutableListOf<Pair<Int, Int>>()
         for (p in firstLineMatches) {
             if (secondLineMatches.contains(p.first + 1 to p.second) && thirdLineMatches.contains(p.first + 2 to p.second)) {
@@ -254,14 +252,12 @@ class Day20: Day("20") {
         return res.toList()
     }
 
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val tile = Tile(0, getLines(name).map { it.map { s -> s.toString().toInt() }.toIntArray() }).rotate180()
         val lines = tile.lines.map { it.joinToString("") { s -> s.toString() } }
         val allHashes = lines.joinToString("").count { it == '1' }
-        return allHashes - findLinesContainingSeamonsterTop(lines).count() * 15
+        return (allHashes - findLinesContainingSeamonsterTop(lines).count() * 15).toLong()
     }
-
-    override fun expectedResultPart2() = 2133
 
     companion object {
         private const val FIRST_LINE: String = "..................1."

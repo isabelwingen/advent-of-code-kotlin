@@ -12,8 +12,6 @@ class Day1: Day("1") {
            .maxOf { it.sumOf { s -> s.toInt() } }
     }
 
-    override fun expectedResultPart1() = 70374
-
     override fun executePart2(name: String): Int {
         return getInputAsLines(name)
             .splitBy { it.isBlank() }
@@ -25,5 +23,4 @@ class Day1: Day("1") {
             .sum()
     }
 
-    override fun expectedResultPart2() = 204610
 }

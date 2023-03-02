@@ -49,8 +49,6 @@ class Day7: Day("7") {
         return res.maxOrNull()!!
     }
 
-    override fun expectedResultPart1() = 67023L
-
     override fun executePart2(name: String): Long {
         val combs = combinations(lower = 5, upper = 9)
         val res = mutableSetOf<Long>()
@@ -85,5 +83,4 @@ class Day7: Day("7") {
         return res.maxOrNull()!!
     }
 
-    override fun expectedResultPart2() = 7818398L
 }

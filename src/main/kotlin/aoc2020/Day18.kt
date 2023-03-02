@@ -53,13 +53,10 @@ class Day18: Day("18") {
             .sumOf { solvePart1(it) }
     }
 
-    override fun expectedResultPart1() = 12956356593940L
-
     override fun executePart2(name: String): Long {
         return parseInput(name)
             .map { it.toCharArray().iterator() }
             .sumOf { solvePart2(it) }
     }
 
-    override fun expectedResultPart2() = 94240043727614L
 }

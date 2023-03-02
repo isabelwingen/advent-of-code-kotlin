@@ -150,16 +150,12 @@ class Day12Part2 {
 }
 
 class Day12 : Day("12") {
-    override fun executePart1(name: String): Any {
-        return Day12Part1().execute(name)
+    override fun executePart1(name: String): Long {
+        return Day12Part1().execute(name).toLong()
     }
 
-    override fun expectedResultPart1() = 364
-
-    override fun executePart2(name: String): Any {
-        return Day12Part2().execute(name)
+    override fun executePart2(name: String): Long {
+        return Day12Part2().execute(name).toLong()
     }
-
-    override fun expectedResultPart2() = 39518
 
 }

@@ -86,8 +86,6 @@ class Day14: Day("14") {
         return mem.values.sum()
     }
 
-    override fun expectedResultPart1() = 12135523360904L
-
     override fun executePart2(name: String): Long {
         val commands = parseInput(name) { transformInputPairPart2(it) }
         var mask = ""
@@ -105,5 +103,4 @@ class Day14: Day("14") {
         return mem.values.sum()
     }
 
-    override fun expectedResultPart2() = 2741969047858L
 }

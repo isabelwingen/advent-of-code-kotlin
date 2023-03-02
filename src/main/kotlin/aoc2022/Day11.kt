@@ -1,6 +1,5 @@
 package aoc2022
 
-import getInput
 import getInputAsLines
 import splitBy
 import util.Day
@@ -78,15 +77,12 @@ class Day11: Day("11") {
         return monkeyEngine(getMonkeys(name), 20) { it.div(3) }
     }
 
-    override fun expectedResultPart1() = 50830L
-
     override fun executePart2(name: String): Any {
         val monkeys = getMonkeys(name)
         val div = monkeys.map { it.test.toLong() }.reduceRight { a, b -> a * b }
         return monkeyEngine(monkeys, 10_000) { it.mod(div) }
     }
 
-    override fun expectedResultPart2() = 14399640002L
 }
 
 class Monkey(

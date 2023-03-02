@@ -103,17 +103,13 @@ class Day4: Day("4") {
         return validPassports
     }
 
-    override fun executePart1(name: String): Int {
-        return readBatchFile(name) { validPassportPart1(it) }
+    override fun executePart1(name: String): Long {
+        return readBatchFile(name) { validPassportPart1(it) }.toLong()
     }
 
-    override fun expectedResultPart1() = 192
-
-    override fun executePart2(name: String): Int {
-        return readBatchFile(name) { validPassportPart2(it) }
+    override fun executePart2(name: String): Long {
+        return readBatchFile(name) { validPassportPart2(it) }.toLong()
     }
 
-    //TODO: Fix. Should be 101
-    override fun expectedResultPart2() = 93
 }
 

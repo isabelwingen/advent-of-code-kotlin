@@ -33,9 +33,6 @@ class Day16: Day("16") {
         return this.multiply(Array(vector.size) { row -> IntArray(1) {vector[row]} }).map { it.first() }.toIntArray()
     }
 
-    private fun IntArray.multiply(vector: IntArray): IntArray {
-        return IntArray(this.size) {this[it] * vector[it]}
-    }
     fun <T> Sequence<T>.repeatIndefinitely(): Sequence<T> =
         generateSequence(this) { this }.flatten()
 
@@ -57,7 +54,7 @@ class Day16: Day("16") {
         return Array(m) { createLine(it + 1, m) }
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         var input = getInput(name)
             .trim()
             .map { it.toString().toInt() }
@@ -67,17 +64,11 @@ class Day16: Day("16") {
         for (i in 0 until 100) {
             input = a.multiply(input)
         }
-        return input.toList().take(8).joinToString("").toInt()
+        return input.toList().take(8).joinToString("").toLong()
 
     }
 
-    private fun triangleMatrix(n: Int): Array<IntArray> {
-        return Array(n) {row -> IntArray(n) {col -> if (col < row) 0 else 1} }
-    }
-
-    override fun expectedResultPart1() = 69549155
-
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         var input = List(10_000) { _ -> getInput(name).trim().map { it.toString().toInt() } }.flatten().toIntArray()
         val skip = input.take(7).joinToString("").toInt()
         input = input.sliceArray(IntRange(skip, input.size - 1))
@@ -87,8 +78,7 @@ class Day16: Day("16") {
                 input[i] = (input[i] + input[i + 1]) % 10
             }
         }
-        return input.take(8).joinToString("").toInt()
+        return input.take(8).joinToString("").toLong()
     }
 
-    override fun expectedResultPart2() = 83253465
 }

@@ -38,9 +38,9 @@ class Day4: Day("4") {
         return true
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val (lower, upper) = parseInput(name)
-        var res = 0
+        var res = 0L
         var number = lower
         while (number <= upper) {
             if (isValidPassword(number)) {
@@ -51,11 +51,9 @@ class Day4: Day("4") {
         return res
     }
 
-    override fun expectedResultPart1() = 2050
-
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val (lower, upper) = parseInput(name)
-        var res = 0
+        var res = 0L
         var number = lower
         while (number <= upper) {
             if (isValidPassword2(number)) {
@@ -66,5 +64,4 @@ class Day4: Day("4") {
         return res
     }
 
-    override fun expectedResultPart2() = 1390
 }

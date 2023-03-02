@@ -54,7 +54,7 @@ class Day23 : Day("23") {
         return cups
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val cups = execute(100)
         val res = mutableListOf<Int>()
         var current = 1
@@ -62,11 +62,7 @@ class Day23 : Day("23") {
             current = cups[current]
             res.add(current)
         }
-        return res.joinToString("").toInt()
-    }
-
-    override fun expectedResultPart1(): Any {
-        return 785692341
+        return res.joinToString("").toLong()
     }
 
     override fun executePart2(name: String): Long {
@@ -81,5 +77,4 @@ class Day23 : Day("23") {
         return a.toLong() * b.toLong()
     }
 
-    override fun expectedResultPart2() = 565615814504L
 }

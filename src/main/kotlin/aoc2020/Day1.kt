@@ -14,7 +14,7 @@ class Day1: Day("1") {
             .toIntArray()
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val coll = parseInput(name)
 
         for (i in coll.indices) {
@@ -22,7 +22,7 @@ class Day1: Day("1") {
                 val x = coll[i]
                 val y = coll[j]
                 if (x + y == 2020) {
-                    return x * y
+                    return x * y.toLong()
                 } else if (x + y < 2020) {
                     break
                 }
@@ -31,9 +31,7 @@ class Day1: Day("1") {
         return -1
     }
 
-    override fun expectedResultPart1() = 605364
-
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val coll = parseInput(name)
 
         for (i in coll.indices) {
@@ -43,7 +41,7 @@ class Day1: Day("1") {
                     val y = coll[j]
                     val z = coll[k]
                     if (x + y + z == 2020) {
-                        return x * y * z
+                        return x * y * z.toLong()
                     }
                 }
             }
@@ -51,5 +49,4 @@ class Day1: Day("1") {
         return -1
     }
 
-    override fun expectedResultPart2() = 128397680
 }

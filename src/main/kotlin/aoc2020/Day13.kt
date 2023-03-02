@@ -12,16 +12,15 @@ class Day13 : Day("13") {
         return coll[0].toInt() to coll[1].split(",").filter { it != "x" }.map { it.toInt() }
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val (a, busIDs) = parseInput(name)
         return busIDs
             .map { it to ((a / it) + 1) * it - a }
             .sortedBy { it.second }
             .map { it.first * it.second }
             .first()
+            .toLong()
     }
-
-    override fun expectedResultPart1() = 4315
 
     // t+id_1  mod a1 == 0
     // t+id_2  mod a2 == 0
@@ -44,7 +43,6 @@ class Day13 : Day("13") {
         return (s / r) % m
     }
 
-    override fun expectedResultPart2() = 556100168221141L
 }
 
 fun extented_euclid(a: Long, b: Long): Triple<Long, Long, Long> {

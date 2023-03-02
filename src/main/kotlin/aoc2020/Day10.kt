@@ -13,7 +13,7 @@ class Day10: Day("10") {
             .toIntArray()
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val list = parseInput(name)
         var ones = 1
         var threes = 1
@@ -24,10 +24,8 @@ class Day10: Day("10") {
                 threes += 1
             }
         }
-        return ones * threes
+        return ones * threes.toLong()
     }
-
-    override fun expectedResultPart1() = 2040
 
     private fun getCombinations(s: Int): Int {
         return when (s) {
@@ -72,5 +70,4 @@ class Day10: Day("10") {
             .reduceRight { a, b -> a * b}
     }
 
-    override fun expectedResultPart2() = 28346956187648L
 }

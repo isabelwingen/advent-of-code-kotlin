@@ -18,7 +18,7 @@ class Day8: Day("8") {
             .toIntArray()
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val input = parseInput(name)
         val layers = input.toList()
             .chunked(25)
@@ -26,12 +26,11 @@ class Day8: Day("8") {
             .chunked(6)
             .map { Layer(it) }
         val fewestZeros = layers.minByOrNull { layer -> layer.lines.flatMap { t -> t.toList() }.count { it == 0 } }!!
-        return fewestZeros.lines.flatMap { t -> t.toList() }.count { it == 1} * fewestZeros.lines.flatMap { t -> t.toList() }.count { it == 2}
+        return fewestZeros.lines.flatMap { t -> t.toList() }.count { it == 1} *
+                fewestZeros.lines.flatMap { t -> t.toList() }.count { it == 2}.toLong()
     }
 
-    override fun expectedResultPart1() = 1088
-
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): String {
         val input = parseInput(name)
         val layers = input.toList()
             .chunked(25)
@@ -64,11 +63,4 @@ class Day8: Day("8") {
             .joinToString("\n") { it.joinToString("") }
     }
 
-    override fun expectedResultPart2()= "\n" +
-            "#     ##  #   ##  # ###  \n" +
-            "#    #  # #   ##  # #  # \n" +
-            "#    #     # # #### ###  \n" +
-            "#    # ##   #  #  # #  # \n" +
-            "#    #  #   #  #  # #  # \n" +
-            "####  ###   #  #  # ###  "
 }

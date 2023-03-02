@@ -38,12 +38,12 @@ class Day6: Day("6") {
             .map { Orbit(it[0], it[1]) }
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val graph = parseInput(name)
         var nodes = setOf("COM")
         val seen = mutableSetOf<String>()
         var depth = 0
-        var res = 0
+        var res = 0L
         while (nodes.isNotEmpty()) {
             res += (nodes.size * depth)
             seen.addAll(nodes)
@@ -53,17 +53,14 @@ class Day6: Day("6") {
         return res
     }
 
-    override fun expectedResultPart1() = 322508
-
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val graph = parseInput(name)
         val yourParents = getParents("YOU", graph)
         val santasParents = getParents("SAN", graph)
         val intersection = yourParents.intersect(santasParents).last()
         val a = yourParents.reversed().indexOf(intersection)
         val b = santasParents.reversed().indexOf(intersection)
-        return a + b
+        return (a + b).toLong()
     }
 
-    override fun expectedResultPart2() = 496
 }

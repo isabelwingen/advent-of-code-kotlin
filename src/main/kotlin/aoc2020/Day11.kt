@@ -77,7 +77,7 @@ class Day11 : Day("11") {
             .toSet()
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val input = parseInput(name)
         val livingCells = input.filter { it.third == Seat.OCCUPIED }.map { it.first to it.second }.toSet()
         val allCells = input.filter { it.third != Seat.FLOOR }.map { it.first to it.second }.toSet()
@@ -98,12 +98,10 @@ class Day11 : Day("11") {
         while (gameOfLife.hasChanged()) {
             gameOfLife.step()
         }
-        return gameOfLife.getLivingCells().count()
+        return gameOfLife.getLivingCells().count().toLong()
     }
 
-    override fun expectedResultPart1() = 2289
-
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val input = parseInput(name)
         val livingCells = input.filter { it.third == Seat.OCCUPIED }.map { it.first to it.second }.toSet()
         val allCells = input.filter { it.third != Seat.FLOOR }.map { it.first to it.second }.toSet()
@@ -124,8 +122,7 @@ class Day11 : Day("11") {
         while (gameOfLife.hasChanged()) {
             gameOfLife.step()
         }
-        return gameOfLife.getLivingCells().count()
+        return gameOfLife.getLivingCells().count().toLong()
     }
 
-    override fun expectedResultPart2() = 2059
 }

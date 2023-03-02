@@ -103,8 +103,6 @@ class Day12: Day("12") {
         return io.totalEnergy() + europa.totalEnergy() + ganymede.totalEnergy() + callisto.totalEnergy()
     }
 
-    override fun expectedResultPart1() = 7636L
-
     private fun simulateXCoordinate(xs: List<Int>): Int {
         val velocity = IntArray(4) { 0 }
         var positions = xs
@@ -142,5 +140,4 @@ class Day12: Day("12") {
         return lcm(lcm(a, b), c)
     }
 
-    override fun expectedResultPart2()= 281691380235984L
 }

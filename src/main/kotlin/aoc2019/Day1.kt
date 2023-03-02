@@ -14,8 +14,6 @@ class Day1: Day("1") {
             .sumOf { it - 2 }
     }
 
-    override fun expectedResultPart1() = 3210097L
-
     override fun executePart2(name: String): Long {
         return getInputAsLines(name)
             .asSequence()
@@ -26,8 +24,6 @@ class Day1: Day("1") {
             .map { it + recursiveFuel(it) }
             .sum()
     }
-
-    override fun expectedResultPart2() = 4812287L
 
     private fun recursiveFuel(value: Long): Long {
         val next = (value / 3) - 2

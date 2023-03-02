@@ -19,7 +19,7 @@ class Day17: Day("17") {
             .map { it.toMutableList() }
             .toMutableList()
 
-        var res = 0
+        var res = 0L
         for (r in scaffolds.indices) {
             if (r == 0 || r == scaffolds.size - 1) continue
             for (c in scaffolds.first().indices) {
@@ -36,10 +36,7 @@ class Day17: Day("17") {
         }
 
         return res
-
     }
-
-    override fun expectedResultPart1() = 4220
 
     fun findRoboterPosition(chars: List<List<Char>>): Pair<Pair<Int, Int>, String> {
         for (r in chars.indices) {
@@ -164,5 +161,4 @@ class Day17: Day("17") {
         return 0
     }
 
-    override fun expectedResultPart2() = 809736L
 }

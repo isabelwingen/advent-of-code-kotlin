@@ -27,11 +27,9 @@ class Day2: Day("2") {
         return policy.range.contains(policy.password.count { policy.char == it })
     }
 
-    override fun executePart1(name: String): Int {
-        return parseInput(name).count { validForPart1(it) }
+    override fun executePart1(name: String): Long {
+        return parseInput(name).count { validForPart1(it) }.toLong()
     }
-
-    override fun expectedResultPart1() = 614
 
     private fun validForPart2(policy: Policy): Boolean {
         val a = policy.range.first
@@ -40,10 +38,9 @@ class Day2: Day("2") {
         return (policy.password[a-1] == policy.char).xor(policy.password[b-1] == policy.char)
     }
 
-    override fun executePart2(name: String): Int {
-        return parseInput(name).count { validForPart2(it) }
+    override fun executePart2(name: String): Long {
+        return parseInput(name).count { validForPart2(it) }.toLong()
     }
 
-    override fun expectedResultPart2() = 354
 }
 

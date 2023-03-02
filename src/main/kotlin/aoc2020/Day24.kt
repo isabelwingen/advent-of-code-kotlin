@@ -23,7 +23,7 @@ class Day24 : Day("24") {
         return res.toList()
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         return getInputAsLines(name)
             .asSequence()
             .filter { it.isNotBlank() }
@@ -34,9 +34,8 @@ class Day24 : Day("24") {
             .mapValues { it.value.count() }
             .filter { it.value % 2 == 1 }
             .count()
+            .toLong()
     }
-
-    override fun expectedResultPart1() = 479
 
     private fun getNeighbours(coord: HexCoordinate): Set<HexCoordinate> {
         return listOf(
@@ -91,7 +90,7 @@ class Day24 : Day("24") {
         return HexCoordinate(s = s, q = q, r = r)
     }
 
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val initialState = getInputAsLines(name)
             .asSequence()
             .filter { it.isNotBlank() }
@@ -116,8 +115,7 @@ class Day24 : Day("24") {
                 aliveNeighbours == 0 || aliveNeighbours > 2
             })
         repeat(100) { gameOfLife.step() }
-        return gameOfLife.getLivingCells().count()
+        return gameOfLife.getLivingCells().count().toLong()
     }
 
-    override fun expectedResultPart2() = 4135
 }
