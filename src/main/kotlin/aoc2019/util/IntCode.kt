@@ -72,7 +72,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     private fun executeOpCode1(opCode: String) {
-        printCommand(opCode, 3)
+        printCommand(opCode)
         val a = getValue(opCode, 1)
         val b = getValue(opCode, 2)
         val goal = getAddress(opCode, 3)
@@ -82,7 +82,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     private fun executeOpCode2(opCode: String) {
-        printCommand(opCode, 3)
+        printCommand(opCode)
         val a = getValue(opCode, 1)
         val b = getValue(opCode, 2)
         val goal = getAddress(opCode, 3)
@@ -92,7 +92,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     private fun executeOpCode3(opCode: String) {
-        printCommand(opCode, 1)
+        printCommand(opCode)
         val addr = getAddress(opCode, 1)
         if (input.isEmpty()) {
             input.add(-1)
@@ -103,7 +103,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     private fun executeOpCode4(opCode: String): Long {
-        printCommand(opCode, 1)
+        printCommand(opCode)
         output = getValue(opCode, 1)
         pointer += 2
         println1("$name:   Result: return $output and pause execution at $pointer")
@@ -111,7 +111,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     private fun executeOpCode5(opCode: String) {
-        printCommand(opCode, 2)
+        printCommand(opCode)
         val firstParam = getValue(opCode, 1)
         val secondParam = getValue(opCode, 2)
         if (firstParam != 0L) {
@@ -124,7 +124,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     private fun executeOpCode6(opCode: String) {
-        printCommand(opCode, 2)
+        printCommand(opCode)
         val firstParam = getValue(opCode, 1)
         val secondParam = getValue(opCode, 2)
         if (firstParam == 0L) {
@@ -137,7 +137,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     private fun executeOpCode7(opCode: String) {
-        printCommand(opCode, 3)
+        printCommand(opCode)
         val firstParam = getValue(opCode, 1)
         val secondParam = getValue(opCode, 2)
         val goal = getAddress(opCode, 3)
@@ -152,7 +152,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     private fun executeOpCode8(opCode: String) {
-        printCommand(opCode, 3)
+        printCommand(opCode)
         val firstParam = getValue(opCode, 1)
         val secondParam = getValue(opCode, 2)
         val goal = getAddress(opCode, 3)
@@ -167,7 +167,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
     }
 
     private fun executeOpCode9(opCode: String) {
-        printCommand(opCode, 1)
+        printCommand(opCode)
         val firstParam = getValue(opCode, 1)
         if (firstParam > 0) {
             println1("$name   Increase relative base $relativeBase by $firstParam")
@@ -184,7 +184,7 @@ class IntCode(private val name: String, private val intCode: LongArray) {
         return if (output == -1L) getMemory(0) else output
     }
 
-    private fun printCommand(opCode: String, length: Int) {
+    private fun printCommand(opCode: String) {
         println1("$name: Execute opCode $opCode at position $pointer")
     }
 

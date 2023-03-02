@@ -73,7 +73,7 @@ class Day14: Day("14") {
             low = high
             high = 10 * low
         }
-        var mid = 0L
+        var mid: Long
         while (low < high - 1) {
             mid = (low + high) / 2
             val ore = round(reactions, mid)

@@ -1,4 +1,4 @@
-package util
+package aoc2019.util
 
 class Dijkstra<E>(private val edges: Set<DijkstraEdge<E>>, private val startNodeId: E) {
 

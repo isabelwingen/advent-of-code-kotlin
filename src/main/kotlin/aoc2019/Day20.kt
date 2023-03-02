@@ -1,5 +1,7 @@
 package aoc2019
 
+import aoc2019.util.Dijkstra
+import aoc2019.util.DijkstraEdge
 import getInputAsLines
 import util.*
 

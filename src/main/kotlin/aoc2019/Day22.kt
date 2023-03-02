@@ -2,7 +2,6 @@ package aoc2019
 
 import getInputAsLines
 import util.Day
-import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.math.abs
 
@@ -122,7 +121,7 @@ class Day22: Day("22") {
         return simplifyCommands(newCommands, count)
     }
 
-    private fun reverseCut(cut: Long, goal: Long, size: Long): Long {
+    private fun reverseCut(cut: Long, goal: Long): Long {
         return if (goal > cut) {
             goal - cut - 1
         } else {
@@ -151,7 +150,7 @@ class Day22: Day("22") {
             goal = when (c.first) {
                 NEW -> reverseNew(goal, SIZE)
                 INC -> reverseIncrement(c.second, goal, SIZE)
-                CUT -> reverseCut(c.second, goal, SIZE)
+                CUT -> reverseCut(c.second, goal)
                 else -> throw java.lang.IllegalStateException()
             }
         }

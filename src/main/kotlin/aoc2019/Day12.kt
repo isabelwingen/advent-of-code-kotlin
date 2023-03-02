@@ -91,26 +91,14 @@ class Day12: Day("12") {
         callisto.move()
     }
 
-    private fun print(io: Moon, europa: Moon, ganymede: Moon, callisto: Moon, id: Int) {
-//        println("After $id steps")
-//        println(io)
-//        println(europa)
-//        println(ganymede)
-//        println(callisto)
-//        println("Sum of total energy: ${io.totalEnergy() + europa.totalEnergy() + ganymede.totalEnergy() + callisto.totalEnergy()}")
-//        println()
-    }
-
     private fun step(io: Moon, europa: Moon, ganymede: Moon, callisto: Moon, id: Int = 0) {
         applyGravity(io, europa, ganymede, callisto)
         move(io, europa, ganymede, callisto)
-        print(io, europa, ganymede, callisto, id)
     }
 
 
     override fun executePart1(name: String): Long {
         val (io, europa, ganymede, callisto) = parseInput(name)
-        print(io, europa, ganymede, callisto, 0)
         repeat(1000) { step(io, europa, ganymede, callisto, it + 1) }
         return io.totalEnergy() + europa.totalEnergy() + ganymede.totalEnergy() + callisto.totalEnergy()
     }

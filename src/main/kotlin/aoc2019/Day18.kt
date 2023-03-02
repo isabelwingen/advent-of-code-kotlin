@@ -149,7 +149,7 @@ class Day18: Day("18") {
         }
 
         fun branchToCollectableKeys(): List<State> {
-            val x = currentPositions.flatMapIndexed {  index, currentPosition -> branchToCollectableKeys(currentPosition) }
+            val x = currentPositions.flatMapIndexed { _, currentPosition -> branchToCollectableKeys(currentPosition) }
             return x
         }
 
