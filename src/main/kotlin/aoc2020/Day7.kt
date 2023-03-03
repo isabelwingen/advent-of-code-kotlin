@@ -5,7 +5,7 @@ import util.Day
 
 class Day7 : Day("7") {
 
-    private class Edge(val from: String, val to: String, val value: Int) {
+    private data class Edge(val from: String, val to: String, val value: Int) {
         @Override
         override fun toString(): String {
             return "$from -> $to ($value)"
@@ -55,10 +55,9 @@ class Day7 : Day("7") {
         return if (nextEdges.isEmpty()) {
             edge.value
         } else {
-            edge.value
-            +nextEdges
+            nextEdges
                 .map { getPath(it, edges) * edge.value }
-                .reduceRight { a, b -> a + b }
+                .reduceRight { a, b -> a + b } + edge.value
         }
     }
 

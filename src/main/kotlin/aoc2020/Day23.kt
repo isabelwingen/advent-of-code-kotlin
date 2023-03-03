@@ -33,6 +33,13 @@ class Day23 : Day("23") {
         return cups
     }
 
+    /**
+     * Create some kind of linked list
+     * The order of the cups is decoded in the array:
+     * The label of the cup that is immediately clockwise of the cup with the label i,
+     * can be found in cups[i]
+     * i.e cups[i] is a pointer to the next cup
+     */
     private fun buildArray(input: IntArray): IntArray {
         val cups = IntArray(input.size + 1) { -1 }
         for (i in input.indices) {
@@ -58,7 +65,7 @@ class Day23 : Day("23") {
         val cups = execute(100)
         val res = mutableListOf<Int>()
         var current = 1
-        while (res.size < 9) {
+        while (res.size < 8) {
             current = cups[current]
             res.add(current)
         }
