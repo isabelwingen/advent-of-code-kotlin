@@ -87,7 +87,6 @@ internal class Year2019Test {
                 .mapIndexed { index, day -> index+1 to day }
                 .filter { it.first != 8 }
                 .filter { it.first != 11 }
-                .filter { it.first != 24 }
                 .map { Arguments.of(it.first, it.second) }
                 .toList()
         }
