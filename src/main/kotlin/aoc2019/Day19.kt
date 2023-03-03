@@ -4,78 +4,51 @@ import aoc2019.util.IntCode
 import util.Day
 
 class Day19: Day("19") {
+
+    fun testCoordinates(pair: Pair<Int, Int>): Int {
+        return IntCode("Day19", "2019/day19.txt")
+            .execute(pair.toList().map { it.toLong() })
+            .toInt()
+    }
+
     override fun executePart1(name: String): Long {
         var sum = 0L
         for (x in 0 until 50) {
             for (y in 0 until 50) {
-                val prog = IntCode("Day19", name).execute(listOf(x.toLong(), y.toLong())).toInt()
-                if (x == 1 && prog == 1) {
-                    println("$x, $y: $prog")
-                }
+                val prog = testCoordinates(x to y)
                 sum += prog
             }
         }
         return sum
     }
 
-    fun IntRange.intersect(other: IntRange): IntRange {
-        val intersectSet = this.toSet().intersect(other)
-        if (intersectSet.isEmpty()) {
-            return IntRange(0, 0)
-        } else {
-            return IntRange(intersectSet.minOf { it }, intersectSet.maxOf { it })
-        }
-    }
-
-    fun IntRange.size(): Int {
-        return this.toList().size;
-    }
 
     override fun executePart2(name: String): Long {
-        val MAX = 1000
-        val ranges = HashMap<Int, IntRange>()
-        for (x in 0 until MAX) {
-            val range = ranges.getOrPut(x) { findRange(x, name) }
-            if (range.size() < 100) {
-                continue
+        val left = hashMapOf(5 to 4)
+        var i = 5
+        while (true) {
+            // get left border
+            var j = 0
+            while (true) {
+                val testCoordinate = left[i]!!+j to i+1
+                if (testCoordinates(testCoordinate) == 1) {
+                    left[i+1] = left[i]!!+j
+                    break
+                }
+                j++
             }
-            val goal = x + 99
-            val otherRange = ranges.getOrPut(goal) { findRange(goal, name) }
-            val intersection = range.intersect(otherRange)
-            if (intersection.size() >= 100) {
-                return x * 10_000 + intersection.first.toLong()
+            if (testCoordinates(left[i]!!+99 to i) == 1) {
+                // bottom row would fit.
+                // bottom left corner is at y=i, x=left[i]
+                // check if top right corner would also fit
+                // top right corner would be at y=i-99, x=left[i]+99
+                if (testCoordinates(left[i]!!+99 to i-99) == 1) {
+                    break
+                }
             }
+            i++
         }
-        return 0L
-    }
-
-    private fun findRange(x: Int, name: String): IntRange {
-        val start = findStart(x, 0, 1_000, name)
-        if (start == -1) {
-            return IntRange(0, 0)
-        } else {
-            return IntRange(start, findEnd(x, start, 1_200, name));
-        }
-    }
-
-    private fun findStart(x: Int, start: Int, end: Int, name: String): Int {
-        for (y in start until end + 1) {
-            val res = IntCode("", name).execute(listOf(x.toLong(), y.toLong())).toInt()
-            if (res == 1) {
-                return y
-            }
-        }
-        return -1
-    }
-
-    private fun findEnd(x: Int, start: Int, end: Int, name: String): Int {
-        for (y in start until end + 1) {
-            val res = IntCode("", name).execute(listOf(x.toLong(), y.toLong())).toInt()
-            if (res == 0) {
-                return y - 1
-            }
-        }
-        return -1
+        return (i-99)+left[i]!!*10_000L
     }
 
 }
