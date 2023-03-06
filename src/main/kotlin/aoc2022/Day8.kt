@@ -18,10 +18,11 @@ class Day8: Day("8") {
         return left || right
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         val board = readInput(name)
         return board.flatMapIndexed { row, l -> List(l.size) { col -> row to col } }
             .count { visible(board[it.first], it.second) || visible(board.map { t -> t[it.second] }, it.first) }
+            .toLong()
     }
 
     private fun scenicScoreOfPart(line: List<Int>, value: Int): Int {
@@ -44,10 +45,11 @@ class Day8: Day("8") {
                 scenicScoreOfPart(down, value)
     }
 
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val board = readInput(name)
         return board.flatMapIndexed { row, l -> List(l.size) { col -> row to col } }
             .maxOf { scenicScore(board, it.first, it.second) }
+            .toLong()
     }
 
 }

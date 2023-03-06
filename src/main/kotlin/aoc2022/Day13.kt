@@ -70,7 +70,7 @@ class Day13: Day("13") {
         }
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         val lists = getInputAsLines(name)
             .filter { it.isNotEmpty() }
             .map { getList(it) }
@@ -78,9 +78,10 @@ class Day13: Day("13") {
             .mapIndexed { index, it -> rightOrder(it[0], it[1]) to index + 1 }
             .filter { it.first == "YES" }
             .sumOf { it.second }
+            .toLong()
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val lines = getInputAsLines(name).toMutableList()
         lines.add("[[2]]")
         lines.add("[[6]]")
@@ -96,7 +97,7 @@ class Day13: Day("13") {
         }
         val div1 = listOf(listOf(2))
         val div2 = listOf(listOf(6))
-        return sorted.indexOf(div1).inc() * sorted.indexOf(div2).inc()
+        return sorted.indexOf(div1).inc() * sorted.indexOf(div2).inc().toLong()
     }
 
 }

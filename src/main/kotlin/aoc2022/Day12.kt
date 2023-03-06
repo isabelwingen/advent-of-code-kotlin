@@ -75,7 +75,7 @@ class Day12: Day("12") {
         return end.minOf { distance[it]!! }
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         val charGrid = getGrid(name)
         // start node
         val startRow = charGrid.withIndex().first { it.value.contains('S') }
@@ -85,11 +85,11 @@ class Day12: Day("12") {
         val endRow = charGrid.withIndex().first { it.value.contains('E') }
         val end = endRow.index to endRow.value.indexOf('E')
         val graph = makeGraph(charGrid)
-        return dijkstra(Node(start, 0), setOf(Node(end, 25)), graph)
+        return dijkstra(Node(start, 0), setOf(Node(end, 25)), graph).toLong()
 
     }
 
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val charGrid = getGrid(name)
 
         // end node
@@ -106,7 +106,7 @@ class Day12: Day("12") {
             .map { Node(it, 0) }
             .toSet()
 
-        return dijkstra(Node(end, 25), starts, reverseGraph)
+        return dijkstra(Node(end, 25), starts, reverseGraph).toLong()
     }
 
 }

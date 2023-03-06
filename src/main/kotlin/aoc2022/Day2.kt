@@ -20,12 +20,12 @@ class Day2: Day("2") {
         }
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         return getInputAsLines(name)
             .filter { it.isNotEmpty() }
             .map { it.toCharArray() }
             .map { it[0] to it[2] }
-            .sumOf { determineScorePart1(it) }
+            .sumOf { determineScorePart1(it) }.toLong()
 
     }
 
@@ -50,12 +50,12 @@ class Day2: Day("2") {
         }
     }
 
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         return getInputAsLines(name)
             .filter { it.isNotEmpty() }
             .map { it.toCharArray() }
             .map { it[0] to it[2] }
-            .sumOf { determineScorePart2(it) }
+            .sumOf { determineScorePart2(it) }.toLong()
     }
 
 }

@@ -14,14 +14,14 @@ class Day10: Day("10") {
             .map { if (it.size > 1) it[0] to it[1].toInt() else it[0] to 0 }
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         val commands = LinkedList(readInput(name))
         var c = 1
         var wait = false
         var currrentCommand = "noop" to 0
         var registerX = 1
         val importantCycles = listOf(20, 60, 100, 140, 180, 220)
-        var result = 0
+        var result = 0L
         while (commands.isNotEmpty()) {
             if (wait) {
                 wait = false
@@ -42,7 +42,7 @@ class Day10: Day("10") {
         return result
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): String {
         val commands = LinkedList(readInput(name))
         var c = 0
         var wait = false
