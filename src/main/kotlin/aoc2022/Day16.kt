@@ -53,8 +53,7 @@ class Day16: Day("16") {
         return newEdges.toSet()
     }
 
-    private fun simplifyGraph(edges: Set<Edge>, nodes: Map<String, Int>): Set<Edge> {
-        val emptyNodes = nodes.filter { it.value == 0 }.filter { it.key != "AA" }.map { it.key }
+    private fun simplifyGraph(edges: Set<Edge>, emptyNodes: Set<String>): Set<Edge> {
         var res = edges
         for (n in emptyNodes) {
             res = removeNode(res, n)
@@ -95,7 +94,7 @@ class Day16: Day("16") {
         while (stack.isNotEmpty()) {
             val p = stack.removeAt(0)
             val (current, remaining, open, units, history) = p
-            val candidates = values.keys.filter { !open.contains(it) }.filter { dist[current]!![it]!! + 1 < remaining }
+            val candidates = dist.keys.filter { !open.contains(it) }.filter { dist[current]!![it]!! + 1 < remaining }
             if (candidates.isEmpty()) {
                 if (units > max.units) {
                     max = p
@@ -123,13 +122,13 @@ class Day16: Day("16") {
         val lineInformation = getInputAsLines(name)
             .filter { it.isNotBlank() }
             .map { splitLine(it) }
-        val nodeValues = lineInformation.associate { it.first to it.second }.toMutableMap()
+        val allNodeValues = lineInformation
+            .associate { it.first to it.second }
+        val emptyNodes = allNodeValues.filter { it.value == 0 }.filter { it.key != "AA" }.map { it.key }.toSet()
         val edges = lineInformation.flatMap { li -> li.third.map { Edge(li.first, it, 1) } }.toSet()
-        val g = simplifyGraph(edges, nodeValues)
-        val nodes = g.flatMap { it.nodes() }.toSet()
-        nodeValues.keys.filter { !nodes.contains(it) }.forEach { nodeValues.remove(it) }
+        val g = simplifyGraph(edges, emptyNodes)
         val dist = floydWarshall(g)
-        val res = findBestPath(dist, nodeValues)
+        val res = findBestPath(dist, allNodeValues)
         return res
     }
 
