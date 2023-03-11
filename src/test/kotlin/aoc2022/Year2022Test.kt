@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import util.Day;
 import kotlin.math.min
+import kotlin.system.measureTimeMillis
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Year2022Test {
@@ -39,7 +40,9 @@ class Year2022Test {
 
     @Test
     fun testDay16() {
-        println(Day16().executePart1())
+        val p: Day16.Point
+        val q = measureTimeMillis {  p = Day16().executePart1() }
+        println("Solve Day 16 in $q milliseconds. Result ${p.units}")
     }
 
     @Test

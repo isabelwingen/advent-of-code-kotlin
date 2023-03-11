@@ -2,15 +2,14 @@ package aoc2022
 
 import getInputAsLines
 import util.Day
-import java.util.LinkedList
 
 class Day16: Day("16") {
 
-    private fun splitLine(line: String): Triple<String, Long, List<String>> {
+    private fun splitLine(line: String): Triple<String, Int, List<String>> {
         val x = line.split(" has flow rate=")
         val y = x[1].split("; ")
         val id = x[0].split(" ")[1]
-        val flowRate = y[0].toLong()
+        val flowRate = y[0].toInt()
         val leadTo = y[1].split(" ").drop(4).map { if (it.last() == ',') it.dropLast(1) else it }
         return Triple(id, flowRate, leadTo)
     }
@@ -54,8 +53,8 @@ class Day16: Day("16") {
         return newEdges.toSet()
     }
 
-    private fun simplifyGraph(edges: Set<Edge>, nodes: Map<String, Long>): Set<Edge> {
-        val emptyNodes = nodes.filter { it.value == 0L }.filter { it.key != "AA" }.map { it.key }
+    private fun simplifyGraph(edges: Set<Edge>, nodes: Map<String, Int>): Set<Edge> {
+        val emptyNodes = nodes.filter { it.value == 0 }.filter { it.key != "AA" }.map { it.key }
         var res = edges
         for (n in emptyNodes) {
             res = removeNode(res, n)
@@ -63,43 +62,75 @@ class Day16: Day("16") {
         return res
     }
 
-    private fun findShortestPaths(edges: Set<Edge>, start: String): Any {
+    private fun HashMap<String, HashMap<String, Int>>.safe_get(a: String, b: String, default: Int = Int.MAX_VALUE): Int {
+        return this[a]!!.getOrDefault(b, default)
+    }
+
+    private fun floydWarshall(edges: Set<Edge>): HashMap<String, HashMap<String, Int>> {
         val nodes = edges.flatMap { it.nodes() }.toSet()
-        val abstand = nodes.associateWith { Long.MAX_VALUE }.toMutableMap()
-        val vorgaenger = mutableMapOf<String, String>()
-        abstand[start] = 0
-        val queue = LinkedList(nodes)
-        while (queue.isNotEmpty()) {
-            val u = queue.minByOrNull { abstand[it]!! }!!
-            queue.remove(u)
-            val neighborEdges = edges.filter { it.hasNode(u) }.associateBy { it.nodes().first { x -> x != u } }
-            val neighbors = neighborEdges.keys
-            for (v in neighbors) {
-                if (queue.contains(v)) {
-                    val alternativ = abstand[u]!! + neighborEdges[v]!!.time
-                    if (alternativ < abstand[v]!!) {
-                        abstand[v] = alternativ
-                        vorgaenger[v] = u
+        val dist = HashMap<String, HashMap<String, Int>>(nodes.size)
+        nodes.forEach { dist[it] = HashMap() }
+        for (edge in edges) {
+            dist[edge.a]!![edge.b] = edge.time
+            dist[edge.b]!![edge.a] = edge.time
+        }
+        nodes.forEach { dist[it]!![it] = 0 }
+        for (k in nodes) {
+            for (i in nodes) {
+                for (j in nodes) {
+                    if (dist.safe_get(i, j).toLong() > dist.safe_get(i, k).toLong() + dist.safe_get(k, j).toLong()) {
+                        dist[i]!![j] = dist.safe_get(i, k) + dist.safe_get(k, j)
                     }
                 }
             }
-
         }
-        return abstand
+        return dist
     }
 
-    override fun executePart1(name: String): Any {
+    data class Point(val current: String, val remainingMinutes: Int, val openValves: Set<String>, val units: Long, val history: List<String>)
+
+    private fun findBestPath(dist: Map<String, Map<String, Int>>, values: Map<String, Int>): Point {
+        val stack = MutableList(1) { Point("AA", 30, setOf("AA"), 0, listOf("Start at AA")) }
+        var max = stack.first()
+        while (stack.isNotEmpty()) {
+            val p = stack.removeAt(0)
+            val (current, remaining, open, units, history) = p
+            val candidates = values.keys.filter { !open.contains(it) }.filter { dist[current]!![it]!! + 1 < remaining }
+            if (candidates.isEmpty()) {
+                if (units > max.units) {
+                    max = p
+                }
+            } else {
+                candidates.forEach {
+                    val timeToOpen = dist[current]!![it]!! + 1
+                    if (timeToOpen <= remaining) {
+                        val unitsProduced = (remaining - timeToOpen) * values[it]!!
+                        val openValves = open.toMutableSet()
+                        openValves.add(it)
+                        stack.add(
+                            0,
+                            Point(
+                                it, remaining - timeToOpen, open + it, units + unitsProduced,
+                                history + "Open Valve $it with ${remaining - timeToOpen} minutes left. ($unitsProduced)"))
+                    }
+                }
+            }
+        }
+        return max
+    }
+
+    override fun executePart1(name: String): Point {
         val lineInformation = getInputAsLines(name)
             .filter { it.isNotBlank() }
             .map { splitLine(it) }
-        val nodes = lineInformation.associate { it.first to it.second }
+        val nodeValues = lineInformation.associate { it.first to it.second }.toMutableMap()
         val edges = lineInformation.flatMap { li -> li.third.map { Edge(li.first, it, 1) } }.toSet()
-        val g = simplifyGraph(edges, nodes)
-        val n = g.flatMap { it.nodes() }.toSet()
-        for (m in n) {
-            println(findShortestPaths(g, m))
-        }
-        return 0
+        val g = simplifyGraph(edges, nodeValues)
+        val nodes = g.flatMap { it.nodes() }.toSet()
+        nodeValues.keys.filter { !nodes.contains(it) }.forEach { nodeValues.remove(it) }
+        val dist = floydWarshall(g)
+        val res = findBestPath(dist, nodeValues)
+        return res
     }
 
     override fun executePart2(name: String): Any {
