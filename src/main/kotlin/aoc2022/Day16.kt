@@ -2,6 +2,7 @@ package aoc2022
 
 import getInputAsLines
 import util.Day
+import org.paukov.combinatorics3.Generator;
 
 class Day16: Day("16") {
 
@@ -88,37 +89,38 @@ class Day16: Day("16") {
 
     data class Point(val current: String, val remainingMinutes: Int, val openValves: Set<String>, val units: Long, val history: List<String>)
 
-    private fun findBestPath(dist: Map<String, Map<String, Int>>, values: Map<String, Int>): Point {
-        val stack = MutableList(1) { Point("AA", 30, setOf("AA"), 0, listOf("Start at AA")) }
-        var max = stack.first()
+    private fun findBestPath(
+        dist: Map<String, Map<String, Int>>,
+        values: Map<String, Int>,
+        nodes: Set<String> = dist.keys,
+        time: Int = 30
+    ): Long {
+        val stack = MutableList(1) { Point("AA", time, setOf("AA"), 0, listOf("Start at AA")) }
+        var max = stack.first().units
         while (stack.isNotEmpty()) {
             val p = stack.removeAt(0)
             val (current, remaining, open, units, history) = p
-            val candidates = dist.keys.filter { !open.contains(it) }.filter { dist[current]!![it]!! + 1 < remaining }
+            val candidates = nodes.filter { !open.contains(it) }.filter { dist[current]!![it]!! + 1 < remaining }
             if (candidates.isEmpty()) {
-                if (units > max.units) {
-                    max = p
+                if (units > max) {
+                    max = p.units
                 }
             } else {
                 candidates.forEach {
                     val timeToOpen = dist[current]!![it]!! + 1
-                    if (timeToOpen <= remaining) {
-                        val unitsProduced = (remaining - timeToOpen) * values[it]!!
-                        val openValves = open.toMutableSet()
-                        openValves.add(it)
-                        stack.add(
-                            0,
-                            Point(
-                                it, remaining - timeToOpen, open + it, units + unitsProduced,
-                                history + "Open Valve $it with ${remaining - timeToOpen} minutes left. ($unitsProduced)"))
-                    }
+                    val unitsProduced = (remaining - timeToOpen) * values[it]!!
+                    stack.add(
+                        0,
+                        Point(
+                            it, remaining - timeToOpen, open + it, units + unitsProduced,
+                            history + "Open Valve $it with ${remaining - timeToOpen} minutes left. ($unitsProduced)"))
                 }
             }
         }
         return max
     }
 
-    override fun executePart1(name: String): Point {
+    override fun executePart1(name: String): Long {
         val lineInformation = getInputAsLines(name)
             .filter { it.isNotBlank() }
             .map { splitLine(it) }
@@ -128,11 +130,38 @@ class Day16: Day("16") {
         val edges = lineInformation.flatMap { li -> li.third.map { Edge(li.first, it, 1) } }.toSet()
         val g = simplifyGraph(edges, emptyNodes)
         val dist = floydWarshall(g)
-        val res = findBestPath(dist, allNodeValues)
-        return res
+        return findBestPath(dist, allNodeValues)
+    }
+
+    private fun findBestPath2(dist: Map<String, Map<String, Int>>, values: Map<String, Int>): Long {
+        val nodes = dist.keys.filter { it != "AA" }.toSet()
+        var max = 0L
+        for (n in 1 until nodes.size/2 + 1) {
+            //println("Calculate max units for n=$n")
+            for (a in Generator.combination(nodes).simple(n).map { it.toSet() }) {
+                val b = nodes.filter { !a.contains(it) }.toSet()
+                val unitsOfA = findBestPath(dist, values, a, 26)
+                val unitsOfB = findBestPath(dist, values, b, 26)
+                val units = unitsOfA + unitsOfB
+                if (units > max) {
+                    max = units
+                }
+            }
+            //println("Max units after n=$n: $max")
+        }
+        return max
     }
 
     override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+        val lineInformation = getInputAsLines(name)
+            .filter { it.isNotBlank() }
+            .map { splitLine(it) }
+        val allNodeValues = lineInformation
+            .associate { it.first to it.second }
+        val emptyNodes = allNodeValues.filter { it.value == 0 }.filter { it.key != "AA" }.map { it.key }.toSet()
+        val edges = lineInformation.flatMap { li -> li.third.map { Edge(li.first, it, 1) } }.toSet()
+        val g = simplifyGraph(edges, emptyNodes)
+        val dist = floydWarshall(g)
+        return findBestPath2(dist, allNodeValues)
     }
 }

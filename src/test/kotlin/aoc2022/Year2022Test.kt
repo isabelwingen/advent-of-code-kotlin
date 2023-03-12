@@ -40,9 +40,9 @@ class Year2022Test {
 
     @Test
     fun testDay16() {
-        val p: Day16.Point
-        val q = measureTimeMillis {  p = Day16().executePart1() }
-        println("Solve Day 16 in $q milliseconds. Result ${p.units}")
+        val p: Any
+        val q = measureTimeMillis {  p = Day16().executePart2() }
+        println("Solve Day 16 in $q milliseconds. Result ${p}")
     }
 
     @Test
@@ -71,6 +71,7 @@ class Year2022Test {
                 Arguments.of("13", Day13()),
                 Arguments.of("14", Day14()),
                 Arguments.of("15", Day15()),
+                Arguments.of("16", Day16()),
             )
         }
 
@@ -86,6 +87,7 @@ class Year2022Test {
                 Arguments.of("13", Day13()),
                 Arguments.of("14", Day14()),
                 Arguments.of("15", Day15()),
+                Arguments.of("16", Day16()),
             )
         }
     }
