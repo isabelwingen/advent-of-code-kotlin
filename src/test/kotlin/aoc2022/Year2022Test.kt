@@ -39,13 +39,6 @@ class Year2022Test {
     }
 
     @Test
-    fun testDay16() {
-        val p: Any
-        val q = measureTimeMillis {  p = Day16().executePart2() }
-        println("Solve Day 16 in $q milliseconds. Result ${p}")
-    }
-
-    @Test
     fun testDay10Part2() {
         assertEquals(
             "\n" +

@@ -137,7 +137,6 @@ class Day16: Day("16") {
         val nodes = dist.keys.filter { it != "AA" }.toSet()
         var max = 0L
         for (n in 1 until nodes.size/2 + 1) {
-            //println("Calculate max units for n=$n")
             for (a in Generator.combination(nodes).simple(n).map { it.toSet() }) {
                 val b = nodes.filter { !a.contains(it) }.toSet()
                 val unitsOfA = findBestPath(dist, values, a, 26)
@@ -147,7 +146,6 @@ class Day16: Day("16") {
                     max = units
                 }
             }
-            //println("Max units after n=$n: $max")
         }
         return max
     }
