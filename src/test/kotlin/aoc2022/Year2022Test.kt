@@ -39,6 +39,11 @@ class Year2022Test {
     }
 
     @Test
+    fun testDay18() {
+        println(Day18().executePart2())
+    }
+
+    @Test
     fun testDay10Part2() {
         assertEquals(
             "\n" +
@@ -66,6 +71,7 @@ class Year2022Test {
                 Arguments.of("15", Day15()),
                 Arguments.of("16", Day16()),
                 Arguments.of("17", Day17()),
+                Arguments.of("18", Day18()),
             )
         }
 
@@ -83,6 +89,7 @@ class Year2022Test {
                 Arguments.of("15", Day15()),
                 Arguments.of("16", Day16()),
                 Arguments.of("17", Day17()),
+                Arguments.of("18", Day18()),
             )
         }
     }
