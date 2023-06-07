@@ -39,8 +39,8 @@ class Year2022Test {
     }
 
     @Test
-    fun testDay18() {
-        println(Day18().executePart2())
+    fun testDay19() {
+        println(Day19().executePart1())
     }
 
     @Test
@@ -63,6 +63,7 @@ class Year2022Test {
                 Arguments.of("1", Day1()),
                 Arguments.of("2", Day2()),
                 Arguments.of("8", Day8()),
+                Arguments.of("9", Day9()),
                 Arguments.of("10", Day10()),
                 Arguments.of("11", Day11()),
                 Arguments.of("12", Day12()),
@@ -81,7 +82,8 @@ class Year2022Test {
                 Arguments.of("1", Day1()),
                 Arguments.of("2", Day2()),
                 Arguments.of("8", Day8()),
-                //Arguments.of("8", Day10()) --> separate test
+                Arguments.of("9", Day9()),
+                //Arguments.of("10", Day10()) --> separate test
                 Arguments.of("11", Day11()),
                 Arguments.of("12", Day12()),
                 Arguments.of("13", Day13()),
