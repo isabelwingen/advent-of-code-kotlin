@@ -37,13 +37,6 @@ class Year2022Test {
     }
 
     @Test
-    fun testDay19() {
-        val res = Day19().executePart2()
-        println(res)
-        assertEquals(8580, res)
-    }
-
-    @Test
     fun testDay10Part2() {
         assertEquals(
             "\n" +
@@ -73,6 +66,7 @@ class Year2022Test {
                 Arguments.of("16", Day16()),
                 Arguments.of("17", Day17()),
                 Arguments.of("18", Day18()),
+                Arguments.of("19", Day19()),
             )
         }
 
@@ -92,6 +86,7 @@ class Year2022Test {
                 Arguments.of("16", Day16()),
                 Arguments.of("17", Day17()),
                 Arguments.of("18", Day18()),
+                Arguments.of("19", Day19()),
             )
         }
     }

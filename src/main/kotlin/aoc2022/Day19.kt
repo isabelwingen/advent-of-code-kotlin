@@ -33,9 +33,9 @@ class Day19: Day("19") {
             .map { parseLine(it) }
     }
 
-    override fun executePart1(name: String): Int {
+    override fun executePart1(name: String): Long {
         val blueprints = parseInput(name)
-        return blueprints.mapIndexed { index, blueprint ->  maxGeodes(blueprint, 24) * (index+1) }.sumOf { it }
+        return blueprints.mapIndexed { index, blueprint ->  maxGeodes(blueprint, 24) * (index+1) }.sumOf { it }.toLong()
     }
 
     private fun maxGeodes(blueprint: List<List<Int>>, time: Int): Int {
@@ -135,9 +135,9 @@ class Day19: Day("19") {
     }
 
 
-    override fun executePart2(name: String): Int {
+    override fun executePart2(name: String): Long {
         val blueprints = parseInput(name).take(3)
         val (a,b,c) = blueprints.map { maxGeodes(it, 32) }
-        return a*b*c
+        return (a*b*c).toLong()
     }
 }
