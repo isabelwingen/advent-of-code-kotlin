@@ -1,12 +1,10 @@
 package aoc2022
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 class Day19Test {
 
@@ -18,6 +16,12 @@ class Day19Test {
 
         val result = day.build(robotToBuild, state, blueprint, listOf(4,14,7), 24)
         assertEquals(expectedState, result)
+    }
+
+    @Test
+    fun execution() {
+       assertEquals(988, Day19().executePart1())
+       assertEquals(8580, Day19().executePart2())
     }
 
 

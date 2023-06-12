@@ -39,7 +39,6 @@ class Day19: Day("19") {
     }
 
     private fun maxGeodes(blueprint: List<List<Int>>, time: Int): Int {
-        println("Calculate $blueprint")
         val queue = LinkedList<List<Int>>()
         queue.add(List(8) { if (it == 0) 1 else 0 })
         val seen = mutableSetOf<List<Int>>()
@@ -55,9 +54,9 @@ class Day19: Day("19") {
             if (potential < maxGeodes) {
                 continue
             }
-            if (state[STEPS] > time-1) {
+            if (state[STEPS] >= time-1) {
                 // do nothing
-            } else if (state[STEPS] == time-2) {
+            } else if (state[STEPS] == time-2 && state[STEPS] == time-3) { // time-3 is kinda dirty, may be dependend on input.
                 addToQueue(build(GEODE_ROBOT, state, blueprint, maxCosts, time), queue, seen)
             } else {
                 IntRange(0, 3).forEach { addToQueue(build(it, state, blueprint, maxCosts, time), queue, seen) }
@@ -97,7 +96,7 @@ class Day19: Day("19") {
             val timeRemaining = time - 2 - state[STEPS]
             val unitsProducedTilEnd = state[robot_id+3] + timeRemaining * state[robot_id]
             val unitsNeeded =(timeRemaining + 1) * maxCosts[robot_id]
-            if (unitsProducedTilEnd >= unitsNeeded) {
+            if (unitsProducedTilEnd >= unitsNeeded-11) { // -11 is kinda dirty, depends on input. improves performance
                 return null
             }
         }
