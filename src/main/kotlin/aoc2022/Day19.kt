@@ -33,7 +33,7 @@ class Day19: Day("19") {
             .map { parseLine(it) }
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Int {
         val blueprints = parseInput(name)
         return blueprints.mapIndexed { index, blueprint ->  maxGeodes(blueprint, 24) * (index+1) }.sumOf { it }
     }
@@ -51,7 +51,7 @@ class Day19: Day("19") {
             if (state[SCORE] > maxGeodes) {
                 maxGeodes = state[SCORE]
             }
-            val potential = IntRange(1, (time - state[STEPS] - 1)).sum() + state[SCORE]
+            val potential = potential(time, state)
             if (potential < maxGeodes) {
                 continue
             }
@@ -66,36 +66,47 @@ class Day19: Day("19") {
         return maxGeodes
     }
 
+    private fun potential(time: Int, state: List<Int>): Int {
+        return IntRange(1, (time - state[STEPS] - 1)).sum() + state[SCORE]
+    }
+
     private fun addToQueue(elem: List<Int>?, queue: LinkedList<List<Int>>, seen: MutableSet<List<Int>>) {
         if (elem != null) {
             if (!queue.contains(elem) && !seen.contains(elem)) {
-                queue.add(elem)
+                queue.add(0, elem)
             }
         }
     }
 
     fun build(robot_id: Int, state: List<Int>, blueprint: List<List<Int>>, maxCosts: List<Int>, time: Int): List<Int>? {
-        val (needed_ore, needed_clay, needed_obsidian) = blueprint[robot_id]
-        if (needed_ore > 0 && state[ORE_ROBOT] == 0) {
-            return null
+        val needed = blueprint[robot_id]
+        // robots missing to build it
+        IntRange(0, 2).forEach {
+            if (needed[it] > 0 && state[it] == 0) {
+                return null
+            }
         }
-        if (needed_clay > 0 && state[CLAY_ROBOT] == 0) {
-            return null
-        }
-        if (needed_obsidian > 0 && state[OBSIDIAN_ROBOT] == 0) {
-            return null
-        }
+        // we have enough robots of this kind (step 1)
         if (robot_id < 3) {
             if (state[robot_id] >= maxCosts[robot_id]) {
                 return null
             }
         }
+        // we have enough robots of this kind (step 2)
+        if (robot_id < 3) {
+            val timeRemaining = time - 2 - state[STEPS]
+            val unitsProducedTilEnd = state[robot_id+3] + timeRemaining * state[robot_id]
+            val unitsNeeded =(timeRemaining + 1) * maxCosts[robot_id]
+            if (unitsProducedTilEnd >= unitsNeeded) {
+                return null
+            }
+        }
 
         val newState = state.toMutableList()
-        if (state[ORE_MATERIAL] >= needed_ore && state[CLAY_MATERIAL] >= needed_clay && state[OBSIDIAN_MATERIAL] >= needed_obsidian) {
-            newState[ORE_MATERIAL] += newState[ORE_ROBOT] - needed_ore
-            newState[CLAY_MATERIAL] += newState[CLAY_ROBOT] - needed_clay
-            newState[OBSIDIAN_MATERIAL] += newState[OBSIDIAN_ROBOT] - needed_obsidian
+        if (state[ORE_MATERIAL] >= needed[ORE_ROBOT] && state[CLAY_MATERIAL] >= needed[CLAY_ROBOT] && state[OBSIDIAN_MATERIAL] >= needed[OBSIDIAN_ROBOT]) {
+            IntRange(0, 2).forEach {
+                newState[it+3] += newState[it] - needed[it]
+            }
             newState[STEPS] += 1
             if (robot_id == GEODE_ROBOT) {
                 val timeRemaining = time - newState[STEPS]
@@ -104,28 +115,11 @@ class Day19: Day("19") {
                 newState[robot_id] += 1
             }
         } else {
-            val stepsToOre =
-                if (state[ORE_MATERIAL] >= needed_ore) {
-                    0
-                } else {
-                   ceil((needed_ore-state[ORE_MATERIAL]).toDouble() / state[ORE_ROBOT]).toInt()
-                }
-            val stepsToClay =
-                if (state[CLAY_MATERIAL] >= needed_clay) {
-                    0
-                } else {
-                    ceil((needed_clay-state[CLAY_MATERIAL]).toDouble() / state[CLAY_ROBOT]).toInt()
-                }
-            val stepsToObisidian =
-                if (state[OBSIDIAN_MATERIAL] >= needed_obsidian) {
-                    0
-                } else {
-                    ceil((needed_obsidian-state[OBSIDIAN_MATERIAL]).toDouble() / state[OBSIDIAN_ROBOT]).toInt()
-                }
-            val stepsNeeded = listOf(stepsToOre, stepsToClay, stepsToObisidian).maxOf { it } + 1
-            newState[ORE_MATERIAL] += newState[ORE_ROBOT] * stepsNeeded - needed_ore
-            newState[CLAY_MATERIAL] += newState[CLAY_ROBOT] * stepsNeeded - needed_clay
-            newState[OBSIDIAN_MATERIAL] += newState[OBSIDIAN_ROBOT] * stepsNeeded - needed_obsidian
+            val stepsNeeded = IntRange(0,2)
+                .maxOf { if (state[it+3] >= needed[it]) 0 else ceil((needed[it]-state[it+3]).toDouble() / state[it]).toInt() } + 1
+            IntRange(0,2).forEach {
+                newState[it+3] += newState[it] * stepsNeeded - needed[it]
+            }
             newState[STEPS] += stepsNeeded
             if (newState[STEPS] > time) {
                 return null
@@ -141,7 +135,7 @@ class Day19: Day("19") {
     }
 
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Int {
         val blueprints = parseInput(name).take(3)
         val (a,b,c) = blueprints.map { maxGeodes(it, 32) }
         return a*b*c

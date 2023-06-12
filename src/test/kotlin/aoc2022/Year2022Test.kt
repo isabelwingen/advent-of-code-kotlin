@@ -38,7 +38,9 @@ class Year2022Test {
 
     @Test
     fun testDay19() {
-        println(Day19().executePart2())
+        val res = Day19().executePart2()
+        println(res)
+        assertEquals(8580, res)
     }
 
     @Test
