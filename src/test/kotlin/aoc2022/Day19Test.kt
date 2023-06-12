@@ -16,7 +16,7 @@ class Day19Test {
         val day = Day19()
         val blueprint = listOf(listOf(4,0,0), listOf(2,0,0), listOf(3,14,0), listOf(2,0,7))
 
-        val result = day.build(robotToBuild, state, blueprint, listOf(4,14,7))
+        val result = day.build(robotToBuild, state, blueprint, listOf(4,14,7), 24)
         assertEquals(expectedState, result)
     }
 
