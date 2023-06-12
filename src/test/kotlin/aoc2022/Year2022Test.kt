@@ -12,8 +12,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import util.Day;
-import kotlin.math.min
-import kotlin.system.measureTimeMillis
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Year2022Test {
@@ -40,7 +38,7 @@ class Year2022Test {
 
     @Test
     fun testDay19() {
-        println(Day19().executePart1())
+        println(Day19().executePart1("2022/example/day19.txt"))
     }
 
     @Test

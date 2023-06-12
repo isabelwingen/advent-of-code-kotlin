@@ -38,26 +38,31 @@ class Day19: Day("19") {
         return maxGeodes(blueprints[0])
     }
 
-    private fun maxGeodes(blueprint: List<List<Int>>) {
+    private fun maxGeodes(blueprint: List<List<Int>>): Int {
         val queue = LinkedList<List<Int>>()
         queue.add(List(8) { if (it == 0) 1 else 0 })
         val seen = mutableSetOf<List<Int>>()
         var maxGeodes = 0
+        val maxCosts = IntRange(0,2).map { material -> blueprint.maxOf { it[material] } }
         while (queue.isNotEmpty()) {
             val state = queue.pop()
-            println("$maxGeodes, ${queue.size}: $state")
             seen.add(state)
             if (state[SCORE] > maxGeodes) {
                 maxGeodes = state[SCORE]
             }
+            val potential = IntRange(1, (24 - state[STEPS] - 1)).sum() + state[SCORE]
+            if (potential < maxGeodes) {
+                continue
+            }
             if (state[STEPS] > 23) {
                 // do nothing
             } else if (state[STEPS] == 22) {
-                addToQueue(build(GEODE_ROBOT, state, blueprint), queue, seen)
+                addToQueue(build(GEODE_ROBOT, state, blueprint, maxCosts), queue, seen)
             } else {
-                IntRange(0, 3).forEach { addToQueue(build(it, state, blueprint), queue, seen) }
+                IntRange(0, 3).forEach { addToQueue(build(it, state, blueprint, maxCosts), queue, seen) }
             }
         }
+        return maxGeodes
     }
 
     private fun addToQueue(elem: List<Int>?, queue: LinkedList<List<Int>>, seen: MutableSet<List<Int>>) {
@@ -68,7 +73,7 @@ class Day19: Day("19") {
         }
     }
 
-    fun build(robot_id: Int, state: List<Int>, blueprint: List<List<Int>>): List<Int>? {
+    fun build(robot_id: Int, state: List<Int>, blueprint: List<List<Int>>, maxCosts: List<Int>): List<Int>? {
         val (needed_ore, needed_clay, needed_obsidian) = blueprint[robot_id]
         if (needed_ore > 0 && state[ORE_ROBOT] == 0) {
             return null
@@ -79,6 +84,12 @@ class Day19: Day("19") {
         if (needed_obsidian > 0 && state[OBSIDIAN_ROBOT] == 0) {
             return null
         }
+        if (robot_id < 3) {
+            if (state[robot_id] >= maxCosts[robot_id]) {
+                return null
+            }
+        }
+
         val newState = state.toMutableList()
         if (state[ORE_MATERIAL] >= needed_ore && state[CLAY_MATERIAL] >= needed_clay && state[OBSIDIAN_MATERIAL] >= needed_obsidian) {
             newState[ORE_MATERIAL] += newState[ORE_ROBOT] - needed_ore
