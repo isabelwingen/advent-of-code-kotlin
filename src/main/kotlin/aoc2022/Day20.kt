@@ -28,11 +28,7 @@ class Day20: Day("20") {
         val value = list[currentPosition].second
         val newPosition = remainder(currentPosition + value, list.lastIndex)
         list.removeAt(currentPosition)
-        if (newPosition == 0) {
-            list.addLast(index to value)
-        } else {
-            list.add(newPosition, index to value)
-        }
+        list.add(newPosition, index to value)
     }
 
     private fun findPosition(index: Int, list: LinkedList<Pair<Int, Long>>): Int {

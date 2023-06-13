@@ -49,6 +49,11 @@ class Year2022Test {
             Day10().executePart2())
     }
 
+    @Test
+    public fun testDay20() {
+        println(Day20().executePart2())
+    }
+
     companion object {
         @JvmStatic
         fun getDataPart1():List<Arguments> {
