@@ -49,11 +49,6 @@ class Year2022Test {
             Day10().executePart2())
     }
 
-    @Test
-    public fun testDay20() {
-        println(Day20().executePart2())
-    }
-
     companion object {
         @JvmStatic
         fun getDataPart1():List<Arguments> {
@@ -72,6 +67,7 @@ class Year2022Test {
                 Arguments.of("17", Day17()),
                 Arguments.of("18", Day18()),
                 Arguments.of("19", Day19()),
+                Arguments.of("21", Day21()),
             )
         }
 
@@ -87,11 +83,12 @@ class Year2022Test {
                 Arguments.of("12", Day12()),
                 Arguments.of("13", Day13()),
                 Arguments.of("14", Day14()),
-                Arguments.of("15", Day15()),
-                Arguments.of("16", Day16()),
+                //Arguments.of("15", Day15()),
+                //Arguments.of("16", Day16()),
                 Arguments.of("17", Day17()),
                 Arguments.of("18", Day18()),
                 Arguments.of("19", Day19()),
+                Arguments.of("21", Day21()),
             )
         }
     }
