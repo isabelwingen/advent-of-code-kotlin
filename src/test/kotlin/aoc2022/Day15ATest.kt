@@ -41,14 +41,18 @@ internal class Day15ATest {
         assertEquals(mutableListOf(5L to 120L, 200L to 300L, 350L to 370L, 400L to 500L), field[0], "between two ranges")
         d.addNoZoneToField(field, 0, 370L to 380L)
         assertEquals(mutableListOf(5L to 120L, 200L to 300L, 350L to 380L, 400L to 500L), field[0], "equal ends")
+        d.addNoZoneToField(field, 0, 4L to 121L)
         d.addNoZoneToField(field, 0, 301L to 349L)
-        assertEquals(mutableListOf(5L to 120L, 200L to 380L, 400L to 500L), field[0], "connect diff by one")
+        d.addNoZoneToField(field, 0, 0L to 3L)
+        d.addNoZoneToField(field, 0, 122L to 199L)
+        d.addNoZoneToField(field, 0, 381L to 399L)
+        d.addNoZoneToField(field, 0, 501L to 510L)
+        d.addNoZoneToField(field, 0, 510L to 530L)
+        assertEquals(mutableListOf(0L to 530L), field[0], "connect diff by one")
+    }
 
-
-        //d.addNoZoneToField(field, 0, 0L to 25L)
-        //assertEquals(mutableListOf(0L to 25L, 30L to 40L), field[0], "bigger zone removes smaller zones")
-
-
-
+    @Test
+    fun test() {
+        println(Day15A().executePart2())
     }
 }

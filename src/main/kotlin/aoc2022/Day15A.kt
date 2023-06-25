@@ -4,6 +4,8 @@ import getInputAsLines
 import util.Day
 import kotlin.math.abs
 
+private const val MAX_ROW = 4_000_000L
+
 class Day15A: Day("15") {
 
     private fun calculateManhattenDistance(p1: Pair<Long, Long>, p2: Pair<Long, Long>): Long {
@@ -27,8 +29,21 @@ class Day15A: Day("15") {
         return this.first <= l && l <= this.second
     }
 
-    fun addNoZoneToField(field: MutableMap<Long, MutableList<Pair<Long, Long>>>, rowIndex: Long, zone: Pair<Long, Long>): Any {
-        if (!field.containsKey(rowIndex)) {
+    private fun connectTouchingElements(field: MutableMap<Long, MutableList<Pair<Long, Long>>>, rowIndex: Long) {
+        val row = field[rowIndex]!!
+        var i = 0
+        while (i < row.lastIndex) {
+            if (row[i].second == row[i+1].first - 1) {
+                row[i] = row[i].first to row[i+1].second
+                row.removeAt(i+1)
+            } else {
+                i++
+            }
+        }
+    }
+
+    fun addNoZoneToField(field: MutableMap<Long, MutableList<Pair<Long, Long>>>, rowIndex: Long, zone: Pair<Long, Long>) {
+        if (!field.containsKey(rowIndex) || field[rowIndex]!!.isEmpty()) {
             field[rowIndex] = mutableListOf(zone)
         } else {
             val row = field[rowIndex]!!
@@ -70,19 +85,52 @@ class Day15A: Day("15") {
                 }
             }
         }
-        return 0
+        connectTouchingElements(field, rowIndex)
     }
 
+    //
+    //
+    //3     #
+    //4    ###
+    //5   #####
+    //6  #######
+    //7 ####S####
+    //
+    //
+    //
+    //
+
+
+
     override fun executePart2(name: String): Any {
+        val x = MAX_ROW
         val sensorToBeacon = getInputAsLines(name)
             .filter { it.isNotBlank() }
             .associate { transformLine(it) }
-        val field = mutableMapOf<Long, List<Pair<Long, Long>>>()
-        sensorToBeacon.forEach { sensor, beacon ->
-            val manhattenDiff = calculateManhattenDistance(sensor, beacon)
+        val res = mutableSetOf<Pair<Long, MutableList<Pair<Long, Long>>>>()
+        for (j in 0 .. 1) {
+            val field = LongRange(j * 1_000_000L, (j + 1) * 1_000_000L).associateWith { mutableListOf<Pair<Long, Long>>() }.toMutableMap()
+            sensorToBeacon.forEach { sensor, beacon ->
+                val manhattenDiff = calculateManhattenDistance(sensor, beacon)
+                val p = minOf(manhattenDiff, 1_350_000)
+                for (i in -p until p + 1) {
+                    val y = sensor.second + i
+                    if (y in 0..MAX_ROW) {
+                        val length = manhattenDiff - abs(i)
+                        val xRange = maxOf(0, sensor.first - length) to minOf(MAX_ROW, sensor.first + length)
+                        if (field.containsKey(y)) {
+                            addNoZoneToField(field, y, xRange)
+                        }
+                        if (field[y] != null && field[y]!!.first().first == 0L && field[y]!!.first().second == MAX_ROW) {
+                            field.remove(y)
+                        }
+                    }
+                }
 
+            }
+            res.addAll(field.entries.map { it.key to it.value })
         }
-        return 0
+        return res.count()
     }
 
 
