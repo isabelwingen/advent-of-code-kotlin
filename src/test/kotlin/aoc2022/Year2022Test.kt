@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import util.Day;
+import kotlin.system.measureTimeMillis
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Year2022Test {
@@ -34,6 +35,11 @@ class Year2022Test {
     @MethodSource("getDataPart2")
     fun testPart2(key: Int, day: Day) {
         assertEquals(expectedResults[day.key]!!["part2"], day.executePart2())
+    }
+
+    @Test
+    fun testDay15() {
+        println(Day15A().executePart2("2022/example/day15.txt"))
     }
 
     @Test
@@ -83,7 +89,7 @@ class Year2022Test {
                 Arguments.of("12", Day12()),
                 Arguments.of("13", Day13()),
                 Arguments.of("14", Day14()),
-                //Arguments.of("15", Day15()),
+                Arguments.of("15", Day15()),
                 //Arguments.of("16", Day16()),
                 Arguments.of("17", Day17()),
                 Arguments.of("18", Day18()),

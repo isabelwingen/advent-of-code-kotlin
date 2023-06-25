@@ -84,10 +84,13 @@ class Day15: Day("15") {
         val manhattanMap = getInputAsLines(name)
             .filter { it.isNotBlank() }
             .associate { transformLine(it) }
-        val line = LongRange(0, 4_000_000L)
-            .mapIndexed { i, it -> i to findDetectionRangesForLine(manhattanMap, it) }.first { it.second.count() == 2 }
-        val y = line.first
-        val x = line.second.maxByOrNull { it.first }!!.first - 1
-        return x * 4_000_000L + y
+        for (i in 0 until 4_000_000L) {
+            val ranges = findDetectionRangesForLine(manhattanMap, i)
+            if (ranges.size == 2) {
+                val x = ranges.maxByOrNull{ it.first }!!.first
+                return x * 4_000_000L + i
+            }
+        }
+       return 0
     }
 }
