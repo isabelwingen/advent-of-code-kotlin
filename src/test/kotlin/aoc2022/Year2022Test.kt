@@ -69,6 +69,7 @@ class Year2022Test {
                 Arguments.of("19", Day19()),
                 Arguments.of("20", Day20()),
                 Arguments.of("21", Day21()),
+                Arguments.of("22", Day22()),
             )
         }
 
@@ -91,6 +92,7 @@ class Year2022Test {
                 Arguments.of("19", Day19()),
                 Arguments.of("20", Day20()),
                 Arguments.of("21", Day21()),
+                Arguments.of("22", Day22()),
             )
         }
     }
