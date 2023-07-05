@@ -96,7 +96,7 @@ class Day16: Day("16") {
         time: Int = 30
     ): Long {
         val stack = MutableList(1) { Point("AA", time, setOf("AA"), 0, listOf("Start at AA")) }
-        var max = stack.first().units
+        var max = 0L
         while (stack.isNotEmpty()) {
             val p = stack.removeAt(0)
             val (current, remaining, open, units, history) = p
@@ -106,6 +106,15 @@ class Day16: Day("16") {
                     max = p.units
                 }
             } else {
+                val potential = nodes.filter { !open.contains(it) }
+                    .sortedBy { values[it] }.reversed()
+                    .take(maxOf(remaining-2, 0)/2)
+                    .mapIndexed { i, s -> (remaining-2-2*i) * values[s]!! }
+                    .sum()
+                //val potential = nodes.filter { !open.contains(it) }.sumOf { maxOf(remaining - 2, 0) * values[it]!! }
+                if (potential+units < max) {
+                    continue
+                }
                 candidates.forEach {
                     val timeToOpen = dist[current]!![it]!! + 1
                     val unitsProduced = (remaining - timeToOpen) * values[it]!!
@@ -136,21 +145,19 @@ class Day16: Day("16") {
     private fun findBestPath2(dist: Map<String, Map<String, Int>>, values: Map<String, Int>): Long {
         val nodes = dist.keys.filter { it != "AA" }.toSet()
         var max = 0L
-        for (n in 1 until nodes.size/2 + 1) {
-            for (a in Generator.combination(nodes).simple(n).map { it.toSet() }) {
-                val b = nodes.filter { !a.contains(it) }.toSet()
-                val unitsOfA = findBestPath(dist, values, a, 26)
-                val unitsOfB = findBestPath(dist, values, b, 26)
-                val units = unitsOfA + unitsOfB
-                if (units > max) {
-                    max = units
-                }
+        for (a in Generator.combination(nodes).simple(7).map { it.toSet() }) {
+            val b = nodes.filter { !a.contains(it) }.toSet()
+            val unitsOfA = findBestPath(dist, values, a, 26)
+            val unitsOfB = findBestPath(dist, values, b, 26)
+            val units = unitsOfA + unitsOfB
+            if (units > max) {
+                max = units
             }
         }
         return max
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val lineInformation = getInputAsLines(name)
             .filter { it.isNotBlank() }
             .map { splitLine(it) }
