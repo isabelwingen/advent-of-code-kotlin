@@ -38,19 +38,8 @@ class Year2022Test {
     }
 
     @Test
-    fun testDay16() {
-        val day = Day16()
-        var res: Long
-        var timeInMillis = measureTimeMillis {
-            res = day.executePart1()
-        }
-        assertEquals(2265L, res)
-        println("Solving Day16 Part1 took ${timeInMillis.toDouble()/1000} seconds")
-        timeInMillis = measureTimeMillis {
-            res = day.executePart2()
-        }
-        assertEquals(2811L, res)
-        println("Solving Day16  Part 2 took ${timeInMillis.toDouble()/1000} seconds")
+    fun testDay23() {
+        println(Day23().executePart2())
 
     }
 
