@@ -38,8 +38,8 @@ class Year2022Test {
     }
 
     @Test
-    fun testDay23() {
-        println(Day23().executePart2())
+    fun testDay24() {
+        println(Day24().executePart1())
 
     }
 
