@@ -41,9 +41,9 @@ class Day24: Day("24") {
         return Tornados(lefts, rights, ups, downs, lines[0].length, lines.size)
     }
 
-    data class State(val row: Int = -1, val col: Int = 0, val steps: Int = 1)
+    data class State(val row: Int = -1, val col: Int = 0, val steps: Long = 0)
 
-    private fun findPath(tornados: Tornados, start: State, endRow: Int, endCol: Int): Int {
+    private fun findPath(tornados: Tornados, start: State, endRow: Int, endCol: Int): Long {
         val (left, right, up, down, width, height) = tornados
         val queue = LinkedList<State>()
         queue.add(start)
@@ -82,31 +82,31 @@ class Day24: Day("24") {
                 .filter { (row,col) -> !rights[row]!!.contains(col) }
                 .filter { (row,col) -> !ups[col]!!.contains(row) }
                 .filter { (row,col) -> !downs[col]!!.contains(row) }
-            if (validNextPositions.isEmpty() && edgeCaseStart) {
+            if (edgeCaseStart) {
                 queue.add(State(start.row, start.col, steps+1))
-            } else {
-                validNextPositions
-                    .map { (row, col) -> State(row, col, steps + 1) }
-                    .filter { !queue.contains(it) }
-                    .forEach { queue.add(it) }
             }
+            validNextPositions
+                .map { (row, col) -> State(row, col, steps + 1) }
+                .filter { !queue.contains(it) }
+                .forEach { queue.add(it) }
         }
         return 0
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         val tornados = getInput(name)
-        return findPath(getInput(name), State(), tornados.height-1, tornados.width-1)
+        return findPath(getInput(name), State(), tornados.height-1, tornados.width-1)+1
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         val tornados = getInput(name)
         val startRow = -1
         val startCol = 0
         val endRow = tornados.height
         val endCol = tornados.width-1
-        val firstTrip = findPath(getInput(name), State(), endRow, endCol)
-        return firstTrip
+        val firstTrip = findPath(tornados, State(), endRow, endCol)
+        val secondTrip = findPath(tornados, State(endRow, endCol, firstTrip), startRow, startCol)
+        return findPath(tornados, State(startRow, startCol, secondTrip), endRow, endCol)
     }
 }
 

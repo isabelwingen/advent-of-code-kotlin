@@ -88,7 +88,7 @@ class Day23: Day("23") {
         return emptyTiles
     }
 
-    override fun executePart1(name: String): Any {
+    override fun executePart1(name: String): Long {
         var elves = getElvesPosition(name)
         val directions = LinkedList(listOf('n','s','w','e'))
         for (i in 0 until 10) {
@@ -111,10 +111,10 @@ class Day23: Day("23") {
             elves = elves.map { allowedToMove.getOrDefault(it, it) }.toSet()
             directions.addLast(directions.pop())
         }
-        return printElves(elves)
+        return printElves(elves).toLong()
     }
 
-    override fun executePart2(name: String): Any {
+    override fun executePart2(name: String): Long {
         var elves = getElvesPosition(name)
         val directions = LinkedList(listOf('n','s','w','e'))
         var c = 1
@@ -142,7 +142,7 @@ class Day23: Day("23") {
             directions.addLast(directions.pop())
             c++
         }
-        return c
+        return c.toLong()
     }
 
 }

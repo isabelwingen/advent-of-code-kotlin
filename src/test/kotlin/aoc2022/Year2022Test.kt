@@ -38,12 +38,6 @@ class Year2022Test {
     }
 
     @Test
-    fun testDay24() {
-        println(Day24().executePart2("2022/example/day24.txt"))
-
-    }
-
-    @Test
     fun testDay10Part2() {
         assertEquals(
             "\n" +
@@ -77,6 +71,8 @@ class Year2022Test {
                 Arguments.of("20", Day20()),
                 Arguments.of("21", Day21()),
                 Arguments.of("22", Day22()),
+                Arguments.of("23", Day23()),
+                Arguments.of("24", Day24()),
             )
         }
 
@@ -100,6 +96,8 @@ class Year2022Test {
                 Arguments.of("20", Day20()),
                 Arguments.of("21", Day21()),
                 Arguments.of("22", Day22()),
+                Arguments.of("23", Day23()),
+                Arguments.of("24", Day24()),
             )
         }
     }
