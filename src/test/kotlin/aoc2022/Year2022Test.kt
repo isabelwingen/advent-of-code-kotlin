@@ -39,7 +39,7 @@ class Year2022Test {
 
     @Test
     fun testDay24() {
-        println(Day24().executePart1())
+        println(Day24().executePart2("2022/example/day24.txt"))
 
     }
 

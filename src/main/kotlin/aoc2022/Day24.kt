@@ -21,8 +21,8 @@ class Day24: Day("24") {
             .drop(1)
             .dropLast(1)
             .map { it.drop(1).dropLast(1) }
-        val rights = (listOf(-1) + lines.indices).associateWith { mutableListOf<Int>() }
-        val lefts = (listOf(-1) + lines.indices).associateWith { mutableListOf<Int>() }
+        val rights = (lines.indices).associateWith { mutableListOf<Int>() }
+        val lefts = (lines.indices).associateWith { mutableListOf<Int>() }
         val downs = lines[0].indices.associateWith { mutableListOf<Int>() }
         val ups = lines[0].indices.associateWith { mutableListOf<Int>() }
         for (row in lines.indices) {
@@ -43,20 +43,28 @@ class Day24: Day("24") {
 
     data class State(val row: Int = -1, val col: Int = 0, val steps: Int = 1)
 
-    private fun findPath(tornados: Tornados, start: State): Int {
+    private fun findPath(tornados: Tornados, start: State, endRow: Int, endCol: Int): Int {
         val (left, right, up, down, width, height) = tornados
         val queue = LinkedList<State>()
         queue.add(start)
-        val endRow = height-1
-        val endCol = width-1
+
         while (queue.isNotEmpty()) {
+            var edgeCaseStart = false
             val (row, col, steps) = queue.pop()
             if (row == endRow && col == endCol) {
                 return steps
             }
-            val possibleNextPosition = setOf(row-1 to col, row to col-1, row to col, row to col+1, row+1 to col)
+            var possibleNextPosition = setOf(row-1 to col, row to col-1, row to col, row to col+1, row+1 to col)
+            if (possibleNextPosition.contains(start.row to start.col)) {
+                edgeCaseStart = true
+            }
+            if (possibleNextPosition.contains(endRow to endCol)) {
+                return steps
+            }
+            possibleNextPosition = possibleNextPosition
                 .filter { (it.first >= 0 && it.second >= 0 && it.second < width && it.first < height) }
                 .toSet()
+
             val lefts = left
                 .filterKeys { possibleNextPosition.any { p -> p.first == it } }
                 .mapValues { it.value.map { v -> (v-steps).mod(width) } }
@@ -74,8 +82,8 @@ class Day24: Day("24") {
                 .filter { (row,col) -> !rights[row]!!.contains(col) }
                 .filter { (row,col) -> !ups[col]!!.contains(row) }
                 .filter { (row,col) -> !downs[col]!!.contains(row) }
-            if (validNextPositions.isEmpty() && ((row == -1 && col == 0) || (row == 0 && col == 0))) {
-                queue.add(State(row, col, steps+1))
+            if (validNextPositions.isEmpty() && edgeCaseStart) {
+                queue.add(State(start.row, start.col, steps+1))
             } else {
                 validNextPositions
                     .map { (row, col) -> State(row, col, steps + 1) }
@@ -87,11 +95,18 @@ class Day24: Day("24") {
     }
 
     override fun executePart1(name: String): Any {
-       return findPath(getInput(name), State())
+        val tornados = getInput(name)
+        return findPath(getInput(name), State(), tornados.height-1, tornados.width-1)
     }
 
     override fun executePart2(name: String): Any {
-        return 0
+        val tornados = getInput(name)
+        val startRow = -1
+        val startCol = 0
+        val endRow = tornados.height
+        val endCol = tornados.width-1
+        val firstTrip = findPath(getInput(name), State(), endRow, endCol)
+        return firstTrip
     }
 }
 
