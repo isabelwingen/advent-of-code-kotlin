@@ -43,16 +43,13 @@ class Day24: Day("24") {
 
     data class State(val row: Int = -1, val col: Int = 0, val steps: Int = 1)
 
-    override fun executePart1(name: String): Any {
-
-        val (left, right, up, down, width, height) = getInput(name)
-        val start = State()
+    private fun findPath(tornados: Tornados, start: State): Int {
+        val (left, right, up, down, width, height) = tornados
         val queue = LinkedList<State>()
         queue.add(start)
         val endRow = height-1
         val endCol = width-1
         while (queue.isNotEmpty()) {
-            println(queue.size)
             val (row, col, steps) = queue.pop()
             if (row == endRow && col == endCol) {
                 return steps
@@ -87,6 +84,10 @@ class Day24: Day("24") {
             }
         }
         return 0
+    }
+
+    override fun executePart1(name: String): Any {
+       return findPath(getInput(name), State())
     }
 
     override fun executePart2(name: String): Any {
