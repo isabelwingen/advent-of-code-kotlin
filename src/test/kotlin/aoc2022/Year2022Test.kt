@@ -38,6 +38,11 @@ class Year2022Test {
     }
 
     @Test
+    fun testDay25() {
+        println(Day25().executePart1())
+    }
+
+    @Test
     fun testDay10Part2() {
         assertEquals(
             "\n" +
