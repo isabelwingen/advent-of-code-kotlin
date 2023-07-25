@@ -26,10 +26,6 @@ class Day6: Day("6") {
             .toList()
     }
 
-    private fun manhattanDistance(p1: Pair<Int, Int>, p2: Pair<Int, Int>): Int {
-        return abs(p1.first - p2.first) + abs(p1.second - p2.second)
-    }
-
     override fun executePart1(name: String): Any {
         val points = getPoints(name)
         val xRange: IntRange = (points.minByOrNull { it.x }!!.x..points.maxByOrNull { it.x }!!.x)
@@ -55,9 +51,20 @@ class Day6: Day("6") {
 
 
     override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+        val points = getPoints(name)
+        val xRange: IntRange = (points.minByOrNull { it.x }!!.x..points.maxByOrNull { it.x }!!.x)
+        val yRange: IntRange = (points.minByOrNull { it.y }!!.y..points.maxByOrNull { it.y }!!.y)
+        var res = 0
+        val limit = 10000
+        for (x in xRange) {
+            for (y in yRange) {
+                val p = Point(x,y)
+                val sumOfDistance = points.sumOf { it.distanceTo(p) }
+                if (sumOfDistance < limit) {
+                    res++
+                }
+            }
+        }
+        return res
     }
-
-    // lower: 1854
-    // upper: 4829
 }
