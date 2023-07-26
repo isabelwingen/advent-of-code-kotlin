@@ -41,8 +41,7 @@ class Day12: Day("12") {
 
         fun trim() {
             val emptyPrefixSize = state.takeWhile { it == 0 }.count()
-            val emptySuffixSize = state.takeLastWhile { it == 0 }.count()
-            state = state.sliceArray(IntRange(emptyPrefixSize, state.lastIndex-emptySuffixSize))
+            state = state.dropWhile { it == 0 }.dropLastWhile { it == 0 }.toIntArray()
             positionOfZero -= emptyPrefixSize
         }
 
@@ -50,8 +49,8 @@ class Day12: Day("12") {
             addBuffer()
             val newState = state.copyOf()
             for (i in state.indices.drop(2).dropLast(2)) {
-                val matchingRule = rules.first { rule -> rule.left.contentEquals(state.sliceArray(IntRange(i-2,i+2))) }
-                newState[i] = matchingRule.right
+                val matchingRule = rules.find { rule -> rule.left.contentEquals(state.sliceArray(i - 2..i + 2)) }
+                newState[i] = matchingRule?.right ?: 0
             }
             state = newState
             trim()
@@ -82,9 +81,12 @@ class Day12: Day("12") {
 
     private fun getInput(name: String): Game {
         val input = getInputAsLines(name)
-        return Game(
-            input[0].drop(15).map { if (it=='#') 1 else 0 }.toIntArray(),
-            input.drop(2).dropLast(1).map { Rule.create(it) })
+        require(input.size >= 3) { "Input must contain at least 3 lines." }
+
+        val initialState = input[0].drop(15).mapNotNull { if (it == '#') 1 else if (it == '.') 0 else null }.toIntArray()
+        val rules = input.drop(2).dropLast(1).map { Rule.create(it) }
+
+        return Game(initialState, rules)
     }
 
     override fun executePart1(name: String): Any {
