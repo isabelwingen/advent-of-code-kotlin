@@ -2,28 +2,30 @@ package aoc2018
 
 import getInputAsLines
 import util.Day
+import kotlin.reflect.jvm.internal.impl.incremental.components.Position
 
 class Day13: Day("13") {
 
-    private fun printInput(name: String) {
-        println()
-        getInputAsLines(name)
-            .filter { it.isNotBlank() }
-            .forEach { println(it) }
-
-    }
-
     private data class Rail(var left: Rail? = null, var right: Rail? = null, var up: Rail? = null, var down: Rail? = null, val value: Char, val position: Pair<Int, Int>) {
         override fun toString() = "$value"
+
+        override fun equals(other: Any?): Boolean {
+            return if (other is Rail) {
+                position == other.position
+            } else {
+                false
+            }
+        }
     }
 
-    private data class Cart(var rail: Rail, var direction: Char, var step: Int = 0)
+    private data class Cart(var rail: Rail, var direction: Char, var step: Int = 0, var dead: Boolean = false)
 
-    private fun parseInput(name: String): Pair<List<List<Rail?>>, List<Cart>> {
+    private fun parseInput(name: String): List<Cart> {
         val lines = getInputAsLines(name).filter { it.isNotBlank() }
         val numberOfCols = lines.maxOf { it.length }
         val rails = MutableList(lines.size) { MutableList<Rail?>(numberOfCols) { null } }
         val carts = mutableListOf<Cart>()
+
         for (row in lines.indices) {
             for (col in 0 until numberOfCols) {
                 val cell = lines[row].getOrElse(col) { ' ' }
@@ -71,7 +73,7 @@ class Day13: Day("13") {
                 }
             }
         }
-        return rails.map { it.toList() }.toList() to carts.toList()
+        return carts.toList()
     }
 
     private fun doMove(cart: Cart, turnLeft: Char, turnRight: Char, next: (Cart) -> Rail) {
@@ -129,21 +131,33 @@ class Day13: Day("13") {
     }
 
     override fun executePart1(name: String): Pair<Int, Int> {
-        val (_, carts) = parseInput(name)
-        var i = 0
-       while (i < 1000) {
-           carts.forEach { moveCart(it) }
-           val p = carts.map { it.rail.position }
-           if (p.size != p.distinct().size) {
-               println(p.size - p.distinct().size)
-               return p.groupBy { it }.map { it.value }.first { it.size > 1 }.first()
-           }
-           i++
-       }
-        return 0 to 0
+        val carts = parseInput(name)
+        while (true) {
+            carts.sortedBy { it.rail.position.second }.sortedBy { it.rail.position.first }.forEach { cart ->
+                moveCart(cart)
+                val p = carts.filter { it != cart }.find { it.rail.position == cart.rail.position }
+                if (p != null) {
+                    return p.rail.position
+                }
+            }
+        }
     }
 
     override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+        var carts = parseInput(name)
+        while (carts.size > 1) {
+            for (cart in carts.sortedBy { it.rail.position.second }.sortedBy { it.rail.position.first }) {
+                if (!cart.dead) {
+                    moveCart(cart)
+                    val p = carts.filter { it != cart }.find { it.rail.position == cart.rail.position }
+                    if (p != null) {
+                        cart.dead = true
+                        p.dead = true
+                    }
+                }
+            }
+            carts = carts.filterNot { it.dead }
+        }
+        return carts.first().rail.position
     }
 }
