@@ -29,42 +29,36 @@ class Day13: Day("13") {
         for (row in lines.indices) {
             for (col in 0 until numberOfCols) {
                 val cell = lines[row].getOrElse(col) { ' ' }
+                val left = rails[row].getOrNull(col-1)
+                val up = rails.getOrElse(row-1) { emptyList() }.getOrNull(col)
                 if (cell == '-' || cell == '<' || cell == '>') {
-                    val left = rails[row][col-1]
                     rails[row][col] = Rail(left = left, value = '-', position = row to col)
                     left!!.right = rails[row][col]
                 } else if (cell == '|' || cell == '^' || cell == 'v') {
-                    val up = rails[row-1][col]
                     rails[row][col] = Rail(up = up, value = '|', position = row to col)
                     up!!.down = rails[row][col]
                 } else if (cell == '+') {
-                    val left = rails[row][col-1]
-                    val up = rails[row-1][col]
                     rails[row][col] = Rail(left = left, up = up, value = '+', position = row to col)
                     left!!.right = rails[row][col]
                     up!!.down = rails[row][col]
                 } else if (cell == '\\') {
-                    if (col != 0 && (lines[row][col-1] == '-' || lines[row][col-1] == '+' || lines[row][col-1] == '<' || lines[row][col-1] == '>')) {
-                        //from down to left
-                        val left = rails[row][col-1]
+                    if (col != 0 && setOf('-', '<', '+', '>').contains(left?.value)) {
+                        //upper right corner
                         rails[row][col] = Rail(left = left, down = null, value = '\\', position = row to col)
                         left!!.right = rails[row][col]
                     } else {
-                        //from up to right
-                        val up = rails[row-1][col]
+                        //lower left corner
                         rails[row][col] = Rail(up = up, right = null, value = '\\', position = row to col)
                         up!!.down = rails[row][col]
                     }
                 } else if (cell == '/') {
-                    if (col != 0 && row != 0 && (lines[row][col-1] == '-' || lines[row][col-1] == '+' || lines[row][col-1] == '<' || lines[row][col-1] == '>')) {
-                        //from left to up
-                        val left = rails[row][col-1]
-                        val up = rails[row-1][col]
+                    if (col != 0 && setOf('-', '<', '+', '>').contains(left?.value)) {
+                        //lower right corner
                         rails[row][col] = Rail(left = left, up = up, value = '/', position = row to col)
                         left!!.right = rails[row][col]
                         up!!.down = rails[row][col]
                     } else {
-                        //from down to right
+                        //upper left corner
                         rails[row][col] = Rail(value = '/', position = row to col)
                     }
                 }
