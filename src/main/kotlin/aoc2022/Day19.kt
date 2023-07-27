@@ -39,20 +39,23 @@ class Day19: Day("19") {
 
     private fun maxGeodes(blueprint: List<IntArray>, time: Int): Int {
         val queue = LinkedList<IntArray>()
-        queue.add(IntArray(8) { if (it == 0) 1 else 0 })
+        queue.add(intArrayOf(1,0,0,0,0,0,0,0))
         var maxGeodes = 0
-        val maxCosts = IntRange(0,2).map { material -> blueprint.maxOf { it[material] } }
+        val maxCosts = (ORE_ROBOT..OBSIDIAN_ROBOT).map { material -> blueprint.maxOf { it[material] } }
         while (queue.isNotEmpty()) {
             val state = queue.pop()
-            if (state[SCORE] > maxGeodes) {
-                maxGeodes = state[SCORE]
-            }
+            maxGeodes = maxOf(maxGeodes, state[SCORE])
+
             val potential = potential(time, state)
             if (potential < maxGeodes) {
                 continue
             }
+
             if (state[STEPS] < time-1) {
-                IntRange(0, 3).forEach { addToQueue(build(it, state, blueprint, maxCosts, time), queue) }
+                (ORE_ROBOT..GEODE_ROBOT).forEach { robot ->
+                    val nextState = build(robot, state, blueprint, maxCosts, time)
+                    addToQueue(nextState, queue)
+                }
             }
         }
         return maxGeodes
@@ -63,16 +66,16 @@ class Day19: Day("19") {
     }
 
     private fun addToQueue(elem: IntArray?, queue: LinkedList<IntArray>) {
-        if (elem != null) {
-            if (!queue.contains(elem)) {
-                queue.add(0, elem)
-            }
+        if (elem != null && !queue.contains(elem)) {
+            queue.add(0, elem)
         }
     }
 
     fun build(robot_id: Int, state: IntArray, blueprint: List<IntArray>, maxCosts: List<Int>, time: Int): IntArray? {
+        // these are the materials needed to build a robot with id `robot_id`
         val needed = blueprint[robot_id]
-        // robots missing to build it
+
+        // check for each material needed, if there is at least on robot
         IntRange(0, 2).forEach {
             if (needed[it] > 0 && state[it] == 0) {
                 return null
@@ -98,7 +101,7 @@ class Day19: Day("19") {
             }
         }
 
-        val newState = state.toMutableList().toIntArray()
+        val newState = state.copyOf()
         if (state[ORE_MATERIAL] >= needed[ORE_ROBOT] && state[CLAY_MATERIAL] >= needed[CLAY_ROBOT] && state[OBSIDIAN_MATERIAL] >= needed[OBSIDIAN_ROBOT]) {
             IntRange(0, 2).forEach {
                 newState[it+3] += newState[it] - needed[it]
