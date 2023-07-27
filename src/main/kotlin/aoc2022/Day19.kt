@@ -5,28 +5,28 @@ import util.Day
 import java.util.LinkedList
 import kotlin.math.ceil
 
-const val ORE_ROBOT = 0
-const val CLAY_ROBOT = 1
-const val OBSIDIAN_ROBOT = 2
-const val GEODE_ROBOT = 3
-const val ORE_MATERIAL = 3
-const val CLAY_MATERIAL = 4
-const val OBSIDIAN_MATERIAL = 5
+const val ORE = 0
+const val CLAY = 1
+const val OBSIDIAN = 2
+const val GEODE = 3
+const val ORE_STASH = 3
+const val CLAY_STASH = 4
+const val OBSIDIAN_STASH = 5
 const val SCORE = 6
 const val STEPS = 7
 
 class Day19: Day("19") {
 
-    private fun parseLine(line: String): List<IntArray> {
+    private fun parseLine(line: String): Array<IntArray> {
         val (_,b,c,d,e) = line.split("Each ")
         val ore = listOf(b.split(" ")[3].toInt(), 0, 0).toIntArray()
         val clay = listOf(c.split(" ")[3].toInt(), 0, 0).toIntArray()
         val obsidian = listOf(d.split(" ")[3].toInt(), d.split(" ")[6].toInt(), 0).toIntArray()
         val geode = listOf(e.split(" ")[3].toInt(), 0, e.split(" ")[6].toInt()).toIntArray()
-        return listOf(ore, clay, obsidian, geode)
+        return arrayOf(ore, clay, obsidian, geode)
     }
 
-    private fun parseInput(name: String): List<List<IntArray>> {
+    private fun parseInput(name: String): List<Array<IntArray>> {
         return getInputAsLines(name)
             .filter { x -> x.isNotBlank()}
             .map { parseLine(it) }
@@ -37,11 +37,11 @@ class Day19: Day("19") {
         return blueprints.mapIndexed { index, blueprint ->  maxGeodes(blueprint, 24) * (index+1) }.sumOf { it }.toLong()
     }
 
-    private fun maxGeodes(blueprint: List<IntArray>, time: Int): Int {
+    private fun maxGeodes(blueprint: Array<IntArray>, time: Int): Int {
         val queue = LinkedList<IntArray>()
         queue.add(intArrayOf(1,0,0,0,0,0,0,0))
         var maxGeodes = 0
-        val maxCosts = (ORE_ROBOT..OBSIDIAN_ROBOT).map { material -> blueprint.maxOf { it[material] } }
+        val maxCosts = (ORE..OBSIDIAN).map { material -> blueprint.maxOf { it[material] } }.toIntArray()
         while (queue.isNotEmpty()) {
             val state = queue.pop()
             maxGeodes = maxOf(maxGeodes, state[SCORE])
@@ -52,7 +52,7 @@ class Day19: Day("19") {
             }
 
             if (state[STEPS] < time-1) {
-                (ORE_ROBOT..GEODE_ROBOT).forEach { robot ->
+                (ORE..GEODE).forEach { robot ->
                     val nextState = build(robot, state, blueprint, maxCosts, time)
                     addToQueue(nextState, queue)
                 }
@@ -71,59 +71,55 @@ class Day19: Day("19") {
         }
     }
 
-    fun build(robot_id: Int, state: IntArray, blueprint: List<IntArray>, maxCosts: List<Int>, time: Int): IntArray? {
+    fun build(robot_id: Int, state: IntArray, blueprint: Array<IntArray>, maxCosts: IntArray, time: Int): IntArray? {
         // these are the materials needed to build a robot with id `robot_id`
         val needed = blueprint[robot_id]
 
         // check for each material needed, if there is at least on robot
-        IntRange(0, 2).forEach {
+        (ORE..OBSIDIAN).forEach {
             if (needed[it] > 0 && state[it] == 0) {
                 return null
             }
         }
-        // we have enough robots of this kind (step 1)
+
         if (robot_id < 3) {
-            val timeRemaining = time - 2 - state[STEPS]
-            val unitsProducedTilEnd = state[robot_id+3] + timeRemaining * state[robot_id]
-            val unitsNeeded =(timeRemaining + 1) * maxCosts[robot_id]
-            if (unitsProducedTilEnd >= unitsNeeded-11) { // -11 is kinda dirty, depends on input. improves performance
+            if (state[robot_id] >= maxCosts[robot_id]) {
                 return null
             }
         }
 
-        // we have enough robots of this kind (step 2)
         if (robot_id < 3) {
-            val timeRemaining = time - 2 - state[STEPS]
-            val unitsProducedTilEnd = state[robot_id+3] + timeRemaining * state[robot_id]
-            val unitsNeeded =(timeRemaining + 1) * maxCosts[robot_id]
-            if (unitsProducedTilEnd >= unitsNeeded-11) { // -11 is kinda dirty, depends on input. improves performance
+            val timeRemaining = time - 1 - state[STEPS]
+            val unitsProducedTilEnd = state[robot_id + 3] + timeRemaining * state[robot_id]
+            val unitsNeeded = (timeRemaining + 1) * maxCosts[robot_id]
+            if (unitsProducedTilEnd >= unitsNeeded-11) {
                 return null
             }
         }
 
         val newState = state.copyOf()
-        if (state[ORE_MATERIAL] >= needed[ORE_ROBOT] && state[CLAY_MATERIAL] >= needed[CLAY_ROBOT] && state[OBSIDIAN_MATERIAL] >= needed[OBSIDIAN_ROBOT]) {
-            IntRange(0, 2).forEach {
+        if (state[ORE_STASH] >= needed[ORE] && state[CLAY_STASH] >= needed[CLAY] && state[OBSIDIAN_STASH] >= needed[OBSIDIAN]) {
+            (ORE..OBSIDIAN).forEach {
                 newState[it+3] += newState[it] - needed[it]
             }
             newState[STEPS] += 1
-            if (robot_id == GEODE_ROBOT) {
+            if (robot_id == GEODE) {
                 val timeRemaining = time - newState[STEPS]
                 newState[SCORE] += timeRemaining
             } else {
                 newState[robot_id] += 1
             }
         } else {
-            val stepsNeeded = IntRange(0,2)
+            val stepsNeeded = (ORE..OBSIDIAN)
                 .maxOf { if (state[it+3] >= needed[it]) 0 else ceil((needed[it]-state[it+3]).toDouble() / state[it]).toInt() } + 1
-            IntRange(0,2).forEach {
+            (ORE..OBSIDIAN).forEach {
                 newState[it+3] += newState[it] * stepsNeeded - needed[it]
             }
             newState[STEPS] += stepsNeeded
             if (newState[STEPS] > time) {
                 return null
             }
-            if (robot_id == GEODE_ROBOT) {
+            if (robot_id == GEODE) {
                 val timeRemaining = time - newState[STEPS]
                 newState[SCORE] += timeRemaining
             } else {
