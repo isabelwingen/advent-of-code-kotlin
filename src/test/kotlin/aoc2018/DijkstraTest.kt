@@ -1,5 +1,11 @@
 package aoc2018
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
-internal class DijkstraTest
+internal class DijkstraTest {
+
+   @Test
+   fun test() {
+       println(Dijkstra().findPath())
+   }
+}
