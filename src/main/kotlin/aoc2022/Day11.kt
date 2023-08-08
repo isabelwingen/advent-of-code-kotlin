@@ -17,7 +17,8 @@ class Day11: Day("11") {
         val operator = operationStrings[1]
         val left = operationStrings[0]
         val right = operationStrings[2]
-        val operation: (Long) -> Long = if (left == "old" && right == "old") {
+        val operation: (Long) -> Long =
+            if (left == "old" && right == "old") {
             if (operator == "+") {
                 { it + it }
             } else {

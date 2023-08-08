@@ -34,7 +34,7 @@ class Day19: Day("19") {
 
     override fun executePart1(name: String): Long {
         val blueprints = parseInput(name)
-        return blueprints.mapIndexed { index, blueprint ->  maxGeodes(blueprint, 24) * (index+1) }.sumOf { it }.toLong()
+        return blueprints.mapIndexed { index, blueprint -> maxGeodes(blueprint, 24) * (index + 1) }.sum().toLong()
     }
 
     private fun maxGeodes(blueprint: Array<IntArray>, time: Int): Int {
@@ -89,10 +89,17 @@ class Day19: Day("19") {
         }
 
         if (robot_id < 3) {
-            val timeRemaining = time - 1 - state[STEPS]
-            val unitsProducedTilEnd = state[robot_id + 3] + timeRemaining * state[robot_id]
-            val unitsNeeded = (timeRemaining + 1) * maxCosts[robot_id]
-            if (unitsProducedTilEnd >= unitsNeeded-11) {
+            var suppliedEnough = true
+            var stash = state[robot_id+3] + state[robot_id]
+            for (i in 1 until time-state[STEPS]) {
+                stash += state[robot_id]
+                stash -= maxCosts[robot_id]
+                if (stash < 0) {
+                    suppliedEnough = false
+                    break
+                }
+            }
+            if (suppliedEnough) {
                 return null
             }
         }
