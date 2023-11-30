@@ -3,8 +3,6 @@ package aoc2018
 import getInputAsLines
 import util.Day
 import java.util.LinkedList
-import kotlin.Comparator
-import java.util.PriorityQueue
 
 
 private const val INF = 100_000
@@ -32,11 +30,11 @@ class Day15: Day("15") {
         return Triple(positions, elves, goblins)
     }
 
-    data class Player(var position: Pair<Int, Int>,  var type: String = "elf", var life: Int = 200, var attackPower: Int = 3) {
+    data class Player(var position: Pair<Int, Int>, val type: String = "elf", val attackPower: Int,  var life: Int = 200) {
         override fun toString() = "${if (type == "elf") "e" else "g"}(${position.first},${position.second}/${life}/${attackPower})"
     }
 
-    data class Playfield(val area: Set<Pair<Int, Int>>, val players: MutableList<Player>, var finished: Boolean = false)
+    data class Playfield(val area: Set<Pair<Int, Int>>, val players: MutableList<Player>, var finished: Boolean = false, var elfDied: Boolean = false)
 
     private fun neighbors(p: Pair<Int, Int>): Set<Pair<Int, Int>> {
         val (row, col) = p
@@ -125,7 +123,10 @@ class Day15: Day("15") {
         candidate.life -= unit.attackPower
     }
 
-    private fun sort(playfield: Playfield) {
+    private fun cleanUp(playfield: Playfield) {
+        if (playfield.players.any { it.type == "elf" && it.life <= 0 }) {
+            playfield.elfDied = true
+        }
         playfield.players.removeIf { it.life <= 0 }
         playfield.players.sortBy { it.position.second }
         playfield.players.sortBy { it.position.first }
@@ -144,13 +145,17 @@ class Day15: Day("15") {
 
     private fun playOneRound(playfield: Playfield) {
         playfield.players.forEach { turn(playfield, it) }
-        sort(playfield)
+        cleanUp(playfield)
+    }
+
+    private fun createPlayfield(attackPower: Int, positions: Set<Pair<Int, Int>>, elves: Set<Pair<Int, Int>>, goblins: Set<Pair<Int, Int>>): Playfield {
+        val players = (elves.map { Player(it, "elf", attackPower) } + goblins.map { Player(it, "goblin", 3) }).sortedBy { it.position.second }.sortedBy { it.position.first }
+        return Playfield(positions, players.toMutableList())
     }
 
     override fun executePart1(name: String): Any {
         val (positions, e, g) = parse(name)
-        val players = (e.map { Player(it) } + g.map { Player(it, "goblin") }).sortedBy { it.position.second }.sortedBy { it.position.first }
-        val playfield = Playfield(positions, players.toMutableList())
+        val playfield = createPlayfield(3, positions, e, g)
         var c = -1
         while (!playfield.finished) {
             playOneRound(playfield)
@@ -159,7 +164,16 @@ class Day15: Day("15") {
         return c.toLong() * (playfield.players.sumOf { it.life.toLong() })
     }
 
+
+
     override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+        val (positions, e, g) = parse(name)
+        val playfield = createPlayfield(26, positions, e, g)
+        var c = -1
+        while (!playfield.finished) {
+            playOneRound(playfield)
+            c++
+        }
+        return c.toLong() * (playfield.players.sumOf { it.life.toLong() })
     }
 }
