@@ -5,11 +5,15 @@ import util.Day
 
 class Day2: Day("2") {
 
+    private fun roundToMap(round: String): Map<String, Int> {
+        return round.trim()
+            .split(", ")
+            .map { it.split(" ") }
+            .associate { it[1].trim() to it[0].trim().toInt() }
+    }
+
     private fun transformLine(line: String): Map<String, Int> {
-        val maps =  line.split(":")[1].split("; ")
-            .map { it.trim().split(", ") }
-            .map { it.map { x -> x.split(" ") } }
-            .map { drawing -> drawing.associate { entry -> entry[1].trim() to entry[0].trim().toInt() } }
+        val maps =  line.split(":")[1].split("; ").map { roundToMap(it) }
         return listOf("blue", "red", "green").associateWith { color ->  maps.maxOf { it.getOrDefault(color, 0) } }
     }
 
