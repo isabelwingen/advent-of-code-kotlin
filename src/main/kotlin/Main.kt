@@ -14,8 +14,8 @@ fun getInput(file: String): String {
     return File(dirUrl.file).readText()
 }
 
-fun getInputAsLines(file: String): List<String> {
-    return getInput(file).split("\n")
+fun getInputAsLines(file: String, filterOutEmptyLines: Boolean = false): List<String> {
+    return getInput(file).split("\n").filter { if (filterOutEmptyLines) it.isNotEmpty() else true }
 }
 
 @OptIn(ExperimentalTime::class)
