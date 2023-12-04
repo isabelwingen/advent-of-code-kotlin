@@ -9,23 +9,6 @@ private val COMMANDS = listOf("addr", "addi", "mulr", "muli", "banr", "bani", "b
 
 class Day16: Day("16") {
 
-    data class Computer(val registers: IntArray = IntArray(4) { 0 }) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as Computer
-
-            if (!registers.contentEquals(other.registers)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return registers.contentHashCode()
-        }
-    }
-
     private fun executeCommand(command: Int, a: Int, b: Int, c: Int, registers: IntArray, commandoMap: Map<Int, String>): IntArray {
         return executeCommand(commandoMap[command]!!, a, b, c, registers)
     }
