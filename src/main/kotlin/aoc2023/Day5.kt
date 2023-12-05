@@ -7,44 +7,42 @@ import util.Day
 class Day5: Day("5") {
 
     data class Line(val destinationStart: Long, val sourceStart: Long, val length: Int) {
-        fun transform(a: Long): Pair<Boolean, Long> {
+        fun transform(a: Long): Long {
             return if (a in sourceStart until (sourceStart + length)) {
-                true to (destinationStart + a - sourceStart)
+                destinationStart + a - sourceStart
             } else {
-                false to a
+                a
             }
         }
 
-        fun back(a: Long): Pair<Boolean, Long> {
+        fun back(a: Long): Long {
             return if (a in destinationStart until (destinationStart + length)) {
-                true to (sourceStart + a - destinationStart)
+                sourceStart + a - destinationStart
             } else {
-                false to a
+                a
             }
         }
     }
 
     data class PlantMap(val title: String, val lines: List<Line>) {
         fun findResult(a: Long): Long {
-            return lines.fold(a) { acc, line ->
-                val (b, r) = line.transform(acc)
-                if (b) {
+            lines.forEach { line ->
+                val r = line.transform(a)
+                if (r != a) {
                     return r
-                } else {
-                    r
                 }
             }
+            return a
         }
 
         fun back(a: Long): Long {
-            return lines.fold(a) { acc, line ->
-                val (b, r) = line.back(a)
-                if (b) {
+            lines.forEach { line ->
+                val r = line.back(a)
+                if (r != a) {
                     return r
-                } else {
-                    r
                 }
             }
+            return a
         }
     }
 
