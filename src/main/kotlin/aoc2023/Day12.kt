@@ -43,10 +43,15 @@ class Day12: Day("12") {
 
     }
 
+    val cache = mutableMapOf<Pair<String, Int>, List<Int>>()
+
     private fun findPossiblePositions(string: String, blockLength: Int): List<Int> {
-        return (0 .. (string.length - blockLength))
-            .filter { string.getOrElse(it-1) { '?' } == '?' && string.getOrElse(it + blockLength) { '?' } == '?' }
-            .toList()
+        cache.putIfAbsent(
+            string to blockLength,
+            (0 .. (string.length - blockLength))
+                .filter { string.getOrElse(it-1) { '?' } == '?' && string.getOrElse(it + blockLength) { '?' } == '?' }
+                .toList())
+        return cache[string to blockLength]!!
     }
 
     private fun findPossiblePositions(groups: List<Group>, blockLength: Int): List<Int> {
