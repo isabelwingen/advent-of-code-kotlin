@@ -8,127 +8,104 @@ import kotlin.math.min
 
 class Day12: Day("12") {
 
-    data class Line(val pattern: List<Char>, val numbers: List<Int>) {
+    data class Group(val start: Int, val text: String, val length: Int = text.length)
 
-        fun valid(): Boolean {
-            return if (pattern.contains('?')) {
-                false
-            } else {
-                pattern.joinToString("").split(".").filter { it.isNotBlank() }.map { it.length }.toList() == numbers
+    data class Row(val groups: List<Group>, val numbers: List<Int>, val original: String) {
+
+        fun toPart2(): Row {
+            return parse("$original?$original?$original?$original?$original ${(numbers + numbers + numbers + numbers + numbers).joinToString(",")}")
+        }
+
+        companion object {
+            fun parse(line: String): Row {
+                val (left, right) = line.split(" ")
+                val original = left.trim()
+                val numbers = right.trim().split(",").filter { it.isNotBlank() }.map { it.toInt() }
+                val groups = mutableListOf<Group>()
+                var i = 0
+                var list = original.toCharArray().toList()
+                while (list.isNotEmpty()) {
+                   if (list.first() == '.') {
+                       list = list.drop(1)
+                       i++
+                   } else {
+                       val p = list.takeWhile { it != '.' }.joinToString("")
+                       groups.add(Group(i, p))
+                       list = list.drop(p.length).toList()
+                       i += p.length
+                   }
+                }
+
+                return Row(groups.toList(), numbers, original)
             }
         }
+
+
     }
 
-    data class Line2(val groups: List<String>, val numbers: List<Int>)
-
-    fun parseLine(line: String): Line {
-        val (part1, part2) = line.split(" ")
-        val numbers = part2.split(",").map { it.trim().toInt() }.toList()
-        val pattern = part1.trim().toCharArray().toList()
-        return Line(pattern, numbers)
+    private fun findPossiblePositions(string: String, blockLength: Int): List<Int> {
+        return (0 .. (string.length - blockLength))
+            .filter { string.getOrElse(it-1) { '?' } == '?' && string.getOrElse(it + blockLength) { '?' } == '?' }
+            .toList()
     }
 
-    fun parseLinePart2(line: String): Line2 {
-        val (pattern, numbers) = parseLine(line)
-        val p = pattern + listOf('?')
-        val l = (p + p + p + p + p).dropLast(1).splitBy { c -> c == '.' }.filterNot { x -> x.all { c -> c == '.' } }.map { it.joinToString("") }
-        return Line2(l, numbers + numbers + numbers + numbers + numbers)
+    private fun findPossiblePositions(groups: List<Group>, blockLength: Int): List<Int> {
+        return groups.flatMap { g -> findPossiblePositions(g.text, blockLength).map { it + g.start } }
     }
 
-    private fun findLastPossiblePosition(line: Line): Int {
-        val paddingRight = line.numbers.drop(1).let { it.sum() + it.size }
-        return line.pattern.size - paddingRight - line.numbers.first()
-    }
+    data class Node(val blockLength: Int, val position: Int, val children: List<Node> = emptyList())
 
-    private fun isPossible(line: Line, i: Int): Line? {
-        val newPattern = line.pattern.toMutableList()
-        for (k in 0 .. min((i + line.numbers.first()), line.pattern.lastIndex)) {
-
-            val char = line.pattern[k]
-            if (k < i-1) {
-                if (char == '?' || char == '.') {
-                    newPattern[k] = '.'
-                } else {
-                    return null
-                }
-            } else if (k == i-1 || k == i + line.numbers.first()) {
-               if (char == '#') {
-                   return null
-               } else {
-                   newPattern[k] = '.'
-               }
-            } else if (k in i until i + line.numbers.first()) {
-                if (char != '?' && char != '#') {
-                    return null
-                } else {
-                    newPattern[k] = '#'
-                }
-            }
+    fun combinations(row: Row): Int {
+        val combMap = row.numbers.toSet().associateWith { findPossiblePositions(row.groups, it) }
+        val possibleCombinations = row.numbers.map { combMap[it]!!.toMutableList() }
+        // Hinweg
+        var firstPossiblePosition = 0
+        for (i in row.numbers.indices) {
+            possibleCombinations[i].removeIf { it < firstPossiblePosition }
+            firstPossiblePosition = possibleCombinations[i].first() + row.numbers[i] + 1
         }
-        return Line(newPattern.drop(i + line.numbers.first() + 1), line.numbers.drop(1))
-    }
-
-
-    fun findAllCombinations(line: Line): Int {
-        val queue = LinkedList<Line>()
-        queue.add(line)
-        var count = 0
+        //Rückweg
+        var lastPossiblePosition = row.original.lastIndex
+        for (i in row.numbers.indices.reversed()) {
+            possibleCombinations[i].removeIf { it > lastPossiblePosition }
+            lastPossiblePosition = possibleCombinations[i].last() - 1 - row.numbers.getOrElse(i-1) { 0 }
+        }
+        val seen = mutableSetOf<List<Int>>()
+        val queue = LinkedList<List<Int>>()
+        queue.add(emptyList())
         while (queue.isNotEmpty()) {
             val current = queue.poll()
-            if (current.numbers.isEmpty()) {
-                if (current.pattern.none { it == '#' }) {
-                    count++
-                }
+            val indices = current.mapIndexed { index, start -> start until start + row.numbers[index] }
+            if (current.isNotEmpty() && row.original.substring(0..current.last()).filterIndexed { index, _ ->  indices.none { it.contains(index) }}.any { it == '#' }) {
+                // can't do
+            } else if (current.size == row.numbers.size) {
+                seen.add(current)
             } else {
-                (0..findLastPossiblePosition(current))
-                    .mapNotNull { isPossible(current, it) }
-                    .forEach { queue.addLast(it) }
+                val nextIndex = current.size
+                val p = if (nextIndex == 0) {
+                    possibleCombinations[nextIndex]
+                } else {
+                    possibleCombinations[nextIndex].filter { it > current.last() + row.numbers[nextIndex-1] }
+                }
+                p.forEach { queue.add(current + it) }
             }
         }
-        return count
+        return seen.count()
     }
 
     override fun executePart1(name: String): Any {
         return getInputAsLines(name, true)
-            .map { parseLine(it) }
-            .sumOf { findAllCombinations(it).toLong() }
+            .map { Row.parse(it) }
+            .sumOf { combinations(it) }
+
     }
 
-    private fun findAllCombinations2(line: Line2): Int {
-        val queue = LinkedList<Line2>()
-        queue.add(line)
-        var count = 0
-        while (queue.isNotEmpty()) {
-            val current = queue.poll()
-            if (current.numbers.isEmpty()) {
-                if (current.groups.none { s -> s.any { c -> c == '#' } }) {
-                    count++
-                }
-            } else if (current.groups.isNotEmpty()) {
-                val firstGroup = current.groups.first()
-                val firstNumber = current.numbers.first()
-                if (firstGroup.length < firstNumber) {
-                    queue.add(Line2(current.groups.drop(1), current.numbers))
-                } else {
-                    val possiblePositions = 0 .. (firstGroup.length - firstNumber)
-                    possiblePositions.forEach { i ->
-                        val newFirstGroup = firstGroup.drop(i + firstNumber)
-                        if (newFirstGroup.isEmpty()) {
-                            queue.add(Line2(current.groups.drop(1), current.numbers.drop(1)))
-                        } else {
-                            queue.add(Line2(listOf(newFirstGroup) + current.groups.drop(1), current.numbers.drop(1)))
-                        }
-                    }
-                }
-            }
-        }
-        return count
-    }
 
     override fun executePart2(name: String): Any {
         return getInputAsLines(name, true)
-            .asSequence()
-            .map { parseLinePart2(it) }
-            .toList()
+            .map { Row.parse(it).toPart2() }
+            .take(1)
+            .sumOf { combinations(it) }
     }
+
 }
