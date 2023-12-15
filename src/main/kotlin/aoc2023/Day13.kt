@@ -6,8 +6,7 @@ import util.Day
 import kotlin.math.min
 
 class Day13: Day("13") {
-    
-    
+
     private fun difference(a: String, b: String): Int {
         if (a == b) {
             return 0
@@ -33,7 +32,6 @@ class Day13: Day("13") {
         }
 
     }
-
 
     override fun executePart1(name: String): Any {
         return getInputAsLines(name, false)
