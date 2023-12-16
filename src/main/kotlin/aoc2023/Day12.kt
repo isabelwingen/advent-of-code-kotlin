@@ -7,42 +7,34 @@ class Day12: Day("12") {
 
     private val cache = hashMapOf<String, HashMap<List<Int>, Long>>()
 
+    private fun validPosition(string: String, startOfBlock: Int, lengthOfBlock: Int): Boolean {
+        return string.substring(0 until startOfBlock).none { it == '#' } &&
+                string.getOrElse(startOfBlock + lengthOfBlock) { '?' } != '#' &&
+                string.substring(startOfBlock until startOfBlock + lengthOfBlock).none { it == '.' }
+    }
+
     fun count(s: String, n: List<Int>): Long {
-        val func = fun(string: String, numbers: List<Int>): Long {
+        val func = fun(string: String, numbers: List<Int>) =
             if (string.isEmpty() || string.all { it == '.' }) {
-                return if (numbers.isEmpty()) {
-                    1
-                } else {
-                    0
-                }
+                if (numbers.isEmpty()) 1L else 0L
             } else if (numbers.isEmpty()) {
-                return if (string.none { it == '#' }) {
-                    1
-                } else {
-                    0
-                }
+                if (string.none { it == '#' }) 1L else 0L
             } else {
                 val firstNumber = numbers.first()
-                return if (firstNumber > string.length) {
-                    0
-                } else {
-                    (0..string.length - firstNumber).sumOf { i ->
-                        if (string.substring(0 until i).none { it == '#' } && string.getOrElse(i + firstNumber) { '?' } != '#' && string.substring(i until i + firstNumber).none { it == '.' }) {
-                            count(string.drop(i + firstNumber + 1), numbers.drop(1))
-                        } else {
-                            0
-                        }
-                    }
-                }
+                (0 .. string.length - firstNumber)
+                    .filter { validPosition(string, it, firstNumber) }
+                    .sumOf { count(string.drop(it + firstNumber + 1), numbers.drop(1)) }
             }
-        }
+
         cache.putIfAbsent(s, hashMapOf())
         return cache.getValue(s).getOrPut(n) { func(s, n) }
     }
 
     private fun parseLine(line: String): Pair<String, List<Int>> {
         val (a, b) = line.split(" ")
-        return a.split(".").filterNot { it.isEmpty() }.joinToString(".") to b.split(",").map { it.toString().toInt() }
+        val string = a.split(".").filterNot { it.isEmpty() }.joinToString(".")
+        val numbers = b.split(",").map { it.toInt() }
+        return string to numbers
     }
 
     override fun executePart1(name: String): Any {
