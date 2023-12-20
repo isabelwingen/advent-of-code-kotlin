@@ -34,11 +34,89 @@ class Day18: Day("18") {
         }
     }
 
-    data class PositionMapper(
-        val newRowsToOldRows: BiMap<Int, Int>,
-        val newColsToOldCols: BiMap<Int, Int>,
-        val newNodesToOldNodes: BiMap<Position, Position>
-    )
+    class PositionMapper {
+
+        private val newRowsToOldRows = BiMap<Int, Int>()
+        private val newColsToOldCols = BiMap<Int, Int>()
+
+        private fun transformToOldRow(newRow: Int) = newRowsToOldRows.getValueFromKey(newRow)!!
+
+        fun transformToNewRow(oldRow: Int) = newRowsToOldRows.getKeyFromValue(oldRow)!!
+
+        private fun transformToOldCol(newCol: Int) = newColsToOldCols.getValueFromKey(newCol)!!
+
+        fun transformToNewCol(oldCol: Int) = newColsToOldCols.getKeyFromValue(oldCol)!!
+
+        private fun isRowIdOfNewNode(newRow: Int) = newRowsToOldRows.containsKey(newRow)
+
+        private fun isColIdOfNewNode(newCol: Int) = newColsToOldCols.containsKey(newCol)
+
+        fun storeRowMapping(newRow: Int, oldRow: Int) {
+            newRowsToOldRows.put(newRow, oldRow)
+        }
+
+        fun storeColMapping(newCol: Int, oldCol: Int) {
+            newColsToOldCols.put(newCol, oldCol)
+        }
+
+        fun originalHeight(row: Int): Long {
+            return if (isRowIdOfNewNode(row)) 1L else abs(transformToOldRow(row+1) - transformToOldRow(row-1)) - 1L
+        }
+
+        fun originalWidth(col: Int): Long {
+            return if (isColIdOfNewNode(col)) 1L else  abs(transformToOldCol(col+1) - transformToOldCol(col-1)) - 1L
+
+        }
+    }
+
+    private fun findSizeOfQuadrant(quadrant: Position, positionMapper: PositionMapper): Long {
+        val (row, col) = quadrant
+        return positionMapper.originalHeight(row) * positionMapper.originalWidth(col)
+    }
+
+    private fun floodFill(graph: Set<Edge>): Set<Position> {
+        val interior = mutableSetOf<Position>()
+        val queue = LinkedList<Position>()
+        val upperLeftCorner = graph.flatMap { setOf(it.a, it.b) }.distinct().filter { it.row == 0 }.minByOrNull { it.col }!!
+        queue.add(Position(upperLeftCorner.row + 1, upperLeftCorner.col + 1))
+        while (queue.isNotEmpty()) {
+            val current = queue.poll()
+
+            if (!interior.contains(current) && !graph.any { it.contains(current) }) {
+                interior.add(current)
+                queue.addAll(current.getNeighbours())
+            }
+        }
+        return interior.toSet()
+    }
+
+    private fun normalizeIndices(l: List<Int>, storeFunc: (Int, Int) -> Unit) {
+        val list = l.distinct().sorted()
+        storeFunc(0, list.first())
+        var lastIndex = 0
+        list.forEachIndexed { index, value ->
+            if (index != 0) {
+                lastIndex += min(2, abs(list[index - 1] - value))
+                storeFunc(lastIndex, value)
+            }
+        }
+    }
+
+    private fun doGraphTransformation(nodes: Set<Position>): PositionMapper {
+        val positionMapper = PositionMapper()
+        normalizeIndices(nodes.map { it.row }) { k, v -> positionMapper.storeRowMapping(k, v) }
+        normalizeIndices(nodes.map { it.col }) { k, v -> positionMapper.storeColMapping(k, v) }
+        return positionMapper
+    }
+
+    private fun normalizeGraph(edges: Set<Edge>, nodes: Set<Position>): Pair<List<Edge>, PositionMapper> {
+        val positionMapper = doGraphTransformation(nodes)
+        return edges.map { (a, b) ->
+            val newA = Position(positionMapper.transformToNewRow(a.row), positionMapper.transformToNewCol(a.col))
+            val newB = Position(positionMapper.transformToNewRow(b.row), positionMapper.transformToNewCol(b.col))
+            Edge(newA, newB)
+        } to positionMapper
+    }
 
     private fun buildGraph(commandos: List<Pair<Direction, Int>>): Pair<Set<Edge>, Set<Position>> {
         var current = Position(0, 0)
@@ -53,77 +131,17 @@ class Day18: Day("18") {
         return edges.toSet() to nodes.toSet()
     }
 
-    private fun normalizeIndices(l: List<Int>): BiMap<Int, Int> {
-        val list = l.distinct().sorted()
-        val q = BiMap<Int, Int>()
-        q.put(0, list.first())
-        var lastIndex = 0
-        list.forEachIndexed { index, value ->
-            if (index != 0) {
-                lastIndex += min(2, abs(list[index - 1] - value))
-                q.put(lastIndex, value)
-            }
-        }
-        return q
+    private fun execute(commands: List<Pair<Direction, Int>>): Long {
+        val graph = buildGraph(commands)
+        val (newEdges, positionMapper) = normalizeGraph(graph.first, graph.second)
+        return floodFill(newEdges.toSet()).sumOf { findSizeOfQuadrant(it, positionMapper) } + commands.sumOf { it.second }
     }
-
-    private fun nodeMap(nodes: Set<Position>, rowMap: BiMap<Int, Int>, colMap: BiMap<Int, Int>): BiMap<Position, Position> {
-        val nodeMap = BiMap<Position, Position>()
-        nodes.forEach { node ->
-            val newNode = Position(rowMap.getKeyFromValue(node.row)!!, colMap.getKeyFromValue(node.col)!!)
-            nodeMap.put(newNode, node)
-        }
-        return nodeMap
-    }
-
-    private fun normalizeGraph(edges: Set<Edge>, nodes: Set<Position>): Pair<List<Edge>, PositionMapper> {
-        val newRowsToOldRows = normalizeIndices(nodes.map { it.row })
-        val newColsToOldCols = normalizeIndices(nodes.map { it.col })
-        val newNodesToOldNodes = nodeMap(nodes, newRowsToOldRows, newColsToOldCols)
-        return edges.map { (a, b) ->
-            Edge(newNodesToOldNodes.getKeyFromValue(a)!!, newNodesToOldNodes.getKeyFromValue(b)!!)
-        } to PositionMapper(newRowsToOldRows, newColsToOldCols, newNodesToOldNodes)
-    }
-
-    private fun findSizeOfQuadrant(quadrant: Position, positionMapper: PositionMapper): Long {
-        val (row, col) = quadrant
-        val width = if (positionMapper.newRowsToOldRows.containsKey(row)) {
-            1
-        } else {
-            abs(positionMapper.newRowsToOldRows.getValueFromKey(row+1)!! - positionMapper.newRowsToOldRows.getValueFromKey(row-1)!!) - 1
-        }
-        val height = if (positionMapper.newColsToOldCols.containsKey(col)) {
-            1
-        } else {
-            abs(positionMapper.newColsToOldCols.getValueFromKey(col+1)!! - positionMapper.newColsToOldCols.getValueFromKey(col-1)!!) - 1
-        }
-        return width.toLong() * height
-    }
-
-    private fun floodFill(graph: Set<Edge>, positionMapper: PositionMapper): Set<Position> {
-        val interior = mutableSetOf<Position>()
-        val queue = LinkedList<Position>()
-        val upperLeftCorner = positionMapper.newNodesToOldNodes.keys().filter { it.row == 0 }.minByOrNull { it.col }!!
-        queue.add(Position(upperLeftCorner.row + 1, upperLeftCorner.col + 1))
-        while (queue.isNotEmpty()) {
-            val current = queue.poll()
-
-            if (!interior.contains(current) && !graph.any { it.contains(current) }) {
-                interior.add(current)
-                queue.addAll(current.getNeighbours())
-            }
-        }
-        return interior.toSet()
-    }
-
 
     override fun executePart1(name: String): Any {
         val commands = getInputAsLines(name, true)
             .map { it.split(" ").dropLast(1) }
             .map { getDirection(it[0][0]) to it[1].toInt() }
-        val graph = buildGraph(commands)
-        val (newEdges, positionMapper) = normalizeGraph(graph.first, graph.second)
-        return floodFill(newEdges.toSet(), positionMapper).sumOf { findSizeOfQuadrant(it, positionMapper) } + commands.sumOf { it.second }
+        return execute(commands)
     }
 
     private fun readCommand(line: String): Pair<Direction, Int> {
@@ -136,8 +154,6 @@ class Day18: Day("18") {
     override fun executePart2(name: String): Any {
         val commands = getInputAsLines(name, true)
             .map { readCommand(it) }
-        val graph = buildGraph(commands)
-        val (newEdges, positionMapper) = normalizeGraph(graph.first, graph.second)
-        return floodFill(newEdges.toSet(), positionMapper).sumOf { findSizeOfQuadrant(it, positionMapper) } + commands.sumOf { it.second }
+        return execute(commands)
     }
 }
