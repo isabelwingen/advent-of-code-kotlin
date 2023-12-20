@@ -1,18 +1,11 @@
 package aoc2023
 
-import aoc2018.Day23
 import getInputAsLines
-import splitBy
 import util.Day
+import util.Direction
+import util.Position
 
 class Day10: Day("10") {
-
-    data class Position(val row: Int, val col: Int) {
-        fun goNorth(): Position = Position(row-1, col)
-        fun goSouth(): Position = Position(row+1, col)
-        fun goWest() = Position(row, col-1)
-        fun goEast() = Position(row, col+1)
-    }
 
     abstract class Pipe {
         abstract fun enterThrough(direction: Char): (Position) -> Position
@@ -21,8 +14,8 @@ class Day10: Day("10") {
     class NorthSouthPipe: Pipe() {
         override fun enterThrough(direction: Char): (Position) -> Position {
             return when (direction) {
-                NORTH -> { pos: Position -> pos.goSouth() }
-                SOUTH -> { pos: Position -> pos.goNorth() }
+                NORTH -> { pos: Position -> pos.move(Direction.DOWN) }
+                SOUTH -> { pos: Position -> pos.move(Direction.UP) }
                 else -> throw IllegalStateException("Could not enter through $direction")
             }
         }
@@ -31,8 +24,8 @@ class Day10: Day("10") {
     class NorthWestPipe: Pipe() {
         override fun enterThrough(direction: Char): (Position) -> Position {
             return when (direction) {
-                NORTH -> { pos: Position -> pos.goWest() }
-                WEST -> { pos: Position -> pos.goNorth() }
+                NORTH -> { pos: Position -> pos.move(Direction.LEFT) }
+                WEST -> { pos: Position -> pos.move(Direction.UP) }
                 else -> throw IllegalStateException("Could not enter through $direction")
             }
         }
@@ -41,8 +34,8 @@ class Day10: Day("10") {
     class NorthEastPipe: Pipe() {
         override fun enterThrough(direction: Char): (Position) -> Position {
             return when (direction) {
-                NORTH -> { pos: Position -> pos.goEast() }
-                EAST -> { pos: Position -> pos.goNorth() }
+                NORTH -> { pos: Position -> pos.move(Direction.RIGHT) }
+                EAST -> { pos: Position -> pos.move(Direction.UP) }
                 else -> throw IllegalStateException("Could not enter through $direction")
             }
         }
@@ -51,10 +44,10 @@ class Day10: Day("10") {
     data class State(val currentPosition: Position, val pipe: Char, val comingFrom: Char) {
         private fun makeNewState2(goingTo: Char, lines: List<CharArray>): State {
             val newPos = when (goingTo) {
-                SOUTH -> currentPosition.goSouth()
-                NORTH -> currentPosition.goNorth()
-                WEST -> currentPosition.goWest()
-                EAST -> currentPosition.goEast()
+                SOUTH -> currentPosition.move(Direction.DOWN)
+                NORTH -> currentPosition.move(Direction.UP)
+                WEST -> currentPosition.move(Direction.LEFT)
+                EAST -> currentPosition.move(Direction.RIGHT)
                 else -> throw IllegalStateException("Unknown direction: $goingTo")
             }
             val newPipe = lines[newPos.row][newPos.col]
