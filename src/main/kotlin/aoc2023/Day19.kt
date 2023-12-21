@@ -15,7 +15,6 @@ class Day19: Day("19") {
     }
 
     data class Part(val map: EnumMap<Category, Int>) {
-
         companion object {
             fun parse(part: String): Part {
                 val (x,m,a,s) = part.drop(1).dropLast(1).split(",")
@@ -40,19 +39,19 @@ class Day19: Day("19") {
             return null
         }
 
-        fun ifChild(): Pair<String, Int> {
+        fun ifChild(undefinedPart: UndefinedPart): UndefinedPart {
             return if (operator == '<') {
-                "max" to threshold-1
+                undefinedPart.setNewMax(threshold-1, category)
             } else {
-                "min" to threshold+1
+                undefinedPart.setNewMin(threshold+1, category)
             }
         }
 
-        fun elseChild(): Pair<String, Int> {
+        fun elseChild(undefinedPart: UndefinedPart): UndefinedPart {
             return if (operator == '<') {
-                "min" to threshold
+                undefinedPart.setNewMin(threshold, category)
             } else {
-                "max" to threshold
+                undefinedPart.setNewMax(threshold, category)
             }
         }
 
@@ -107,7 +106,7 @@ class Day19: Day("19") {
         val x: IntRange = 1..4000,
         val m: IntRange = 1..4000,
         val a: IntRange = 1..4000,
-        val s: IntRange = 1..4000,
+        val s: IntRange = 1..4000
     ) {
 
         fun setNewMin(minVal: Int, category: Category): UndefinedPart {
@@ -135,67 +134,10 @@ class Day19: Day("19") {
                     (s.contains(other.s.first()) || other.s.contains(s.first()))
         }
 
-        fun size(): Long {
+        fun numberOfCombinations(): Long {
             val length = fun(i: IntRange): Long { return i.toList().size.toLong() }
             return length(x) * length(m) * length(a) * length(s)
         }
-    }
-
-    data class QueueItem(val undefinedPart: UndefinedPart, val workflow: Workflow)
-
-    private fun cleanUpCombinations(combinations: Set<UndefinedPart>): Set<UndefinedPart> {
-        val cleanedUp = mutableSetOf<UndefinedPart>()
-        for (combination in combinations) {
-            if (combinations.filter { it != combination }.any {
-                    it.x.contains(combination.x.first()) && it.x.contains(combination.x.last) &&
-                    it.m.contains(combination.m.first()) && it.m.contains(combination.m.last) &&
-                    it.a.contains(combination.a.first()) && it.a.contains(combination.a.last) &&
-                    it.s.contains(combination.s.first()) && it.s.contains(combination.s.last)
-            }) {
-                println("is contained in another range")
-            } else {
-                cleanedUp.add(combination)
-            }
-        }
-        return cleanedUp.toSet()
-    }
-
-    private fun getAllCombinations(workflows: Map<String, Workflow>): Set<UndefinedPart> {
-        val queue = LinkedList<QueueItem>()
-        queue.add(QueueItem(UndefinedPart(), workflows.getValue("in")))
-        val acceptedItems = mutableSetOf<UndefinedPart>()
-        while (queue.isNotEmpty()) {
-            val (undefinedPart, workflow) = queue.poll()
-            if (workflow.rules.isEmpty()) {
-                if (workflow.end == "R") {
-                    acceptedItems.add(undefinedPart)
-                } else if (workflow.end != "A") {
-                    queue.add(QueueItem(undefinedPart, workflows.getValue(workflow.end)))
-                }
-            } else {
-                val firstRule = workflow.rules.first()
-                val ifChild = firstRule.ifChild()
-                val elseChild = firstRule.elseChild()
-                if (ifChild.first == "max") {
-                    val conditionTrue = undefinedPart.setNewMax(ifChild.second, firstRule.category)
-                    if (firstRule.next == "R") {
-                        acceptedItems.add(conditionTrue)
-                    } else if (firstRule.next != "A") {
-                        queue.add(QueueItem(conditionTrue, workflows.getValue(firstRule.next)))
-                    }
-                    queue.add(QueueItem(undefinedPart.setNewMin(elseChild.second, firstRule.category), workflow.copy(rules = workflow.rules.drop(1))))
-                } else {
-                    val conditionTrue = undefinedPart.setNewMin(ifChild.second, firstRule.category)
-                    if (firstRule.next == "R") {
-                        acceptedItems.add(conditionTrue)
-                    } else if (firstRule.next != "A") {
-                        queue.add(QueueItem(conditionTrue, workflows.getValue(firstRule.next)))
-                    }
-                    queue.add(QueueItem(undefinedPart.setNewMax(elseChild.second, firstRule.category), workflow.copy(rules = workflow.rules.drop(1))))
-                }
-            }
-        }
-        return acceptedItems.toSet()
     }
 
     override fun executePart1(name: String): Any {
@@ -209,17 +151,42 @@ class Day19: Day("19") {
     }
 
     private fun checkThatThereAreNoOverlaps(rejectedCombinations: List<UndefinedPart>) {
-        var overlap = false
         for (i in rejectedCombinations.indices) {
             for (j in i+1..rejectedCombinations.lastIndex) {
                 if (rejectedCombinations[i].overlaps(rejectedCombinations[j])) {
-                    overlap = true
+                    throw IllegalStateException("Caution: There are rejected regions that overlap!")
                 }
             }
         }
-        if (overlap) {
-            println("Caution: There are rejected Regions that overlap!")
+    }
+
+    data class QueueItem(val undefinedPart: UndefinedPart, val workflow: Workflow)
+
+    private fun getAllCombinations(workflows: Map<String, Workflow>): Set<UndefinedPart> {
+        val queue = LinkedList<QueueItem>()
+        queue.add(QueueItem(UndefinedPart(), workflows.getValue("in")))
+        val acceptedItems = mutableSetOf<UndefinedPart>()
+        while (queue.isNotEmpty()) {
+            val (undefinedPart, workflow) = queue.poll()
+            if (workflow.rules.isEmpty()) {
+                if (workflow.end == "A") {
+                    acceptedItems.add(undefinedPart)
+                } else if (workflow.end != "R") {
+                    queue.add(QueueItem(undefinedPart, workflows.getValue(workflow.end)))
+                }
+            } else {
+                val firstRule = workflow.rules.first()
+                firstRule.ifChild(undefinedPart).apply {
+                    if (firstRule.next == "A") {
+                        acceptedItems.add(this)
+                    } else if (firstRule.next != "R") {
+                        queue.add(QueueItem(this, workflows.getValue(firstRule.next)))
+                    }
+                }
+                queue.add(QueueItem(firstRule.elseChild(undefinedPart), workflow.copy(rules = workflow.rules.drop(1))))
+            }
         }
+        return acceptedItems.toSet()
     }
 
     override fun executePart2(name: String): Any {
@@ -228,7 +195,6 @@ class Day19: Day("19") {
             .filter { it.isNotEmpty() && it.first().isNotEmpty() }
         return getAllCombinations(workflows.map { Workflow.parse(it) }.associateBy { it.id })
             .also { checkThatThereAreNoOverlaps(it.toList()) }
-            .sumOf { it.size() }
-            .let { 4000L*4000L*4000L*4000L - it }
+            .sumOf { it.numberOfCombinations() }
     }
 }
