@@ -51,23 +51,26 @@ class Day22: Day("22") {
         private fun blocked(z: Int, xy: XY) = planes.containsKey(z) && planes[z]!!.containsKey(xy)
 
         fun enterFallingBrick(brick: Brick): Set<Int> {
-            for (startingZ in planes.keys.sorted()) {
+            var startingZ = planes.keys.sorted().last()
+            while (startingZ > 0) {
                 val possiblePositions = brick.getPositions(startingZ)
-                if (possiblePositions.none { (z, xy) -> blocked(z, xy) }) {
-                    possiblePositions.forEach { (z, xy) ->
-                        planes.putIfAbsent(z, mutableMapOf())
-                        planes[z]!![xy] = brick.id
-                    }
-                    return possiblePositions.mapNotNull { (z, xy) -> planes.getOrDefault(z-1, mutableMapOf())[xy] }
-                        .filter { it != brick.id }
-                        .toSet()
+                if (possiblePositions.any { (z, xy) -> blocked(z, xy) }) {
+                    break
                 }
+                startingZ--
             }
-            throw IllegalStateException("Found no possible position")
+            val possiblePositions = brick.getPositions(startingZ+1)
+            possiblePositions.forEach { (z, xy) ->
+                planes.putIfAbsent(z, mutableMapOf())
+                planes[z]!![xy] = brick.id
+            }
+            return possiblePositions.mapNotNull { (z, xy) -> planes.getOrDefault(z-1, mutableMapOf())[xy] }
+                                    .filter { it != brick.id }
+                                    .toSet()
         }
     }
 
-    override fun executePart1(name: String): Any {
+    private fun simulateFall(name: String): Map<Int, Set<Int>> {
         val bricks = getInputAsLines(name, true)
             .mapIndexed { index, line -> Brick.parse(line, index) }
             .toMutableList()
@@ -76,10 +79,38 @@ class Day22: Day("22") {
             zets.minOf { it }..zets.maxOf { it }
         }
         val grid = Grid(zRange)
-        return bricks.map { it.id to grid.enterFallingBrick(it) }
+        return bricks.associate { it.id to grid.enterFallingBrick(it) }
+
+    }
+
+    override fun executePart1(name: String): Any {
+        val brickMap = simulateFall(name)
+        return brickMap.keys.count { brick ->
+            brickMap.values.filter { it.contains(brick) }.all { it.size > 1 }
+        }
     }
 
     override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+        val brickSupportingMap = simulateFall(name)
+        val egaloBricks = brickSupportingMap.keys
+            .filter { brickId -> brickSupportingMap.values.filter { it.contains(brickId) }.all { it.size > 1 } }
+        val importantBricks = brickSupportingMap.keys.filterNot { egaloBricks.contains(it) }
+        var sum = 0
+        for (brick in importantBricks) {
+            val fallenBricks = mutableSetOf(brick)
+            while (true) {
+                val newFallingBricks = brickSupportingMap.filter { it.value.isNotEmpty() && it.value.all { c -> fallenBricks.contains(c) } }
+                    .map { it.key }
+                    .filterNot { fallenBricks.contains(it) }
+                if (newFallingBricks.isEmpty()) {
+                    break
+                } else {
+                    fallenBricks.addAll(newFallingBricks)
+                }
+            }
+            sum += (fallenBricks.count() - 1)
+        }
+        return sum
+
     }
 }
