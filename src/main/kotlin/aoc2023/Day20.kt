@@ -144,6 +144,8 @@ class Day20: Day("20") {
         val modules = getModules(name)
 
         val periods = mutableMapOf<String, Pair<Boolean, Int>>()
+        // analysing the input reveals that in order for rx to receive a low pulse, hb need to send a low pulse,
+        // hb sends a low pulse, if every of its inputs has sent a high pulse, which happens for every input at a certain interval
         val callbackFunc = fun(pulse: TransmittingPulse, time: Int) {
             if (pulse.to == "hb" && pulse.pulse == Pulse.HIGH) {
                 if (periods.containsKey(pulse.from)) {
