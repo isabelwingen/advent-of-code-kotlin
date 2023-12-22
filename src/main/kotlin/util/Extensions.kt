@@ -46,3 +46,15 @@ fun <E> List<List<E>>.getNeighbouringIndices(position: Pair<Int, Int>): List<Pai
     }
     return neighbours.toList()
 }
+
+fun lcm(a: Long, b: Long): Long {
+    var gcd = 1L
+
+    var i = 1L
+    while (i <= a && i <= b) {
+        if (a % i == 0L && b % i == 0L)
+            gcd = i
+        ++i
+    }
+    return (a * b) / gcd
+}

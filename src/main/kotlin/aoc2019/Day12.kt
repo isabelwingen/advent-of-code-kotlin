@@ -2,6 +2,7 @@ package aoc2019
 
 
 import getInputAsLines
+import lcm
 import util.Day
 import kotlin.math.abs
 
@@ -118,18 +119,6 @@ class Day12: Day("12") {
             i++
         } while (positions != xs || !velocity.all { it == 0 } )
         return i
-    }
-
-    private fun lcm(a: Long, b: Long): Long {
-        var gcd = 1L
-
-        var i = 1L
-        while (i <= a && i <= b) {
-            if (a % i == 0L && b % i == 0L)
-                gcd = i
-            ++i
-        }
-        return (a * b) / gcd
     }
 
     override fun executePart2(name: String): Long {
