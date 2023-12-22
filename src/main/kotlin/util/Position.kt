@@ -1,8 +1,5 @@
 package util
 
-import aoc2018.Day23
-import aoc2022.UP
-
 data class Position(val row: Int, val col: Int) {
 
     fun move(direction: Direction, steps: Int = 1): Position {
