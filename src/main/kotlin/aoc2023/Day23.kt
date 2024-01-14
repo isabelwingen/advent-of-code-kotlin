@@ -1,14 +1,10 @@
 package aoc2023
 
-import aoc2022.DirectedEdge
-import aoc2022.Node
 import getInputAsLines
 import util.Day
 import util.Direction
 import util.Position
 import java.util.*
-import kotlin.Comparator
-import kotlin.collections.HashSet
 
 class Day23: Day("23") {
 
@@ -58,8 +54,6 @@ class Day23: Day("23") {
     }
 
     data class Edge(val nodes: Set<Position>, val weight: Int = 1) {
-
-        fun otherNode(comingFrom: Position) = nodes.first { it != comingFrom }
     }
 
     private fun findPathToNextRelevantNode(startingNode: Position, startingDir: Direction, grid: List<List<Char>>): Edge? {
@@ -79,38 +73,6 @@ class Day23: Day("23") {
                 return Edge(setOf(startingNode, currentNode), seen.count() - 1)
             }
         }
-    }
-
-    private fun dijkstra(start: Position, end: Position, edges: Set<Edge>): Int {
-        val nodes = edges.flatMap { it.nodes }.toSet()
-        val distance = nodes.associateWith { Int.MIN_VALUE }.toMutableMap()
-        distance[start] = 0
-
-        val compareByDistance: Comparator<Position> = compareByDescending { distance[it]!! }
-        val queue = PriorityQueue(compareByDistance)
-        queue.add(start)
-
-        val visited = HashSet<Position>()
-
-        while (queue.isNotEmpty()) {
-            val current = queue.remove()!!
-            visited.add(current)
-            val edgesToNeighbours = edges
-                .filter { it.nodes.contains(current) }
-                .filter { !visited.contains(it.nodes.first { n -> n != current }) }
-
-            for (e in edgesToNeighbours) {
-                val newDistance = distance[current]!! + e.weight
-                val to = e.otherNode(current)
-                if (newDistance > distance[to]!!) {
-                    distance[to] = newDistance
-                    queue.remove(to)
-                    queue.add(to)
-                }
-            }
-
-        }
-        return distance[end]!!
     }
 
     private fun buildGraph(grid: List<List<Char>>, startingNode: Position, endingNode: Position): Set<Edge> {
