@@ -30,11 +30,14 @@ class Day25: Day("25") {
         return connectedArea == allNodes
     }
 
-    private fun findPath(edges: Set<Set<String>>, start: String, end: String): List<Set<String>>? {
+    private fun findPath(start: String, end: String, edges: Set<Set<String>>): List<Set<String>>? {
         val queue = LinkedList<List<Set<String>>>()
         edges.filter { it.contains(start) }.forEach { queue.add(listOf(it)) }
+        val resultPath = mutableSetOf<List<Set<String>>>()
         while (queue.isNotEmpty()) {
+
             val currentPath = queue.poll()
+
             if (currentPath.last().contains(end)) {
                 return currentPath
             } else {
@@ -44,22 +47,54 @@ class Day25: Day("25") {
                     val beforeLastEdge = currentPath.dropLast(1).last()
                     currentPath.last().first { !beforeLastEdge.contains(it) }
                 }
-                val possibleNextEdges = edges.filter { it.contains(lastNode) }.filterNot { currentPath.contains(it) }
+                val possibleNextEdges = edges
+                    .filter { it.contains(lastNode) }
+                    .filterNot { currentPath.contains(it) }
+                    .filterNot { currentPath.flatten().contains(it.first { n -> n != lastNode }) }
+                    .filterNot { resultPath.any { rp -> rp.contains(it) } }
                 possibleNextEdges.forEach {
-                    queue.add(currentPath + listOf(it))
+                    val next = currentPath + listOf(it)
+                    queue.add(next)
                 }
             }
         }
         return null
     }
 
-    private fun sameDomain(from: String, to: String, edges: Set<Set<String>>): Boolean {
-        val allEdges = edges.toMutableSet()
-        for (i in 0..2) {
-            val path = findPath(allEdges, from, to)!!
-            allEdges.removeAll(path.toSet())
+    private fun sameDomain(start: String, end: String, edges: Set<Set<String>>): Boolean {
+        println("xxx $start to $end")
+        val queue = LinkedList<List<Set<String>>>()
+        edges.filter { it.contains(start) }.forEach { queue.add(listOf(it)) }
+        val resultPath = mutableSetOf<List<Set<String>>>()
+        while (queue.isNotEmpty()) {
+
+            val currentPath = queue.poll()
+
+            if (currentPath.last().contains(end)) {
+                queue.removeIf { it.any { edge -> currentPath.contains(edge) } }
+                resultPath.add(currentPath)
+                if (resultPath.size > 3) {
+                    return true
+                }
+            } else {
+                val lastNode = if (currentPath.size == 1) {
+                    currentPath.first().first { it != start }
+                } else {
+                    val beforeLastEdge = currentPath.dropLast(1).last()
+                    currentPath.last().first { !beforeLastEdge.contains(it) }
+                }
+                val possibleNextEdges = edges
+                    .filter { it.contains(lastNode) }
+                    .filterNot { currentPath.contains(it) }
+                    .filterNot { currentPath.flatten().contains(it.first { n -> n != lastNode }) }
+                    .filterNot { resultPath.any { rp -> rp.contains(it) } }
+                possibleNextEdges.forEach {
+                    val next = currentPath + listOf(it)
+                    queue.add(next)
+                }
+            }
         }
-        return findPath(allEdges, from, to) != null
+        return resultPath.size > 3
     }
 
     override fun executePart1(name: String): Any {
@@ -75,13 +110,16 @@ class Day25: Day("25") {
                     }
             }
 
-        val origin = edges.first().first()
+        val origin = "slm"
+        println(edges.flatten().distinct().size)
         val (firstDomain, secondDomain) = edges.flatten().distinct()
             .groupBy { sameDomain(origin, it, edges.toSet()) }
             .mapValues { it.value.size }
             .toSortedMap()
             .values.toList()
         return firstDomain.toLong() * secondDomain.toLong()
+
+        return 0
     }
 
     override fun executePart2(name: String): Any {
