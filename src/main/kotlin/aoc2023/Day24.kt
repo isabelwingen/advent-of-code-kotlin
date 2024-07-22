@@ -2,69 +2,60 @@ package aoc2023
 
 import getInputAsLines
 import util.Day
-import java.math.BigDecimal
 import java.math.BigInteger
-
-// y = mx + b
-// p.y = m* p.x + b
-// b = p.y - m*p.x
 
 class Day24: Day("24") {
 
-    data class Point(val x: Double, val y: Double)
-
-    data class Hailstone(val p: Point, val v: Point) {
-
-        val m = v.y/v.x
-
-        val b = p.y - m * p.x
-
-        companion object {
-            fun parse(line: String): Hailstone {
-                val (px, py, _, vx, vy) = line.split("@", ",")
-                    .map { it.trim().toDouble() }
-                return Hailstone(Point(px, py), Point(vx, vy))
-            }
-        }
-
-        fun inFuture(cx: Double): Boolean {
-            return if (v.x < 0) {
-                cx < p.x
-            } else {
-                cx > p.x
-            }
-        }
+    data class Point(val x: BigInteger, val y: BigInteger, val z: BigInteger) {
+        fun add(other: Point) = Point(x + other.x, y + other.y, z + other.z)
+        fun sub(other: Point) = Point(x - other.x, y - other.y, z - other.z)
+        fun multiplyBy(scalar: BigInteger) = Point(x * scalar, y * scalar, z * scalar)
+        fun div(scalar: BigInteger) = Point(x / scalar, y / scalar, z /scalar)
     }
 
-
-    fun intersectInFuture(h1: Hailstone, h2: Hailstone): Boolean {
-        if (h1.m == h2.m) {
-            return false
+    data class Hailstone(val p: Point, val v: Point) {
+        companion object {
+            fun parse(line: String): Hailstone {
+                val (p,v) = line.split('@')
+                val (px, py, pz) = p.split(',').map { it.trim().toBigInteger() }
+                val (vx, vy, vz) = v.split(',').map { it.trim().toBigInteger() }
+                return Hailstone(Point(px, py, pz), Point(vx, vy, vz))
+            }
         }
-        val cx = (h2.b - h1.b) / (h1.m - h2.m)
-        val cy = (h1.m * (cx - h1.p.x)) + h1.p.y
-        assert(cy == h2.m*cx + h2.b)
-
-        return cy in 200000000000000.0..400000000000000.0 && cx in 200000000000000.0..400000000000000.0 && h1.inFuture(cx) && h2.inFuture(cx)
     }
 
     override fun executePart1(name: String): Any {
-        val hailstones = getInputAsLines(name, true)
-            .map { Hailstone.parse(it) }
-        var count = 0
-        for (i in hailstones.indices) {
-            for (j in i+1..hailstones.lastIndex) {
-                if (intersectInFuture(hailstones[i], hailstones[j])) {
-                    count++
-                }
-            }
-        }
-        return count
-    }
-
-    override fun executePart2(name: String): Any {
         TODO("Not yet implemented")
     }
 
+    private fun crossProduct(v: Point, u: Point): Point {
+        return Point(
+            u.y * v.z - u.z * v.y,
+            u.z * v.x - u.x * v.z,
+            u.x * v.y - u.y * v.x)
+    }
+
+    private fun dotProduct(v: Point, u: Point): BigInteger {
+        return v.x.multiply(u.x) + v.y.multiply(u.y) + v.z.multiply(u.z)
+    }
+
+    // https://www.reddit.com/r/adventofcode/comments/18pnycy/comment/kxqjg33/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    override fun executePart2(name: String): Any {
+        val hailstones = getInputAsLines(name, true).map { Hailstone.parse(it) }.toList()
+        val h0 = hailstones[0]
+        val h1 = hailstones[1]
+        val h2 = hailstones[2]
+        val p1 = h1.p.sub(h0.p)
+        val p2 = h2.p.sub(h0.p)
+        val v1 = h1.v.sub(h0.v)
+        val v2 = h2.v.sub(h0.v)
+        val t1 = - (dotProduct(crossProduct(p1, p2), v2)) / (dotProduct(crossProduct(v1, p2), v2))
+        val t2 = - (dotProduct(crossProduct(p1, p2), v1)) / (dotProduct(crossProduct(p1, v2), v1))
+        val c1 = h1.p.add(h1.v.multiplyBy(t1))
+        val c2 = h2.p.add(h2.v.multiplyBy(t2))
+        val v = (c2.sub(c1)).div(t2 -t1)
+        val p = c1.sub(v.multiplyBy(t1))
+        return p.x + p.y + p.z
+    }
 
 }

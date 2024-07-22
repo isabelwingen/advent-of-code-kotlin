@@ -56,7 +56,4 @@ fun main(args: Array<String>) {
     } else {
         executeDay(year, day, part)
     }
-
-
 }
-
