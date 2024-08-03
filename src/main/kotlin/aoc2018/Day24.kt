@@ -4,10 +4,14 @@ import getInputAsLines
 import splitBy
 import util.Day
 import kotlin.math.min
+import kotlin.random.Random
 
 class Day24: Day("24") {
 
-    data class GroupKey(val fractionType: FractionType, val id: Int)
+
+    data class GroupKey(val fractionType: FractionType, val id: Int) {
+        override fun toString() = "${fractionType.name.lowercase()} $id"
+    }
 
     data class Group(
         val fractionType: FractionType,
@@ -20,7 +24,6 @@ class Day24: Day("24") {
         val weakness: Set<Type> = emptySet(),
         val immunity: Set<Type> = emptySet()
     ) {
-
         fun key() = GroupKey(fractionType, id)
 
         fun effectivePower() = attackDamage * units
@@ -33,6 +36,14 @@ class Day24: Day("24") {
                 damage = 0
             }
             return damage
+        }
+
+        override fun toString(): String {
+            return if (units > 0) {
+                "$fractionType $id: $units Units (h:$hitPoints) (a:$attackDamage/$attackType/$initiative) (w:${weakness.joinToString(",")}/im:${immunity.joinToString(",")}), "
+            } else {
+                "$fractionType $id: dead"
+            }
         }
 
         companion object {
@@ -120,55 +131,99 @@ class Day24: Day("24") {
             }
     }
 
-    private fun fight(groups: List<Group>) {
-        val attackingGroups = groups.sortedByDescending { it.initiative }.sortedByDescending { it.effectivePower() }
-            .filter { it.units > 0 }
-        val defendingGroups = groups.filter { it.units > 0 }.toMutableSet()
-        val pairings = mutableMapOf<GroupKey, GroupKey>()
-        for (attackingGroup in attackingGroups) {
-            defendingGroups.asSequence()
-                .filter { it != attackingGroup }
-                .filter { it.fractionType != attackingGroup.fractionType }
-                .sortedByDescending { it.initiative }
-                .sortedByDescending { it.effectivePower() }
-                .maxByOrNull { it.damageFrom(attackingGroup) }
-                .let {
-                    if (it != null) {
-                        pairings[attackingGroup.key()] = it.key()
-                        defendingGroups.remove(it)
-                    }
-                }
+    private fun selectionOrder(groups: Map<GroupKey, Group>): List<GroupKey> {
+        return groups.entries
+            .sortedByDescending { it.value.initiative }
+            .sortedByDescending { it.value.effectivePower() }
+            .map { it.key }
+    }
+
+    private fun attackingOrder(groups: Map<GroupKey, Group>): List<GroupKey> {
+        return groups.entries.sortedByDescending { it.value.initiative }.map { it.key }
+    }
+
+    private fun findTarget(attacker: Group, groups: Map<GroupKey, Group>): GroupKey? {
+        var possibleTargets = groups.entries.filter { it.value.fractionType != attacker.fractionType }
+        if (possibleTargets.isEmpty()) {
+            return null
         }
-        groups.sortedByDescending { it.fractionType }.forEach {
-            println("${it.fractionType} ${it.id}: ${it.units} units")
+        val highestDamage = possibleTargets.maxOf { it.value.damageFrom(attacker) }
+        if (highestDamage == 0) {
+            return null
         }
-        println()
-        pairings.forEach { (k, v) ->
-            val kNode = groups.first { it.key() == k }
-            val vNode = groups.first { it.key() == v }
-            println("${k.fractionType} group ${k.id} would deal defending group ${v.id} ${vNode.damageFrom(kNode)} damage")
-        }
-        println()
-        for (attackingGroup in groups.sortedByDescending { it.initiative }) {
-            if (attackingGroup.units > 0 && pairings.containsKey(attackingGroup.key())) {
-                val defendingGroup = groups.first { it.key() == pairings[attackingGroup.key()]!! }
-                val damage = defendingGroup.damageFrom(attackingGroup)
-                val unitsKilled = (damage / defendingGroup.hitPoints)
-                println("${attackingGroup.fractionType} group ${attackingGroup.id} (initiative: ${attackingGroup.initiative}) attacks defending group ${defendingGroup.id}, killing ${min(unitsKilled, defendingGroup.units)} units")
-                defendingGroup.units -= unitsKilled
+        possibleTargets = possibleTargets.filter { it.value.damageFrom(attacker) == highestDamage }
+        val largestEffectivePower = possibleTargets.maxOf { it.value.effectivePower() }
+        possibleTargets = possibleTargets.filter { it.value.effectivePower() == largestEffectivePower }
+            .sortedByDescending { it.value.initiative }
+        return possibleTargets.first().key
+    }
+
+    private fun targetSelectionPhase(groups: Map<GroupKey, Group>): Map<GroupKey, GroupKey?> {
+        val targetMap = mutableMapOf<GroupKey, GroupKey?>()
+        val remainingGroups =  groups.toMutableMap()
+        for (attackerKey in selectionOrder(groups)) {
+            val attacker = groups.getValue(attackerKey)
+            val target = findTarget(attacker, remainingGroups)
+            targetMap[attackerKey] = target
+            if (target != null) {
+                //println("Attacking group $attackerKey chooses target group $target")
+                remainingGroups.remove(target)
+            } else {
+                println("Attacking group $attackerKey cannot deal damage to any group")
             }
         }
-        println()
+        return targetMap.toMap()
+    }
 
+    private fun dealDamage(attacker: Group, defender: Group): Boolean {
+        val deadUnits = defender.damageFrom(attacker) / defender.hitPoints
+        println("${attacker.key()} attacks defending group ${defender.key()}, killing ${min(deadUnits, defender.units)} units")
+        defender.units -= deadUnits
+        if (defender.units <= 0) {
+            println("Defender group ${defender.key()} died through the attack")
+        }
+        return defender.units <= 0
+    }
+
+    private fun fight(groups: MutableMap<GroupKey, Group>) {
+        val targetMap = targetSelectionPhase(groups)
+        println()
+        for (attackerKey in attackingOrder(groups)) {
+            val attacker = groups[attackerKey]
+            val targetKey = targetMap[attackerKey]
+            if (attacker == null) {
+                println("Attacking group $attackerKey died before it could attack")
+            } else if (targetKey == null) {
+                println("Attacking group $attackerKey has no target")
+            } else if (groups[targetKey] == null) {
+                println("Attacking group $attackerKey: target already dead")
+            } else {
+                val dead = dealDamage(attacker, groups[targetKey]!!)
+                if (dead) {
+                    groups.remove(targetKey)
+                }
+            }
+        }
+    }
+
+    private fun any(fractionType: FractionType, groups: Map<GroupKey, Group>): Boolean {
+        return groups.values.any { it.fractionType == fractionType }
     }
 
     override fun executePart1(name: String): Any {
-        val groups = parse(name)
-        while (groups.filter { it.units > 0 }.any { it.fractionType == FractionType.IMMUNE_SYSTEM } && groups.filter { it.units > 0 }.any { it.fractionType == FractionType.INFECTION }) {
+        val groups = parse(name).associateBy { it.key() }.toMutableMap()
+        attackingOrder(groups).forEach { key ->
+            val group = groups.getValue(key)
+            println("${key}: ${group.units} units, ${group.effectivePower()} effective power, ${group.initiative}, initiative")
+        }
+        println()
+        var i = 0
+        while (any(FractionType.IMMUNE_SYSTEM, groups) && any(FractionType.INFECTION, groups)) {
+            println()
+            println("==== Round ${++i} ====")
             fight(groups)
         }
-        return groups.filter { it.units > 0 }.map { it.units }
-
+        return groups.values.sumOf { it.units.toLong() }
     }
 
     override fun executePart2(name: String): Any {
