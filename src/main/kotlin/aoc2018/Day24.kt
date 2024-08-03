@@ -4,7 +4,6 @@ import getInputAsLines
 import splitBy
 import util.Day
 import kotlin.math.min
-import kotlin.random.Random
 
 class Day24: Day("24") {
 
@@ -119,6 +118,14 @@ class Day24: Day("24") {
         INFECTION
     }
 
+    private fun my_println() {
+        //println()
+    }
+
+    private fun my_println(str: String) {
+        //println(str)
+    }
+
     private fun parse(name: String): List<Group> {
         return getInputAsLines(name)
             .splitBy { it.isBlank() }
@@ -130,6 +137,8 @@ class Day24: Day("24") {
                         infection.mapIndexed { index, it -> Group.parse(it, FractionType.INFECTION, index+1) }
             }
     }
+
+   
 
     private fun selectionOrder(groups: Map<GroupKey, Group>): List<GroupKey> {
         return groups.entries
@@ -166,10 +175,10 @@ class Day24: Day("24") {
             val target = findTarget(attacker, remainingGroups)
             targetMap[attackerKey] = target
             if (target != null) {
-                //println("Attacking group $attackerKey chooses target group $target")
+                //my_println("Attacking group $attackerKey chooses target group $target")
                 remainingGroups.remove(target)
             } else {
-                println("Attacking group $attackerKey cannot deal damage to any group")
+                my_println("Attacking group $attackerKey cannot deal damage to any group")
             }
         }
         return targetMap.toMap()
@@ -177,26 +186,26 @@ class Day24: Day("24") {
 
     private fun dealDamage(attacker: Group, defender: Group): Boolean {
         val deadUnits = defender.damageFrom(attacker) / defender.hitPoints
-        println("${attacker.key()} attacks defending group ${defender.key()}, killing ${min(deadUnits, defender.units)} units")
+        my_println("${attacker.key()} attacks defending group ${defender.key()}, killing ${min(deadUnits, defender.units)} units")
         defender.units -= deadUnits
         if (defender.units <= 0) {
-            println("Defender group ${defender.key()} died through the attack")
+            my_println("Defender group ${defender.key()} died through the attack")
         }
         return defender.units <= 0
     }
 
     private fun fight(groups: MutableMap<GroupKey, Group>) {
         val targetMap = targetSelectionPhase(groups)
-        println()
+        my_println()
         for (attackerKey in attackingOrder(groups)) {
             val attacker = groups[attackerKey]
             val targetKey = targetMap[attackerKey]
             if (attacker == null) {
-                println("Attacking group $attackerKey died before it could attack")
+                my_println("Attacking group $attackerKey died before it could attack")
             } else if (targetKey == null) {
-                println("Attacking group $attackerKey has no target")
+                my_println("Attacking group $attackerKey has no target")
             } else if (groups[targetKey] == null) {
-                println("Attacking group $attackerKey: target already dead")
+                my_println("Attacking group $attackerKey: target already dead")
             } else {
                 val dead = dealDamage(attacker, groups[targetKey]!!)
                 if (dead) {
@@ -206,27 +215,60 @@ class Day24: Day("24") {
         }
     }
 
+    private fun combat(name: String, boost: Int = 0): Pair<FractionType, Long> {
+        val groups = parse(name)
+            .map {
+                if (it.fractionType == FractionType.IMMUNE_SYSTEM) {
+                    it.copy(attackDamage = it.attackDamage + boost)
+                } else {
+                    it
+                }
+            }
+            .associateBy { it.key() }.toMutableMap()
+        attackingOrder(groups).forEach { key ->
+            val group = groups.getValue(key)
+            my_println("${key}: ${group.units} units, ${group.effectivePower()} effective power, ${group.initiative}, initiative")
+        }
+        my_println()
+        var i = 0
+        while (any(FractionType.IMMUNE_SYSTEM, groups) && any(FractionType.INFECTION, groups)) {
+            my_println()
+            my_println("==== Round ${++i} ====")
+            val unitsBefore = groups.values.sumOf { it.units.toLong() }
+            fight(groups)
+            val unitsAfter = groups.values.sumOf { it.units.toLong() }
+            if (unitsBefore == unitsAfter) { // TIE break
+                println("Tie break: $i")
+                return FractionType.INFECTION to groups.values.filter { it.fractionType == FractionType.INFECTION }.sumOf { it.units.toLong() }
+            }
+        }
+        return groups.values.first().fractionType to groups.values.sumOf { it.units.toLong() }
+    }
+
     private fun any(fractionType: FractionType, groups: Map<GroupKey, Group>): Boolean {
         return groups.values.any { it.fractionType == fractionType }
     }
 
     override fun executePart1(name: String): Any {
-        val groups = parse(name).associateBy { it.key() }.toMutableMap()
-        attackingOrder(groups).forEach { key ->
-            val group = groups.getValue(key)
-            println("${key}: ${group.units} units, ${group.effectivePower()} effective power, ${group.initiative}, initiative")
-        }
-        println()
-        var i = 0
-        while (any(FractionType.IMMUNE_SYSTEM, groups) && any(FractionType.INFECTION, groups)) {
-            println()
-            println("==== Round ${++i} ====")
-            fight(groups)
-        }
-        return groups.values.sumOf { it.units.toLong() }
+        val (_, unitsRemaining) = combat(name)
+        return unitsRemaining
     }
 
     override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+        var lower = 0
+        var upper = 10_000
+        println("upper limit winner: ${combat(name, upper)}")
+        while (lower != upper) {
+            val middle = (lower + upper) / 2
+            println("lower: $lower, upper: $upper, testing $middle...")
+            val (winningFraction, _)  = combat(name, middle)
+            println("$middle: $winningFraction")
+            if (winningFraction == FractionType.INFECTION) {
+                lower = middle + 1
+            } else {
+                upper = middle
+            }
+        }
+        return combat(name, lower)
     }
 }
