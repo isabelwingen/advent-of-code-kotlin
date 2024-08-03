@@ -10,7 +10,7 @@ import kotlin.math.pow
 
 class Day23: Day("23") {
 
-    data class Nanobot(val pos: Vector, val radius: Int) {
+    private data class Nanobot(val pos: Vector, val radius: Int) {
         fun distance(other: Nanobot) = distance(other.pos)
 
         private fun distance(other: Vector) =
@@ -39,7 +39,7 @@ class Day23: Day("23") {
         }
     }
 
-    data class Vector(val x: Int, val y: Int, val z: Int)
+    private data class Vector(val x: Int, val y: Int, val z: Int)
 
 
     override fun executePart1(name: String): Any {
@@ -48,7 +48,7 @@ class Day23: Day("23") {
         return bots.count { botWithBiggestRadius.isInDistance(it.pos) }
     }
 
-    data class Box(val xMin: BigInteger, val xMax: BigInteger, val yMin: BigInteger, val yMax: BigInteger, val zMin: BigInteger, val zMax: BigInteger) {
+    private data class Box(val xMin: BigInteger, val xMax: BigInteger, val yMin: BigInteger, val yMax: BigInteger, val zMin: BigInteger, val zMax: BigInteger) {
 
         fun manhattanDistance() = xMin.abs() + yMin.abs() + zMin.abs()
 
@@ -80,7 +80,7 @@ class Day23: Day("23") {
             }
         }
 
-        fun intersect(sphere: Sphere): Boolean {
+        private fun intersect(sphere: Sphere): Boolean {
             val x = if (sphere.x <= xMin) {
                 xMin
             } else if (sphere.x <= xMax) {
@@ -127,7 +127,7 @@ class Day23: Day("23") {
         }
     }
 
-    data class Sphere(val x: BigInteger, val y: BigInteger, val z: BigInteger, val radius: BigInteger) {
+    private data class Sphere(val x: BigInteger, val y: BigInteger, val z: BigInteger, val radius: BigInteger) {
         fun inSphere(px: BigInteger, py: BigInteger, pz: BigInteger): Boolean {
             return (x - px).abs() + (y - py).abs() + (z - pz).abs() <= radius
         }
@@ -139,7 +139,7 @@ class Day23: Day("23") {
         }
     }
 
-    data class QueueObject(val box: Box, val spheres: Set<Int>)
+    private data class QueueObject(val box: Box, val spheres: Set<Int>)
 
     private fun findMaxNumberOfOverlappingSpheres(spheres: List<Sphere>, initialBox: Box, lowerLimit: Int = 900): Set<Box> {
         val stack = LinkedList<QueueObject>()
