@@ -7,7 +7,7 @@ class Day10: Day("10") {
 
     private data class Record(val list: List<Int> = IntRange(0, 255).toList(), val skip: Int = 0, val startOfList: Int = 0)
 
-    private fun oneRun(record: Record, lengths: List<Int>): Record {
+    private fun oneRun(record: Record, lengths: IntArray): Record {
         var list = record.list
         var skip = record.skip
         var startOfList = record.startOfList
@@ -22,18 +22,22 @@ class Day10: Day("10") {
         return Record(list, skip, startOfList)
     }
 
+    fun calculateKnotHash(str: String): String {
+        val lengths = (str.map { it.code } + listOf(17, 31, 73, 47, 23)).toIntArray()
+        val record = (0..63).fold(Record()) { r, _ -> oneRun(r, lengths)}
+
+        return (record.list.drop(record.startOfList) + record.list.take(record.startOfList))
+            .chunked(16)
+            .joinToString("") { l -> l.reduce(Int::xor).toString(16).padStart(2, '0') }
+    }
+
     override fun executePart1(name: String): Any {
-        val lengths = getInput(name).split(",").map { Integer.valueOf(it.trim()) }
+        val lengths = (getInput(name).split(",").map { Integer.valueOf(it.trim()) }).toIntArray()
         val (resultList, _, startOfList) = oneRun(Record(), lengths)
         return resultList[startOfList] * resultList[startOfList+1]
     }
 
     override fun executePart2(name: String): Any {
-        val lengths = getInput(name).map { it.code } + listOf(17, 31, 73, 47, 23)
-        val record = (0..63).fold(Record()) { r, _ -> oneRun(r, lengths)}
-
-        return (record.list.drop(record.startOfList) + record.list.take(record.startOfList))
-            .chunked(16)
-            .joinToString("") { l -> l.reduce(Int::xor).toString(16) }
+        return calculateKnotHash(getInput(name))
     }
 }
