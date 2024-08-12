@@ -7,38 +7,29 @@ class Day21: Day("21") {
 
     private data class Rule(val left: String, val right: String)
 
-    private data class Grid(val rows: List<List<Char>>) {
+    private data class Grid(val rows: List<String>) {
         fun size() = rows.size
 
-        //.#.   .#.   #..   ###
-        //..#   #..   #.#   ..#
-        //###   ###   ##.   .#.
-
         fun rotateRight(): Grid {
-            return Grid(rows.indices.map { rows.reversed().map { row -> row[it] } }.map { it })
+            return Grid(rows.indices.map { rows.reversed().map { row -> row[it] } }.map { it.joinToString("") })
         }
 
         fun rotateLeft(): Grid {
-            return Grid(rows.indices.reversed().map { rows.map { row -> row[it] } }.map { it })
+            return Grid(rows.indices.reversed().map { rows.map { row -> row[it] } }.map { it.joinToString("") })
         }
 
         fun flip(): Grid {
             return Grid(rows.map { it.reversed() })
         }
 
-        override fun toString() = rows.joinToString("/") { it.joinToString("") }
+        override fun toString() = rows.joinToString("/")
 
-        private fun matchRule(rule: Rule): Boolean {
+        fun matchRule(rule: Rule): Boolean {
             return allRotations().any { it.toString() == rule.left }
         }
 
-        private fun applyRule(rule: Rule): Grid {
+        fun applyRule(rule: Rule): Grid {
             return fromString(rule.right)
-        }
-
-        fun applyMatchingRule(rules: List<Rule>): Grid {
-            val matchingRule = rules.first { matchRule(it) }
-            return applyRule(matchingRule)
         }
 
         fun breakUp(): List<List<Grid>> {
@@ -73,8 +64,9 @@ class Day21: Day("21") {
         }
 
         companion object {
+
             fun fromString(rule: String): Grid {
-                return Grid(rule.split("/").map { it.toList() })
+                return Grid(rule.split("/").map { it })
             }
 
             fun join(grids: List<List<Grid>>): Grid {
@@ -90,26 +82,46 @@ class Day21: Day("21") {
                         }
                     }
                 }
-                return Grid(rows.map { it.toList() }.toList())
+                return Grid(rows.map { it.joinToString("") }.toList())
             }
         }
     }
 
-    override fun executePart1(name: String): Any {
+    private fun run(rules: List<Rule>, times: Int): Int {
         var grid = Grid.fromString(".#./..#/###")
-        val rules = getInputAsLines(name, true)
-            .map { it.split(" => ") }
-            .map { Rule(it[0], it[1]) }
 
-        for (i in 0..17) {
+        val cache = mutableMapOf<Pair<Grid, Rule>, Boolean>()
+
+        fun matchRule(grid: Grid, rule: Rule): Boolean {
+            return cache.getOrPut(grid to rule) { grid.matchRule(rule) }
+        }
+
+        fun findMatchingRule(grid: Grid): Rule {
+            return rules.first { matchRule(grid, it) }
+        }
+
+        for (i in 1..times) {
             println("$i: ${grid.size()}")
-            val newGrids = grid.breakUp().map { it.map { grid -> grid.applyMatchingRule(rules) } }
+            val newGrids = grid.breakUp().map { it.map { grid -> grid.applyRule(findMatchingRule(grid)) } }
             grid = Grid.join(newGrids)
         }
         return grid.toString().count { it == '#' }
     }
 
+
+    override fun executePart1(name: String): Any {
+        val rules = getInputAsLines(name, true)
+            .map { it.split(" => ") }
+            .map { Rule(it[0], it[1]) }
+
+        return run(rules, 5)
+    }
+
     override fun executePart2(name: String): Any {
-        TODO("Not yet implemented")
+        val rules = getInputAsLines(name, true)
+            .map { it.split(" => ") }
+            .map { Rule(it[0], it[1]) }
+
+        return run(rules, 18)
     }
 }
